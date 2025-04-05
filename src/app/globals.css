@@ -92,6 +92,58 @@
   :lang(ar) {
     font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
   }
+  
+  /* RTL text direction support */
+  html.rtl {
+    direction: rtl;
+    text-align: right;
+  }
+  
+  /* RTL typography adjustments */
+  html.rtl h1, 
+  html.rtl h2, 
+  html.rtl h3, 
+  html.rtl h4, 
+  html.rtl h5, 
+  html.rtl h6, 
+  html.rtl p, 
+  html.rtl span, 
+  html.rtl li {
+    text-align: right;
+  }
+  
+  /* RTL form elements */
+  html.rtl input, 
+  html.rtl textarea {
+    text-align: right;
+  }
+  
+  /* Adjust flexbox directions for RTL */
+  html.rtl .flex-row {
+    flex-direction: row-reverse;
+  }
+  
+  /* RTL margins and padding adjustments */
+  html.rtl .mr-1, html.rtl .mr-2, html.rtl .mr-3, html.rtl .mr-4 {
+    margin-right: 0 !important;
+    margin-left: var(--spacing) !important;
+  }
+  
+  html.rtl .ml-1, html.rtl .ml-2, html.rtl .ml-3, html.rtl .ml-4 {
+    margin-left: 0 !important;
+    margin-right: var(--spacing) !important;
+  }
+  
+  /* RTL specific shadows and borders */
+  html.rtl .shadow-left {
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* RTL dropdown/popover positioning */
+  html.rtl .dropdown-menu-right {
+    left: 0;
+    right: auto;
+  }
 }
 
 @layer base {
@@ -100,5 +152,21 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* RTL specific Tailwind utilities */
+@layer utilities {
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
+  
+  .rtl-rotate-180 {
+    transform: rotate(180deg);
+  }
+  
+  /* Custom spacing variables for RTL adjustments */
+  :root {
+    --spacing: 0.25rem;
   }
 }

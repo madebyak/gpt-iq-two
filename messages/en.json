@@ -1,0 +1,37 @@
+{
+  "Navbar": {
+    "newChat": "New Chat",
+    "resources": "Resources",
+    "signIn": "Sign In",
+    "getStarted": "Get Started",
+    "changelog": "Changelog",
+    "featureRequest": "Feature Request",
+    "aboutUs": "About Us",
+    "changelogDescription": "See what's new in our latest updates",
+    "featureRequestDescription": "Request new features or improvements",
+    "aboutUsDescription": "Learn more about our team and mission"
+  },
+  "HomePage": {
+    "title": "GPT IQ AI Chat Platform",
+    "subtitle": "Experience smarter conversations with our advanced platform",
+    "getStarted": "Get Started",
+    "tryDemo": "Try Demo",
+    "featureOneTitle": "Smart Conversations",
+    "featureOneDescription": "Engage in intelligent, context-aware conversations powered by advanced AI.",
+    "featureTwoTitle": "Lightning Fast",
+    "featureTwoDescription": "Get instant responses with our optimized processing engine.",
+    "featureThreeTitle": "Secure & Private",
+    "featureThreeDescription": "Your conversations are encrypted and your privacy is our priority.",
+    "ctaTitle": "Ready to experience the future of AI chat?",
+    "ctaDescription": "Join thousands of users already benefiting from our advanced AI platform.",
+    "learnMore": "Learn More",
+    "about": "Go to about page"
+  },
+  "ThemeToggle": {
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  },
+  "Common": {
+    "loading": "Loading..."
+  }
+}

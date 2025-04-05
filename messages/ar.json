@@ -1,0 +1,37 @@
+{
+  "Navbar": {
+    "newChat": "محادثة جديدة",
+    "resources": "المصادر",
+    "signIn": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن",
+    "changelog": "سجل التغييرات",
+    "featureRequest": "طلب ميزة",
+    "aboutUs": "من نحن",
+    "changelogDescription": "تعرف على أحدث التحديثات",
+    "featureRequestDescription": "اطلب ميزات أو تحسينات جديدة",
+    "aboutUsDescription": "تعرف أكثر على فريقنا ومهمتنا"
+  },
+  "HomePage": {
+    "title": "منصة GPT IQ للذكاء الاصطناعي",
+    "subtitle": "تجربة محادثات أكثر ذكاءً مع منصتنا المتقدمة",
+    "getStarted": "ابدأ الآن",
+    "tryDemo": "جرب العرض التوضيحي",
+    "featureOneTitle": "محادثات ذكية",
+    "featureOneDescription": "استمتع بمحادثات ذكية وواعية للسياق مدعومة بالذكاء الاصطناعي المتقدم.",
+    "featureTwoTitle": "سرعة فائقة",
+    "featureTwoDescription": "احصل على ردود فورية بفضل محرك المعالجة المحسّن لدينا.",
+    "featureThreeTitle": "آمن وخصوصي",
+    "featureThreeDescription": "محادثاتك مشفرة وخصوصيتك هي أولويتنا.",
+    "ctaTitle": "هل أنت مستعد لتجربة مستقبل محادثات الذكاء الاصطناعي؟",
+    "ctaDescription": "انضم إلى آلاف المستخدمين الذين يستفيدون بالفعل من منصة الذكاء الاصطناعي المتقدمة لدينا.",
+    "learnMore": "اعرف المزيد",
+    "about": "انتقل إلى صفحة من نحن"
+  },
+  "ThemeToggle": {
+    "light": "وضع النهار",
+    "dark": "الوضع الليلي"
+  },
+  "Common": {
+    "loading": "جاري التحميل..."
+  }
+}
