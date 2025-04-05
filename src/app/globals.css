@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import IBM Plex Sans Arabic for Arabic text */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* Light theme colors */
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 3%; /* #080808 */
+    
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 0 0% 3%; /* #080808 */
+    
+    --popover: 0 0% 100%; /* #ffffff */
+    --popover-foreground: 0 0% 3%; /* #080808 */
+    
+    --muted: 220 14% 92%; /* #e5e8ef - mid-grey */
+    --muted-foreground: 220 13% 55%; /* #7a86a0 - text secondary */
+    
+    --accent: 220 33% 96%; /* #f6f7f9 - light-grey */
+    --accent-foreground: 0 0% 3%; /* #080808 */
+    
+    --primary: 153 74% 52%; /* #28e088 - primary-green */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+    
+    --secondary: 222 74% 52%; /* #2364e4 - accent-blue */
+    --secondary-foreground: 0 0% 100%; /* #ffffff */
+    
+    --destructive: 356 76% 53%; /* #e22b35 - accent-orange */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    
+    --border: 220 14% 92%; /* #e5e8ef - mid-grey */
+    --input: 220 14% 92%; /* #e5e8ef - mid-grey */
+    --ring: 153 74% 52%; /* #28e088 - primary-green */
+
+    /* Additional accent color */
+    --purple: 258 76% 52%; /* #5724e2 - accent-purple */
+    
+    --radius: 0.5rem;
+    --font-ibm-plex-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  .dark {
+    /* Dark theme colors */
+    --background: 0 0% 3%; /* #080808 */
+    --foreground: 220 18% 94%; /* #f6f7f9 - text primary */
+    
+    --card: 220 23% 8%; /* #10131a - dark-grey */
+    --card-foreground: 220 18% 94%; /* #f6f7f9 - text primary */
+    
+    --popover: 220 23% 8%; /* #10131a - dark-grey */
+    --popover-foreground: 220 18% 94%; /* #f6f7f9 - text primary */
+    
+    --muted: 220 25% 14%; /* #1a202c - mid-grey */
+    --muted-foreground: 220 15% 75%; /* #b5bbcb - text secondary */
+    
+    --accent: 220 25% 14%; /* #1a202c - mid-grey */
+    --accent-foreground: 220 18% 94%; /* #f6f7f9 - text primary */
+    
+    --primary: 153 74% 52%; /* #28e088 - primary-green */
+    --primary-foreground: 0 0% 3%; /* #080808 */
+    
+    --secondary: 222 74% 52%; /* #2364e4 - accent-blue */
+    --secondary-foreground: 0 0% 100%; /* #ffffff */
+    
+    --destructive: 356 76% 53%; /* #e22b35 - accent-orange */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
+    
+    --border: 220 25% 14%; /* #1a202c - mid-grey */
+    --input: 220 25% 14%; /* #1a202c - mid-grey */
+    --ring: 153 74% 52%; /* #28e088 - primary-green */
+
+    /* Additional accent color */
+    --purple: 258 76% 52%; /* #5724e2 - accent-purple */
+  }
+
+  /* Font family settings */
+  html {
+    font-family: var(--font-ibm-plex-sans), 'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  /* Apply Arabic font for Arabic text */
+  :lang(ar) {
+    font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
