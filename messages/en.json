@@ -2,34 +2,88 @@
   "Navbar": {
     "newChat": "New Chat",
     "resources": "Resources",
-    "signIn": "Sign In",
-    "getStarted": "Get Started",
     "changelog": "Changelog",
-    "featureRequest": "Feature Request",
-    "aboutUs": "About Us",
     "changelogDescription": "See what's new in our latest updates",
+    "featureRequest": "Feature Request",
     "featureRequestDescription": "Request new features or improvements",
-    "aboutUsDescription": "Learn more about our team and mission"
-  },
-  "HomePage": {
-    "title": "GPT IQ AI Chat Platform",
-    "subtitle": "Experience smarter conversations with our advanced platform",
-    "getStarted": "Get Started",
-    "tryDemo": "Try Demo",
-    "featureOneTitle": "Smart Conversations",
-    "featureOneDescription": "Engage in intelligent, context-aware conversations powered by advanced AI.",
-    "featureTwoTitle": "Lightning Fast",
-    "featureTwoDescription": "Get instant responses with our optimized processing engine.",
-    "featureThreeTitle": "Secure & Private",
-    "featureThreeDescription": "Your conversations are encrypted and your privacy is our priority.",
-    "ctaTitle": "Ready to experience the future of AI chat?",
-    "ctaDescription": "Join thousands of users already benefiting from our advanced AI platform.",
-    "learnMore": "Learn More",
-    "about": "Go to about page"
+    "aboutUs": "About Us",
+    "aboutUsDescription": "Learn more about our team and mission",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
   },
   "ThemeToggle": {
-    "light": "Light Mode",
-    "dark": "Dark Mode"
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "HomePage": {
+    "title": "Advanced AI Chat Platform",
+    "subtitle": "Experience smarter conversations with GPT IQ's cutting-edge AI technology",
+    "getStarted": "Get Started",
+    "tryDemo": "Try Demo",
+    "featureOneTitle": "Natural Conversations",
+    "featureOneDescription": "Talk to our AI like you would with a human, with remarkable comprehension and context awareness",
+    "featureTwoTitle": "Lightning Fast",
+    "featureTwoDescription": "Get instant responses with our optimized architecture for minimal latency",
+    "featureThreeTitle": "Security First",
+    "featureThreeDescription": "Your data is protected with enterprise-grade encryption and privacy controls",
+    "ctaTitle": "Ready to experience the future of AI conversation?",
+    "ctaDescription": "Join thousands of users already enjoying smarter AI interactions",
+    "learnMore": "Learn More"
+  },
+  "AuthNavbar": {
+    "backToHome": "Back to Home",
+    "help": "Help",
+    "privacy": "Privacy",
+    "disclaimer": "Disclaimer"
+  },
+  "Auth": {
+    "Common": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "orContinueWith": "Or continue with"
+    },
+    "Login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue to your account",
+      "loginButton": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me",
+      "googleLogin": "Sign in with Google",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up"
+    },
+    "Signup": {
+      "title": "Create an account",
+      "subtitle": "Sign up to get started with GPT IQ",
+      "signupButton": "Sign up",
+      "googleSignup": "Sign up with Google",
+      "firstNameLabel": "First name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastNameLabel": "Last name",
+      "lastNamePlaceholder": "Enter your last name",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "termsText": "I agree to the",
+      "termsLink": "Terms of Service",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "ForgotPassword": {
+      "title": "Forgot password?",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "resetButton": "Send reset link",
+      "rememberedPassword": "Remembered your password?",
+      "backToLoginLink": "Back to login"
+    },
+    "VerifyEmail": {
+      "title": "Verify your email",
+      "subtitle": "Check your inbox to verify your account",
+      "description": "We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.",
+      "resendButton": "Resend verification email",
+      "backToLoginLink": "Back to login"
+    }
   },
   "Common": {
     "loading": "Loading..."

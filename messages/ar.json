@@ -2,36 +2,90 @@
   "Navbar": {
     "newChat": "محادثة جديدة",
     "resources": "المصادر",
-    "signIn": "تسجيل الدخول",
-    "getStarted": "ابدأ الآن",
     "changelog": "سجل التغييرات",
+    "changelogDescription": "اطلع على أحدث التحديثات",
     "featureRequest": "طلب ميزة",
+    "featureRequestDescription": "طلب ميزات أو تحسينات جديدة",
     "aboutUs": "من نحن",
-    "changelogDescription": "تعرف على أحدث التحديثات",
-    "featureRequestDescription": "اطلب ميزات أو تحسينات جديدة",
-    "aboutUsDescription": "تعرف أكثر على فريقنا ومهمتنا"
-  },
-  "HomePage": {
-    "title": "منصة GPT IQ للذكاء الاصطناعي",
-    "subtitle": "تجربة محادثات أكثر ذكاءً مع منصتنا المتقدمة",
-    "getStarted": "ابدأ الآن",
-    "tryDemo": "جرب العرض التوضيحي",
-    "featureOneTitle": "محادثات ذكية",
-    "featureOneDescription": "استمتع بمحادثات ذكية وواعية للسياق مدعومة بالذكاء الاصطناعي المتقدم.",
-    "featureTwoTitle": "سرعة فائقة",
-    "featureTwoDescription": "احصل على ردود فورية بفضل محرك المعالجة المحسّن لدينا.",
-    "featureThreeTitle": "آمن وخصوصي",
-    "featureThreeDescription": "محادثاتك مشفرة وخصوصيتك هي أولويتنا.",
-    "ctaTitle": "هل أنت مستعد لتجربة مستقبل محادثات الذكاء الاصطناعي؟",
-    "ctaDescription": "انضم إلى آلاف المستخدمين الذين يستفيدون بالفعل من منصة الذكاء الاصطناعي المتقدمة لدينا.",
-    "learnMore": "اعرف المزيد",
-    "about": "انتقل إلى صفحة من نحن"
+    "aboutUsDescription": "تعرف على فريقنا ومهمتنا",
+    "signIn": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن"
   },
   "ThemeToggle": {
-    "light": "وضع النهار",
-    "dark": "الوضع الليلي"
+    "light": "فاتح",
+    "dark": "داكن"
+  },
+  "HomePage": {
+    "title": "منصة محادثة ذكاء اصطناعي متقدمة",
+    "subtitle": "استمتع بمحادثات أكثر ذكاءً مع تقنية الذكاء الاصطناعي المتطورة من GPT IQ",
+    "getStarted": "ابدأ الآن",
+    "tryDemo": "جرب العرض التوضيحي",
+    "featureOneTitle": "محادثات طبيعية",
+    "featureOneDescription": "تحدث إلى الذكاء الاصطناعي كما تتحدث مع الإنسان، مع فهم رائع للسياق",
+    "featureTwoTitle": "سريع كالبرق",
+    "featureTwoDescription": "احصل على ردود فورية بفضل بنيتنا المحسنة لتقليل زمن الاستجابة",
+    "featureThreeTitle": "الأمان أولاً",
+    "featureThreeDescription": "بياناتك محمية بتشفير عالي المستوى وضوابط الخصوصية",
+    "ctaTitle": "هل أنت مستعد لتجربة مستقبل محادثات الذكاء الاصطناعي؟",
+    "ctaDescription": "انضم إلى آلاف المستخدمين الذين يستمتعون بالفعل بتفاعلات ذكاء اصطناعي أكثر ذكاءً",
+    "learnMore": "اعرف المزيد"
+  },
+  "AuthNavbar": {
+    "backToHome": "العودة إلى الرئيسية",
+    "help": "المساعدة",
+    "privacy": "الخصوصية",
+    "disclaimer": "إخلاء المسؤولية"
+  },
+  "Auth": {
+    "Common": {
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "orContinueWith": "أو المتابعة باستخدام"
+    },
+    "Login": {
+      "title": "مرحباً بعودتك",
+      "subtitle": "قم بتسجيل الدخول للمتابعة إلى حسابك",
+      "loginButton": "تسجيل الدخول",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "rememberMe": "تذكرني",
+      "googleLogin": "تسجيل الدخول باستخدام جوجل",
+      "noAccount": "ليس لديك حساب؟",
+      "signUpLink": "إنشاء حساب"
+    },
+    "Signup": {
+      "title": "إنشاء حساب",
+      "subtitle": "قم بالتسجيل للبدء مع GPT IQ",
+      "signupButton": "إنشاء حساب",
+      "googleSignup": "التسجيل باستخدام جوجل",
+      "firstNameLabel": "الاسم الأول",
+      "firstNamePlaceholder": "أدخل اسمك الأول",
+      "lastNameLabel": "الاسم الأخير",
+      "lastNamePlaceholder": "أدخل اسمك الأخير",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+      "termsText": "أوافق على",
+      "termsLink": "شروط الخدمة",
+      "hasAccount": "لديك حساب بالفعل؟",
+      "loginLink": "تسجيل الدخول"
+    },
+    "ForgotPassword": {
+      "title": "نسيت كلمة المرور؟",
+      "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
+      "resetButton": "إرسال رابط إعادة التعيين",
+      "rememberedPassword": "تذكرت كلمة المرور؟",
+      "backToLoginLink": "العودة إلى تسجيل الدخول"
+    },
+    "VerifyEmail": {
+      "title": "تحقق من بريدك الإلكتروني",
+      "subtitle": "تحقق من صندوق الوارد لتأكيد حسابك",
+      "description": "لقد أرسلنا رابط التحقق إلى عنوان بريدك الإلكتروني. يرجى التحقق من صندوق الوارد والنقر على الرابط لتأكيد حسابك.",
+      "resendButton": "إعادة إرسال بريد التحقق",
+      "backToLoginLink": "العودة إلى تسجيل الدخول"
+    }
   },
   "Common": {
-    "loading": "جاري التحميل..."
+    "loading": "جارٍ التحميل..."
   }
 }
