@@ -30,6 +30,19 @@
     "ctaDescription": "Join thousands of users already enjoying smarter AI interactions",
     "learnMore": "Learn More"
   },
+  "Chat": {
+    "newChat": "New Chat",
+    "recent": "Recent",
+    "help": "Help",
+    "changelog": "Changelog",
+    "settings": "Settings",
+    "disclaimer": "GPT-IQ can make mistakes, including about people, so double-check its responses.",
+    "chatPlaceholder": "Type a message...",
+    "sendMessage": "Send message",
+    "enterToSend": "Press Enter to send, Shift + Enter for a new line",
+    "headlineTitle": "GPT-IQ",
+    "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights."
+  },
   "AuthNavbar": {
     "backToHome": "Back to Home",
     "help": "Help",

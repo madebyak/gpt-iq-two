@@ -25,63 +25,66 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Link as IntlLink, usePathname } from '@/i18n/navigation'; 
 
+const getLanguageInfo = (localeCode: string) => {
+  switch (localeCode) {
+    case 'ar':
+      return { flag: '🇮🇶', name: 'العربية' };
+    case 'en':
+      return { flag: '🇬🇧', name: 'English' };
+    default:
+      return { flag: '🇮🇶', name: 'العربية' };
+  }
+};
+
 const Navbar = () => {
-  let newChatLabel = "New Chat";
-  let resourcesLabel = "Resources";
-  let changelogLabel = "Changelog";
-  let changelogDescription = "See what's new in our latest updates";
-  let featureRequestLabel = "Feature Request";
-  let featureRequestDescription = "Request new features or improvements";
-  let aboutUsLabel = "About Us";
-  let aboutUsDescription = "Learn more about our team and mission";
-  let signInLabel = "Sign In";
-  let getStartedLabel = "Get Started";
+  // Call all hooks unconditionally at the top level
+  const locale = useLocale();
+  const pathname = usePathname();
   
-  let pathname = "/";
-  let locale = "en";
-  let currentLanguage = { flag: '🇬🇧', name: 'English' };
-  let hasIntlContext = false;
+  // Default fallback values
+  const defaultLabels = {
+    newChat: "New Chat",
+    resources: "Resources",
+    changelog: "Changelog",
+    changelogDescription: "See what's new in our latest updates",
+    featureRequest: "Feature Request",
+    featureRequestDescription: "Request new features or improvements",
+    aboutUs: "About Us",
+    aboutUsDescription: "Learn more about our team and mission",
+    signIn: "Sign In",
+    getStarted: "Get Started"
+  };
   
+  // Create a labels object
+  let labels = { ...defaultLabels };
+  
+  // Try to get translated labels
   try {
     const t = useTranslations('Navbar');
-    locale = useLocale();
-    pathname = usePathname();
-    hasIntlContext = true;
-
-    newChatLabel = t('newChat');
-    resourcesLabel = t('resources');
-    changelogLabel = t('changelog');
-    changelogDescription = t('changelogDescription');
-    featureRequestLabel = t('featureRequest');
-    featureRequestDescription = t('featureRequestDescription');
-    aboutUsLabel = t('aboutUs');
-    aboutUsDescription = t('aboutUsDescription');
-    signInLabel = t('signIn');
-    getStartedLabel = t('getStarted');
-
-    const getLanguageInfo = (localeCode: string) => {
-      switch (localeCode) {
-        case 'ar':
-          return { flag: '🇮🇶', name: 'العربية' };
-        case 'en':
-          return { flag: '🇬🇧', name: 'English' };
-        default:
-          return { flag: '🇮🇶', name: 'العربية' };
-      }
+    labels = {
+      newChat: t('newChat'),
+      resources: t('resources'),
+      changelog: t('changelog'),
+      changelogDescription: t('changelogDescription'),
+      featureRequest: t('featureRequest'),
+      featureRequestDescription: t('featureRequestDescription'),
+      aboutUs: t('aboutUs'),
+      aboutUsDescription: t('aboutUsDescription'),
+      signIn: t('signIn'),
+      getStarted: t('getStarted')
     };
-
-    currentLanguage = getLanguageInfo(locale);
   } catch (error) {
-    console.error("Error in Navbar translations:", error);
+    console.error("Error in navbar translations:", error);
+    // Keep using the default labels
   }
 
-  const NavLink = hasIntlContext ? IntlLink : Link;
+  const currentLanguage = getLanguageInfo(locale);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <Container className="flex h-16 items-center justify-between">
         <div className="flex items-center">
-          <NavLink href="/" className="flex items-center">
+          <IntlLink href="/" className="flex items-center">
             <Image
               src="/logo-vertical-3.svg"
               alt="GPT IQ Logo"
@@ -89,60 +92,64 @@ const Navbar = () => {
               height={58}
               priority
             />
-          </NavLink>
+          </IntlLink>
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" className="hidden sm:flex gap-2 items-center">
+          <Button 
+            variant="outline" 
+            size="default" 
+            className="hidden sm:flex gap-2 items-center h-11 px-4 py-2"
+          >
             <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
-            {newChatLabel}
+            {labels.newChat}
           </Button>
 
           <NavigationMenu className="hidden md:block">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-background border border-input hover:bg-accent hover:text-accent-foreground">
-                  {resourcesLabel}
+                  {labels.resources}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[200px] gap-3 p-4">
                     <li>
                       <NavigationMenuLink asChild>
-                        <NavLink
+                        <IntlLink
                           href="/changelog"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
-                          <div className="text-sm font-medium">{changelogLabel}</div>
+                          <div className="text-sm font-medium">{labels.changelog}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {changelogDescription}
+                            {labels.changelogDescription}
                           </p>
-                        </NavLink>
+                        </IntlLink>
                       </NavigationMenuLink>
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
-                        <NavLink
+                        <IntlLink
                           href="/feature-request"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
-                          <div className="text-sm font-medium">{featureRequestLabel}</div>
+                          <div className="text-sm font-medium">{labels.featureRequest}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {featureRequestDescription}
+                            {labels.featureRequestDescription}
                           </p>
-                        </NavLink>
+                        </IntlLink>
                       </NavigationMenuLink>
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
-                        <NavLink
+                        <IntlLink
                           href="/about"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
-                          <div className="text-sm font-medium">{aboutUsLabel}</div>
+                          <div className="text-sm font-medium">{labels.aboutUs}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {aboutUsDescription}
+                            {labels.aboutUsDescription}
                           </p>
-                        </NavLink>
+                        </IntlLink>
                       </NavigationMenuLink>
                     </li>
                   </ul>
@@ -153,36 +160,32 @@ const Navbar = () => {
 
           <div className="hidden md:block h-6 w-px bg-border/60" aria-hidden="true" />
 
-          {hasIntlContext ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <span className="text-base">{currentLanguage.flag}</span>
-                  <span>{currentLanguage.name}</span>
-                  <ChevronDown className="h-4 w-4 opacity-70" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <IntlLink href={pathname} locale="ar">
-                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                    <span className="text-base">🇮🇶</span>
-                    <span>العربية</span>
-                  </DropdownMenuItem>
-                </IntlLink>
-                <IntlLink href={pathname} locale="en">
-                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                    <span className="text-base">🇬🇧</span>
-                    <span>English</span>
-                  </DropdownMenuItem>
-                </IntlLink>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
-              <span className="text-base">{currentLanguage.flag}</span>
-              <span>{currentLanguage.name}</span>
-            </Button>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 h-11 px-4 py-2"
+              >
+                <span className="text-base">{currentLanguage.flag}</span>
+                <span>{currentLanguage.name}</span>
+                <ChevronDown className="h-4 w-4 opacity-70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <IntlLink href={pathname} locale="ar">
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-base">🇮🇶</span>
+                  <span>العربية</span>
+                </DropdownMenuItem>
+              </IntlLink>
+              <IntlLink href={pathname} locale="en">
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-base">🇬🇧</span>
+                  <span>English</span>
+                </DropdownMenuItem>
+              </IntlLink>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <div className="hidden sm:flex">
             <ThemeToggle />
@@ -190,15 +193,15 @@ const Navbar = () => {
 
           <div className="hidden sm:block h-6 w-px bg-border/60" aria-hidden="true" />
 
-          <Button variant="ghost" size="sm" className="hidden sm:flex">
-            {signInLabel}
+          <Button variant="ghost" className="hidden sm:flex h-11 px-4 py-2">
+            {labels.signIn}
           </Button>
 
-          <Button size="sm">
-            {getStartedLabel}
+          <Button className="h-11 px-4 py-2">
+            {labels.getStarted}
           </Button>
 
-          <Button variant="ghost" size="icon" className="md:hidden">
+          <Button variant="ghost" size="icon" className="md:hidden h-11 w-11">
             <Menu className="h-5 w-5" />
           </Button>
         </div>

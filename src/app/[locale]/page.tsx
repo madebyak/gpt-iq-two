@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { Container } from "@/components/ui/container";
+import { ChatLayout } from "@/components/layout/ChatLayout";
 import HomeClient from "./home-client";
 
 interface PageProps {
@@ -12,6 +12,7 @@ export default async function HomePage({ params }: PageProps) {
   // Get messages for specific namespaces needed by client components
   const navbarT = await getTranslations('Navbar');
   const themeToggleT = await getTranslations('ThemeToggle');
+  const chatT = await getTranslations('Chat');
   
   // Prepare client messages object - only include what the client needs
   const clientMessages = {
@@ -30,18 +31,25 @@ export default async function HomePage({ params }: PageProps) {
     ThemeToggle: {
       light: themeToggleT('light'),
       dark: themeToggleT('dark')
+    },
+    Chat: {
+      newChat: chatT('newChat'),
+      recent: chatT('recent'),
+      help: chatT('help'),
+      changelog: chatT('changelog'),
+      settings: chatT('settings'),
+      disclaimer: chatT('disclaimer'),
+      chatPlaceholder: chatT('chatPlaceholder'),
+      sendMessage: chatT('sendMessage'),
+      enterToSend: chatT('enterToSend'),
+      headlineTitle: chatT('headlineTitle'),
+      headlineSubtitle: chatT('headlineSubtitle')
     }
   };
   
   return (
     <HomeClient locale={params.locale} messages={clientMessages}>
-      <main className="flex min-h-[calc(100vh-4rem)] flex-col">
-        <Container className="flex-grow flex items-center justify-center">
-          <div className="h-full w-full" aria-hidden="true">
-            {/* Intentionally left empty to show only the navbar */}
-          </div>
-        </Container>
-      </main>
+      <ChatLayout locale={params.locale} />
     </HomeClient>
   );
 }
