@@ -1,4 +1,7 @@
-import { getTranslations } from 'next-intl/server';
+"use client";
+
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AuthCard } from '@/components/auth/auth-card';
 import { FormDivider } from '@/components/auth/form-divider';
 import { SocialButton } from '@/components/auth/social-button';
@@ -6,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
+import { useAuth } from '@/lib/auth/auth-context';
 
 interface LoginPageProps {
   params: {
@@ -14,17 +18,76 @@ interface LoginPageProps {
   };
 }
 
-export default async function LoginPage({ params }: LoginPageProps) {
-  // Get translations for the login page
-  const t = await getTranslations('Auth.Login');
-  const commonT = await getTranslations('Auth.Common');
+export default function LoginPage({ params }: LoginPageProps) {
+  const { locale } = params;
+  const isRtl = locale === 'ar';
+  const t = useTranslations('Auth.Login');
+  const commonT = useTranslations('Auth.Common');
+  const router = useRouter();
+  const { signInWithEmail, signInWithGoogle } = useAuth();
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setError(commonT('fieldsRequired'));
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const { error: signInError } = await signInWithEmail(email, password);
+      
+      if (signInError) {
+        setError(commonT('invalidCredentials'));
+        return;
+      }
+      
+      // Redirect is handled in the auth context after successful login
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(commonT('errorOccurred'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setError(null);
+    
+    try {
+      await signInWithGoogle();
+      // Redirect happens automatically after OAuth flow
+    } catch (err) {
+      console.error('Google login error:', err);
+      setError(commonT('errorOccurred'));
+      setGoogleLoading(false);
+    }
+  };
   
   return (
     <AuthCard 
       title={t('title')}
       subtitle={t('subtitle')}
     >
-      <form className="space-y-6">
+      <form className="space-y-6" onSubmit={handleEmailLogin}>
+        {/* Error message */}
+        {error && (
+          <div className="p-3 rounded-md bg-destructive/10 text-destructive text-center">
+            {error}
+          </div>
+        )}
+      
         {/* Google Login Button */}
         <SocialButton
           icon={
@@ -35,6 +98,9 @@ export default async function LoginPage({ params }: LoginPageProps) {
             </svg>
           }
           label={t('googleLogin')}
+          onClick={handleGoogleLogin}
+          isLoading={googleLoading}
+          disabled={isLoading || googleLoading}
         />
       
         <FormDivider text={commonT('orContinueWith')} />
@@ -47,7 +113,12 @@ export default async function LoginPage({ params }: LoginPageProps) {
               id="email"
               type="email"
               placeholder={commonT('emailPlaceholder')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading || googleLoading}
               required
+              className={isRtl ? "text-right" : ""}
+              dir={isRtl ? "rtl" : "ltr"}
             />
           </div>
           
@@ -66,13 +137,23 @@ export default async function LoginPage({ params }: LoginPageProps) {
               id="password"
               type="password"
               placeholder={commonT('passwordPlaceholder')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading || googleLoading}
               required
+              className={isRtl ? "text-right" : ""}
+              dir={isRtl ? "rtl" : "ltr"}
             />
           </div>
           
           {/* Remember Me */}
-          <div className="flex items-center space-x-3">
-            <Checkbox id="remember" />
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <Checkbox 
+              id="remember" 
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+              disabled={isLoading || googleLoading}
+            />
             <Label htmlFor="remember" className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               {t('rememberMe')}
             </Label>
@@ -80,8 +161,13 @@ export default async function LoginPage({ params }: LoginPageProps) {
         </div>
         
         {/* Login Button */}
-        <Button type="submit" className="w-full mt-8">
-          {t('loginButton')}
+        <Button 
+          type="submit" 
+          className="w-full mt-8"
+          disabled={isLoading || googleLoading}
+          aria-disabled={isLoading || googleLoading}
+        >
+          {isLoading ? commonT('loading') : t('loginButton')}
         </Button>
         
         {/* Sign Up Link */}

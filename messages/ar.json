@@ -41,7 +41,8 @@
     "sendMessage": "إرسال رسالة",
     "enterToSend": "اضغط Enter للإرسال، Shift + Enter لإدخال سطر جديد",
     "headlineTitle": "GPT-IQ",
-    "headlineSubtitle": "مساعدك الذكي مدعوم بالذكاء الاصطناعي المتقدم. اطرح الأسئلة واحصل على الإجابات واكتشف الرؤى."
+    "headlineSubtitle": "مساعدك الذكي مدعوم بالذكاء الاصطناعي المتقدم. اطرح الأسئلة واحصل على الإجابات واكتشف الرؤى.",
+    "thinking": "جاري التفكير..."
   },
   "AuthNavbar": {
     "backToHome": "العودة إلى الرئيسية",
@@ -49,35 +50,41 @@
     "privacy": "الخصوصية",
     "disclaimer": "إخلاء المسؤولية"
   },
+  "UserDropdown": {
+    "myAccount": "حسابي",
+    "myHistory": "سجل المحادثات",
+    "settings": "الإعدادات",
+    "logOut": "تسجيل الخروج"
+  },
   "Auth": {
     "Common": {
       "emailLabel": "البريد الإلكتروني",
       "emailPlaceholder": "أدخل بريدك الإلكتروني",
       "passwordLabel": "كلمة المرور",
       "passwordPlaceholder": "أدخل كلمة المرور",
-      "orContinueWith": "أو المتابعة باستخدام"
+      "orContinueWith": "أو تابع باستخدام"
     },
     "Login": {
       "title": "مرحباً بعودتك",
-      "subtitle": "قم بتسجيل الدخول للمتابعة إلى حسابك",
+      "subtitle": "تسجيل الدخول للمتابعة إلى حسابك",
       "loginButton": "تسجيل الدخول",
       "forgotPassword": "نسيت كلمة المرور؟",
       "rememberMe": "تذكرني",
-      "googleLogin": "تسجيل الدخول باستخدام جوجل",
+      "googleLogin": "تسجيل الدخول عبر جوجل",
       "noAccount": "ليس لديك حساب؟",
       "signUpLink": "إنشاء حساب"
     },
     "Signup": {
       "title": "إنشاء حساب",
-      "subtitle": "قم بالتسجيل للبدء مع GPT IQ",
+      "subtitle": "سجل للبدء مع GPT IQ",
       "signupButton": "إنشاء حساب",
-      "googleSignup": "التسجيل باستخدام جوجل",
+      "googleSignup": "التسجيل عبر جوجل",
       "firstNameLabel": "الاسم الأول",
       "firstNamePlaceholder": "أدخل اسمك الأول",
-      "lastNameLabel": "الاسم الأخير",
-      "lastNamePlaceholder": "أدخل اسمك الأخير",
+      "lastNameLabel": "اسم العائلة",
+      "lastNamePlaceholder": "أدخل اسم العائلة",
       "confirmPasswordLabel": "تأكيد كلمة المرور",
-      "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور",
       "termsText": "أوافق على",
       "termsLink": "شروط الخدمة",
       "hasAccount": "لديك حساب بالفعل؟",
@@ -88,17 +95,17 @@
       "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
       "resetButton": "إرسال رابط إعادة التعيين",
       "rememberedPassword": "تذكرت كلمة المرور؟",
-      "backToLoginLink": "العودة إلى تسجيل الدخول"
+      "backToLoginLink": "العودة لتسجيل الدخول"
     },
     "VerifyEmail": {
       "title": "تحقق من بريدك الإلكتروني",
       "subtitle": "تحقق من صندوق الوارد لتأكيد حسابك",
-      "description": "لقد أرسلنا رابط التحقق إلى عنوان بريدك الإلكتروني. يرجى التحقق من صندوق الوارد والنقر على الرابط لتأكيد حسابك.",
+      "description": "لقد أرسلنا رابط التحقق إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد والنقر على الرابط لتأكيد حسابك.",
       "resendButton": "إعادة إرسال بريد التحقق",
-      "backToLoginLink": "العودة إلى تسجيل الدخول"
+      "backToLoginLink": "العودة لتسجيل الدخول"
     }
   },
   "Common": {
-    "loading": "جارٍ التحميل..."
+    "loading": "جاري التحميل..."
   }
 }

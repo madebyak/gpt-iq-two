@@ -193,3 +193,28 @@
   background-clip: text;
   -webkit-background-clip: text;
 }
+
+/* Loading animation gradient for chat */
+.animate-gradient {
+  background: linear-gradient(90deg, #28e088, #2364e4, #e22b35, #5724e2);
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradient 4s ease infinite;
+}
+
+/* Blinking cursor animation for streamed text */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Shadow effect for focused chat elements */
+.shadow-glow {
+  box-shadow: 0 0 5px rgba(40, 224, 136, 0.2), 0 0 20px rgba(40, 224, 136, 0.1);
+}

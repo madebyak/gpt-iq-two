@@ -1,0 +1,346 @@
+"use client";
+
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { Session, User } from "@supabase/supabase-js";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { LanguagePreference, ThemePreference } from "../types/database.types";
+
+// Cache keys
+const PROFILE_CACHE_KEY = 'gpt-iq-profile-cache';
+const USER_ID_CACHE_KEY = 'gpt-iq-user-id';
+
+// Define types for our context
+type ProfileData = {
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  photoUrl: string | null;
+  preferredLanguage: LanguagePreference;
+  preferredTheme: ThemePreference;
+};
+
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  profile: ProfileData | null;
+  isLoading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: any }>;
+  signUpWithEmail: (email: string, password: string, firstName?: string, lastName?: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+  updateProfile: (data: Partial<ProfileData>) => Promise<{ error: any | null }>;
+};
+
+// Create the context with a default value
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Export the provider component
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
+  const supabase = createClient();
+
+  // Try to load cached profile data for faster rendering
+  const getCachedProfile = useCallback(() => {
+    try {
+      const cachedProfile = localStorage.getItem(PROFILE_CACHE_KEY);
+      if (cachedProfile) {
+        return JSON.parse(cachedProfile) as ProfileData;
+      }
+    } catch (error) {
+      console.error('Error reading cached profile:', error);
+    }
+    return null;
+  }, []);
+
+  // Save profile to cache
+  const cacheProfile = useCallback((profileData: ProfileData) => {
+    try {
+      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profileData));
+    } catch (error) {
+      console.error('Error caching profile:', error);
+    }
+  }, []);
+
+  // Clear profile cache
+  const clearProfileCache = useCallback(() => {
+    try {
+      localStorage.removeItem(PROFILE_CACHE_KEY);
+      localStorage.removeItem(USER_ID_CACHE_KEY);
+    } catch (error) {
+      console.error('Error clearing profile cache:', error);
+    }
+  }, []);
+
+  // Fetch profile data for the user - wrapped in useCallback to avoid recreating on every render
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      // Save userId to cache for potential quick loading on next visit
+      localStorage.setItem(USER_ID_CACHE_KEY, userId);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, email, photo_url, preferred_language, preferred_theme')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+
+      if (data) {
+        const profileData = {
+          firstName: data.first_name,
+          lastName: data.last_name,
+          email: data.email,
+          photoUrl: data.photo_url,
+          preferredLanguage: data.preferred_language as LanguagePreference,
+          preferredTheme: data.preferred_theme as ThemePreference,
+        };
+        
+        setProfile(profileData);
+        cacheProfile(profileData);
+        return profileData;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error in fetchProfile:', error);
+      return null;
+    }
+  }, [supabase, cacheProfile]);
+
+  // Update user profile data
+  const updateProfile = async (data: Partial<ProfileData>) => {
+    if (!user) return { error: new Error('User not authenticated') };
+    
+    try {
+      // Convert from our camelCase to database snake_case
+      const dbData: Record<string, any> = {};
+      if (data.firstName !== undefined) dbData.first_name = data.firstName;
+      if (data.lastName !== undefined) dbData.last_name = data.lastName;
+      if (data.photoUrl !== undefined) dbData.photo_url = data.photoUrl;
+      if (data.preferredLanguage !== undefined) dbData.preferred_language = data.preferredLanguage;
+      if (data.preferredTheme !== undefined) dbData.preferred_theme = data.preferredTheme;
+      
+      // Add timestamp
+      dbData.updated_at = new Date().toISOString();
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(dbData)
+        .eq('id', user.id);
+        
+      if (!error && profile) {
+        // Update local state
+        const updatedProfile = {
+          ...profile,
+          ...data
+        };
+        setProfile(updatedProfile);
+        cacheProfile(updatedProfile);
+      }
+      
+      return { error };
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return { error };
+    }
+  };
+
+  // Initialize the auth state
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      
+      try {
+        // First try to load cached profile for quick rendering
+        const cachedProfile = getCachedProfile();
+        if (cachedProfile) {
+          setProfile(cachedProfile);
+        }
+        
+        // Get the current session
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        
+        if (session?.user) {
+          setUser(session.user);
+          
+          // If we already have a cached profile, fetch fresh data in the background
+          if (cachedProfile) {
+            fetchProfile(session.user.id).catch(console.error);
+          } else {
+            // Otherwise wait for the profile fetch to complete
+            await fetchProfile(session.user.id);
+          }
+        } else {
+          // Clear cache if no valid session
+          clearProfileCache();
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        clearProfileCache();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Set up the auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
+      setSession(session);
+      setUser(session?.user || null);
+      
+      if (session?.user) {
+        // On sign in/sign up/token refresh
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+          // Try to load cached profile first for fast rendering
+          const cachedProfile = getCachedProfile();
+          if (cachedProfile) {
+            setProfile(cachedProfile);
+            // Then update in background
+            fetchProfile(session.user.id).catch(console.error);
+          } else {
+            await fetchProfile(session.user.id);
+          }
+        }
+      } else {
+        // User signed out
+        setProfile(null);
+        clearProfileCache();
+      }
+      
+      setIsLoading(false);
+    });
+
+    // Clean up the subscription
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase, fetchProfile, getCachedProfile, clearProfileCache]);
+
+  // Sign in with Google
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
+    }
+  };
+
+  // Sign in with email and password
+  const signInWithEmail = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (!error && pathname.includes('/auth/login')) {
+        // Get the returnUrl or go to home page
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('returnUrl') || '/';
+        router.push(returnUrl);
+      }
+
+      return { error };
+    } catch (error) {
+      console.error('Error signing in with email:', error);
+      return { error };
+    }
+  };
+
+  // Sign up with email and password
+  const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+          data: {
+            first_name: firstName,
+            last_name: lastName
+          }
+        },
+      });
+
+      return { error };
+    } catch (error) {
+      console.error('Error signing up with email:', error);
+      return { error };
+    }
+  };
+
+  // Sign out
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      clearProfileCache();
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  // Refresh the session
+  const refreshSession = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setUser(session?.user || null);
+      
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      }
+    } catch (error) {
+      console.error('Error refreshing session:', error);
+    }
+  };
+
+  // Define the value object to be provided to consumers
+  const value = {
+    user,
+    session,
+    profile,
+    isLoading,
+    signInWithGoogle,
+    signInWithEmail,
+    signUpWithEmail,
+    signOut,
+    refreshSession,
+    updateProfile
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+// Export the hook for consuming the context
+export function useAuth() {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  
+  return context;
+}

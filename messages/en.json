@@ -41,13 +41,20 @@
     "sendMessage": "Send message",
     "enterToSend": "Press Enter to send, Shift + Enter for a new line",
     "headlineTitle": "GPT-IQ",
-    "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights."
+    "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights.",
+    "thinking": "Thinking..."
   },
   "AuthNavbar": {
     "backToHome": "Back to Home",
     "help": "Help",
     "privacy": "Privacy",
     "disclaimer": "Disclaimer"
+  },
+  "UserDropdown": {
+    "myAccount": "My Account",
+    "myHistory": "My History",
+    "settings": "Settings",
+    "logOut": "Log Out"
   },
   "Auth": {
     "Common": {

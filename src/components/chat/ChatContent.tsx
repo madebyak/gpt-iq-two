@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useRef } from "react";
 import { HeadlineEN } from "@/components/chat/HeadlineEN";
 import { HeadlineAR } from "@/components/chat/HeadlineAR";
+import { ChatMessage } from "@/components/chat/ChatMessage";
+import { useChatContext } from "@/components/providers/ChatProvider";
+import { Message } from "@/lib/hooks/useChat";
+import { cn } from "@/lib/utils";
 
 interface ChatContentProps {
   locale: string;
@@ -11,38 +14,44 @@ interface ChatContentProps {
 }
 
 export function ChatContent({ locale, children }: ChatContentProps) {
-  const [messages, setMessages] = useState<any[]>([]);
-  const [showHeadline, setShowHeadline] = useState(true);
+  const { messages, isLoading } = useChatContext();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const isRtl = locale === 'ar';
   
-  // In a real implementation, this would come from your chat state or API
+  // Scroll to bottom when messages change
   useEffect(() => {
-    // Only show headline if there are no messages
-    if (messages.length > 0) {
-      setShowHeadline(false);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
   return (
     <div 
-      className={`h-full p-4 ${isRtl ? "text-right" : "text-left"}`} 
+      className={cn(
+        "h-full flex flex-col",
+        isRtl ? "text-right" : "text-left"
+      )}
       dir={isRtl ? "rtl" : "ltr"}
     >
-      {showHeadline ? (
+      {messages.length === 0 ? (
         <div className="h-full flex items-center justify-center">
           {isRtl ? <HeadlineAR /> : <HeadlineEN />}
         </div>
       ) : (
-        <div className="space-y-6 w-full max-w-4xl mx-auto">
-          {messages.map((message, index) => (
-            <div key={index} className="flex flex-col">
-              {/* Message content would go here */}
-              <Skeleton className="h-12 w-full" />
-            </div>
-          ))}
-          {messages.length === 0 && children}
+        <div className="flex-1 overflow-y-auto pt-10 pb-4">
+          <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+            {messages.map((message: Message) => (
+              <ChatMessage 
+                key={message.id} 
+                message={message} 
+                locale={locale} 
+              />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       )}
+      {children}
     </div>
   );
 }

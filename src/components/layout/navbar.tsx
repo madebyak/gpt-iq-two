@@ -24,6 +24,8 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Link as IntlLink, usePathname } from '@/i18n/navigation'; 
+import { useAuth } from "@/lib/auth/auth-context";
+import { UserDropdown } from "@/components/auth/user-dropdown";
 
 const getLanguageInfo = (localeCode: string) => {
   switch (localeCode) {
@@ -40,6 +42,7 @@ const Navbar = () => {
   // Call all hooks unconditionally at the top level
   const locale = useLocale();
   const pathname = usePathname();
+  const { user, profile, signOut, isLoading } = useAuth();
   
   // Default fallback values
   const defaultLabels = {
@@ -79,6 +82,9 @@ const Navbar = () => {
   }
 
   const currentLanguage = getLanguageInfo(locale);
+  
+  // User is logged in when we have a user and their profile
+  const isLoggedIn = !!user && !!profile;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -191,15 +197,53 @@ const Navbar = () => {
             <ThemeToggle />
           </div>
 
-          <div className="hidden sm:block h-6 w-px bg-border/60" aria-hidden="true" />
+          {!isLoading && (
+            <>
+              <div className="hidden sm:block h-6 w-px bg-border/60" aria-hidden="true" />
 
-          <Button variant="ghost" className="hidden sm:flex h-11 px-4 py-2">
-            {labels.signIn}
-          </Button>
+              {isLoggedIn ? (
+                <UserDropdown 
+                  user={{
+                    firstName: profile?.firstName || user.email?.split('@')[0] || 'User',
+                    lastName: profile?.lastName || '',
+                    photoUrl: profile?.photoUrl || undefined
+                  }}
+                  onLogout={signOut}
+                />
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="hidden sm:flex h-11 px-4 py-2"
+                    asChild
+                  >
+                    <IntlLink href="/auth/login">
+                      {labels.signIn}
+                    </IntlLink>
+                  </Button>
 
-          <Button className="h-11 px-4 py-2">
-            {labels.getStarted}
-          </Button>
+                  <Button 
+                    className="h-11 px-4 py-2"
+                    asChild
+                  >
+                    <IntlLink href="/auth/signup">
+                      {labels.getStarted}
+                    </IntlLink>
+                  </Button>
+                </>
+              )}
+            </>
+          )}
+          {isLoading && (
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 h-11 px-4 py-2 cursor-wait animate-pulse"
+              disabled
+            >
+              <div className="h-5 w-5 rounded-full bg-muted/80 animate-pulse"></div>
+              <div className="h-4 w-16 bg-muted/80 rounded animate-pulse"></div>
+            </Button>
+          )}
 
           <Button variant="ghost" size="icon" className="md:hidden h-11 w-11">
             <Menu className="h-5 w-5" />

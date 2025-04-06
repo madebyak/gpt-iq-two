@@ -72,6 +72,13 @@ export default async function LocaleLayout({
   // This keeps the client-side bundle smaller
   const essentialMessages = {
     ThemeToggle: messages.ThemeToggle,
+    UserDropdown: {
+      myAccount: messages.UserDropdown?.myAccount || "My Account",
+      myHistory: messages.UserDropdown?.myHistory || "My History",
+      settings: messages.UserDropdown?.settings || "Settings",
+      logOut: messages.UserDropdown?.logOut || "Log Out"
+    },
+    Navbar: messages.Navbar
   };
 
   return (
