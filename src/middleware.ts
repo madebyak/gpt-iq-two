@@ -41,14 +41,21 @@ async function middleware(request: NextRequest) {
   // Get the pathname without the locale prefix
   const pathname = request.nextUrl.pathname;
   
+  // Get the locale from the pathname
+  const locale = locales.find(locale => 
+    pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  ) || defaultLocale;
+  
   // Check if the route requires authentication
   const isProtectedRoute = PROTECTED_ROUTES.some(route => 
-    pathname.endsWith(route) || pathname.includes(`${route}/`)
+    pathname === `/${locale}${route}` || 
+    pathname.startsWith(`/${locale}${route}/`)
   );
   
   // Allow public routes to proceed with just i18n handling
   const isPublicRoute = PUBLIC_ROUTES.some(route => 
-    pathname.endsWith(route) || pathname.includes(`${route}/`)
+    pathname === `/${locale}${route}` || 
+    pathname.startsWith(`/${locale}${route}/`)
   );
   
   // If it's not a protected route, just handle i18n
@@ -74,11 +81,6 @@ async function middleware(request: NextRequest) {
   
   // No session, redirect to login with the return URL
   const url = request.nextUrl.clone();
-  
-  // Get the locale from the pathname
-  const locale = locales.find(locale => 
-    pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  ) || defaultLocale;
   
   // Redirect to the login page with the return URL
   url.pathname = `/${locale}/auth/login`;

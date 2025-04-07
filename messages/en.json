@@ -32,17 +32,21 @@
   },
   "Chat": {
     "newChat": "New Chat",
-    "recent": "Recent",
-    "help": "Help",
-    "changelog": "Changelog",
+    "placeholder": "Type your message...",
+    "headline": "Ask me anything about programming, tech, code debugging, or software design",
+    "disclaimer": "This is an AI assistant. Information might not always be accurate.",
+    "recent": "RECENT",
     "settings": "Settings",
-    "disclaimer": "GPT-IQ can make mistakes, including about people, so double-check its responses.",
+    "help": "Help",
+    "changelog": "What's New",
+    "thinking": "Thinking...",
+    "noConversations": "No conversations yet",
+    "signInToViewHistory": "Sign in to view your chat history",
     "chatPlaceholder": "Type a message...",
     "sendMessage": "Send message",
     "enterToSend": "Press Enter to send, Shift + Enter for a new line",
     "headlineTitle": "GPT-IQ",
-    "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights.",
-    "thinking": "Thinking..."
+    "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights."
   },
   "AuthNavbar": {
     "backToHome": "Back to Home",
@@ -107,5 +111,172 @@
   },
   "Common": {
     "loading": "Loading..."
+  },
+  "Account": {
+    "pageTitle": "My Account",
+    "pageDescription": "Manage your personal information and account settings",
+    "accountNav": {
+      "myAccount": "My Account",
+      "chatHistory": "Chat History",
+      "settings": "Settings"
+    },
+    "breadcrumb": {
+      "home": "Home"
+    },
+    "title": "My Account",
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security"
+    },
+    "userAccountTitle": "User Account",
+    "profileSection": {
+      "title": "Profile Information",
+      "description": "Update your personal information and profile picture",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "changePhoto": "Change Photo",
+      "photoHelp": "Click on the profile picture to upload a new image. JPG, PNG or GIF, max 5MB.",
+      "saveChanges": "Save Changes",
+      "imageTypeError": "Please upload an image file (JPG, PNG, GIF)",
+      "imageSizeError": "Image size must be less than 5MB",
+      "imageUploadSuccess": "Profile picture updated successfully",
+      "imageUploadError": "Failed to upload profile picture",
+      "updateSuccess": "Profile updated successfully",
+      "updateError": "Failed to update profile"
+    },
+    "securitySection": {
+      "connectedAccounts": "Connected Accounts",
+      "connectedAccountsDescription": "Manage your connected accounts and sign-in methods",
+      "emailPassword": "Email & Password",
+      "google": "Google",
+      "primary": "Primary",
+      "connected": "Connected",
+      "notConnected": "Not Connected",
+      "changePassword": "Change Password",
+      "changePasswordDescription": "Update your password to keep your account secure",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "updatePassword": "Update Password",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordChangeSuccess": "Password updated successfully",
+      "passwordChangeError": "Failed to update password",
+      "currentPasswordError": "Current password is incorrect",
+      "accountSecurity": "Account Security",
+      "accountSecurityDescription": "Your account security status and recommendations",
+      "accountProtected": "Your Account is Protected",
+      "accountProtectedDescription": "Your account has strong authentication methods enabled",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    }
+  },
+  "History": {
+    "pageTitle": "Chat History",
+    "pageDescription": "Browse and manage your previous conversations",
+    "title": "Chat History",
+    "subtitle": "See your previous conversations",
+    "breadcrumb": {
+      "home": "Home",
+      "history": "Chat History"
+    },
+    "searchPlaceholder": "Search conversations...",
+    "filterByDate": "Filter by date",
+    "applyFilters": "Apply Filters",
+    "startNewChat": "Start New Chat",
+    "tabs": {
+      "all": "All Conversations",
+      "pinned": "Pinned",
+      "archived": "Archived"
+    },
+    "noConversations": "No conversations yet",
+    "noSearchResults": "No matching conversations",
+    "noPinnedConversations": "No pinned conversations",
+    "noArchivedConversations": "No archived conversations",
+    "startConversationDescription": "Start a new chat to see your history here.",
+    "tryDifferentSearch": "Try a different search term or clear filters.",
+    "pinnedConversationsDescription": "Important conversations you've pinned will appear here.",
+    "archivedConversationsDescription": "Conversations you've archived will appear here.",
+    "actions": "Actions",
+    "pinConversation": "Pin conversation",
+    "unpinConversation": "Unpin conversation",
+    "archiveConversation": "Archive conversation",
+    "unarchiveConversation": "Unarchive conversation",
+    "deleteConversation": "Delete conversation",
+    "confirmDelete": "Yes, delete",
+    "cancel": "Cancel",
+    "noMessagePreview": "No message preview available",
+    "errorLoading": "Error loading conversations"
+  },
+  "Settings": {
+    "title": "Settings",
+    "pageTitle": "Settings",
+    "pageDescription": "Manage your application preferences and account settings",
+    "breadcrumb": {
+      "home": "Home",
+      "settings": "Settings"
+    },
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security",
+      "appearance": "Appearance",
+      "language": "Language",
+      "chat": "Chat",
+      "privacy": "Privacy"
+    },
+    "common": {
+      "saving": "Saving...",
+      "saveChanges": "Save Changes"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how the application looks and feels",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "themeSaved": "Theme preference saved successfully",
+      "errorSaving": "Error saving theme preference"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Select your preferred language",
+      "languageChanged": "Language changed successfully",
+      "errorChanging": "Error changing language"
+    },
+    "chat": {
+      "title": "Chat Settings",
+      "description": "Customize your chat experience",
+      "autoSend": "Auto-send messages",
+      "autoSendDescription": "Automatically send messages when you press Enter",
+      "enableSpeech": "Text-to-Speech",
+      "enableSpeechDescription": "Enable speech output for AI responses",
+      "enableSuggestions": "Show suggestions",
+      "enableSuggestionsDescription": "Show suggested prompts and responses",
+      "messageHistory": "Message History Count",
+      "messageHistoryDescription": "Number of messages to keep in the chat history",
+      "settingsSaved": "Chat settings saved successfully",
+      "errorSaving": "Error saving chat settings"
+    },
+    "privacy": {
+      "title": "Privacy Settings",
+      "description": "Manage your privacy preferences",
+      "saveHistory": "Save Conversation History",
+      "saveHistoryDescription": "Store your chat conversations for future reference",
+      "allowUsage": "Allow Usage Data",
+      "allowUsageDescription": "Help us improve by sharing anonymous usage statistics",
+      "allowErrors": "Allow Error Reporting",
+      "allowErrorsDescription": "Automatically send error reports to help us fix issues",
+      "settingsSaved": "Privacy settings saved successfully",
+      "errorSaving": "Error saving privacy settings",
+      "deleteAccount": "Delete Account",
+      "deleteAccountDescription": "Permanently delete your account and all associated data",
+      "deleteAccountButton": "Delete My Account",
+      "deleteConfirmTitle": "Are you sure?",
+      "deleteConfirmDescription": "This action cannot be undone. This will permanently delete your account and remove all of your data from our servers.",
+      "deleting": "Deleting...",
+      "confirmDelete": "Yes, Delete My Account",
+      "errorDeleting": "Error deleting account"
+    }
   }
 }

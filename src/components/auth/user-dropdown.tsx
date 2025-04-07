@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Settings, UserRound, History } from "lucide-react";
+import { LogOut, Settings, History, UserRound } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
@@ -51,6 +51,9 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
 
   // Full name or just first name if lastName is not available
   const displayName = user.firstName + (user.lastName ? ` ${user.lastName}` : '');
+  
+  // Default profile picture handling
+  const profilePicture = user.photoUrl || '/profile-default.jpg';
 
   return (
     <DropdownMenu>
@@ -59,17 +62,13 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
           variant="outline" 
           className="flex items-center gap-2 h-11 px-4 py-2"
         >
-          {user.photoUrl ? (
-            <Image 
-              src={user.photoUrl}
-              alt={displayName} 
-              width={24} 
-              height={24}
-              className="rounded-full h-6 w-6 object-cover"
-            />
-          ) : (
-            <UserRound className="h-5 w-5" />
-          )}
+          <Image 
+            src={profilePicture}
+            alt={displayName} 
+            width={24} 
+            height={24}
+            className="rounded-full h-6 w-6 object-cover"
+          />
           <span className="max-w-[120px] truncate">{displayName}</span>
           <ChevronDown className="h-4 w-4 opacity-70" />
         </Button>

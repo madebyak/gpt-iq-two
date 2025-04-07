@@ -3,8 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   ResizablePanel, 
-  ResizablePanelGroup, 
-  ResizableHandle
+  ResizablePanelGroup
 } from "@/components/ui/resizable";
 import * as ResizablePrimitive from "react-resizable-panels";
 import { Sidebar } from "@/components/chat/Sidebar";
@@ -20,9 +19,10 @@ interface ChatLayoutProps {
   locale: string;
   messages?: Record<string, any>;
   children?: React.ReactNode;
+  conversationId?: string;
 }
 
-export function ChatLayout({ locale, messages, children }: ChatLayoutProps) {
+export function ChatLayout({ locale, messages, children, conversationId }: ChatLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const isRtl = locale === 'ar';
   const [isMobile, setIsMobile] = useState(false);
@@ -137,14 +137,11 @@ export function ChatLayout({ locale, messages, children }: ChatLayoutProps) {
           </div>
         </ResizablePanel>
         
-        {/* Resize Handle */}
-        <ResizableHandle withHandle />
-        
         {/* Main Content Panel */}
         <ResizablePanel defaultSize={80}>
           <div className="flex flex-col h-full">
             <div className="flex-grow overflow-auto">
-              <ChatContent locale={locale}>
+              <ChatContent locale={locale} conversationId={conversationId}>
                 {children}
               </ChatContent>
             </div>
@@ -180,7 +177,7 @@ export function ChatLayout({ locale, messages, children }: ChatLayoutProps) {
       </div>
       
       <div className="flex-grow overflow-auto">
-        <ChatContent locale={locale}>
+        <ChatContent locale={locale} conversationId={conversationId}>
           {children}
         </ChatContent>
       </div>

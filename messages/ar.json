@@ -32,7 +32,7 @@
   },
   "Chat": {
     "newChat": "محادثة جديدة",
-    "recent": "الأخيرة",
+    "recent": "المحادثات الأخيرة",
     "help": "المساعدة",
     "changelog": "سجل التغييرات",
     "settings": "الإعدادات",
@@ -42,7 +42,9 @@
     "enterToSend": "اضغط Enter للإرسال، Shift + Enter لإدخال سطر جديد",
     "headlineTitle": "GPT-IQ",
     "headlineSubtitle": "مساعدك الذكي مدعوم بالذكاء الاصطناعي المتقدم. اطرح الأسئلة واحصل على الإجابات واكتشف الرؤى.",
-    "thinking": "جاري التفكير..."
+    "thinking": "جاري التفكير...",
+    "noConversations": "لا توجد محادثات بعد",
+    "signInToViewHistory": "سجل دخول لعرض سجل المحادثات"
   },
   "AuthNavbar": {
     "backToHome": "العودة إلى الرئيسية",
@@ -107,5 +109,177 @@
   },
   "Common": {
     "loading": "جاري التحميل..."
+  },
+  "Account": {
+    "pageTitle": "حسابي",
+    "pageDescription": "إدارة معلوماتك الشخصية وإعدادات الحساب",
+    "accountNav": {
+      "myAccount": "حسابي",
+      "chatHistory": "سجل المحادثات",
+      "settings": "الإعدادات"
+    },
+    "breadcrumb": {
+      "home": "الرئيسية"
+    },
+    "title": "حسابي",
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "security": "الأمان"
+    },
+    "profileSection": {
+      "title": "معلومات الملف الشخصي",
+      "description": "تحديث معلوماتك الشخصية وصورة الملف الشخصي",
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "email": "البريد الإلكتروني",
+      "changePhoto": "تغيير الصورة",
+      "photoHelp": "انقر على صورة الملف الشخصي لتحميل صورة جديدة. JPG أو PNG أو GIF، بحد أقصى 5 ميجابايت.",
+      "saveChanges": "حفظ التغييرات",
+      "imageTypeError": "يرجى تحميل ملف صورة (JPG، PNG، GIF)",
+      "imageSizeError": "يجب أن يكون حجم الصورة أقل من 5 ميجابايت",
+      "imageUploadSuccess": "تم تحديث صورة الملف الشخصي بنجاح",
+      "imageUploadError": "فشل في تحميل صورة الملف الشخصي",
+      "updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+      "updateError": "فشل في تحديث الملف الشخصي"
+    },
+    "securitySection": {
+      "connectedAccounts": "الحسابات المتصلة",
+      "connectedAccountsDescription": "إدارة حساباتك المتصلة وطرق تسجيل الدخول",
+      "emailPassword": "البريد الإلكتروني وكلمة المرور",
+      "google": "جوجل",
+      "primary": "أساسي",
+      "connected": "متصل",
+      "notConnected": "غير متصل",
+      "changePassword": "تغيير كلمة المرور",
+      "changePasswordDescription": "قم بتحديث كلمة المرور للحفاظ على أمان حسابك",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "updatePassword": "تحديث كلمة المرور",
+      "passwordMinLength": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+      "passwordChangeSuccess": "تم تحديث كلمة المرور بنجاح",
+      "passwordChangeError": "فشل في تحديث كلمة المرور",
+      "currentPasswordError": "كلمة المرور الحالية غير صحيحة",
+      "accountSecurity": "أمان الحساب",
+      "accountSecurityDescription": "حالة أمان حسابك والتوصيات",
+      "accountProtected": "حسابك محمي",
+      "accountProtectedDescription": "حسابك مؤمّن بطرق مصادقة قوية",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور"
+    }
+  },
+  "History": {
+    "pageTitle": "سجل المحادثات",
+    "pageDescription": "تصفح وإدارة محادثاتك السابقة",
+    "title": "سجل المحادثات",
+    "subtitle": "اطلع على محادثاتك السابقة",
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "history": "سجل المحادثات"
+    },
+    "searchPlaceholder": "البحث في المحادثات...",
+    "filterByDate": "تصفية حسب التاريخ",
+    "applyFilters": "تطبيق الفلاتر",
+    "startNewChat": "بدء محادثة جديدة",
+    "tabs": {
+      "all": "جميع المحادثات",
+      "pinned": "المثبتة",
+      "archived": "المؤرشفة"
+    },
+    "noConversations": "لا توجد محادثات حتى الآن",
+    "noSearchResults": "لا توجد محادثات مطابقة",
+    "noPinnedConversations": "لا توجد محادثات مثبتة",
+    "noArchivedConversations": "لا توجد محادثات مؤرشفة",
+    "startConversationDescription": "ابدأ محادثة جديدة لتظهر هنا في سجلك.",
+    "tryDifferentSearch": "جرب كلمة بحث مختلفة أو قم بإزالة الفلاتر.",
+    "pinnedConversationsDescription": "المحادثات المهمة التي قمت بتثبيتها ستظهر هنا.",
+    "archivedConversationsDescription": "المحادثات التي قمت بأرشفتها ستظهر هنا.",
+    "actions": "الإجراءات",
+    "pinConversation": "تثبيت المحادثة",
+    "unpinConversation": "إلغاء تثبيت المحادثة",
+    "archiveConversation": "أرشفة المحادثة",
+    "unarchiveConversation": "إلغاء أرشفة المحادثة",
+    "deleteConversation": "حذف المحادثة",
+    "confirmDelete": "نعم، احذف",
+    "cancel": "إلغاء",
+    "noMessagePreview": "لا تتوفر معاينة للرسالة",
+    "errorLoading": "خطأ في تحميل المحادثات"
+  },
+  "Settings": {
+    "title": "الإعدادات",
+    "pageTitle": "الإعدادات",
+    "pageDescription": "إدارة تفضيلات التطبيق وإعدادات الحساب",
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "settings": "الإعدادات"
+    },
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "security": "الأمان",
+      "appearance": "المظهر",
+      "language": "اللغة",
+      "chat": "المحادثة",
+      "privacy": "الخصوصية"
+    },
+    "common": {
+      "saving": "جارٍ الحفظ...",
+      "saveChanges": "حفظ التغييرات"
+    },
+    "appearance": {
+      "title": "المظهر",
+      "description": "تخصيص شكل ومظهر التطبيق",
+      "light": "فاتح",
+      "dark": "داكن",
+      "system": "النظام",
+      "themeSaved": "تم حفظ تفضيلات المظهر بنجاح",
+      "errorSaving": "خطأ في حفظ تفضيلات المظهر"
+    },
+    "language": {
+      "title": "اللغة",
+      "description": "اختر لغتك المفضلة",
+      "languageChanged": "تم تغيير اللغة بنجاح",
+      "errorChanging": "خطأ في تغيير اللغة"
+    },
+    "chat": {
+      "title": "إعدادات المحادثة",
+      "description": "تخصيص تجربة المحادثة",
+      "autoSend": "إرسال الرسائل تلقائيًا",
+      "autoSendDescription": "إرسال الرسائل تلقائيًا عند الضغط على مفتاح الإدخال",
+      "enableSpeech": "تحويل النص إلى كلام",
+      "enableSpeechDescription": "تمكين تحويل ردود الذكاء الاصطناعي إلى كلام مسموع",
+      "enableSuggestions": "عرض الاقتراحات",
+      "enableSuggestionsDescription": "عرض اقتراحات للأسئلة والردود",
+      "messageHistory": "عدد الرسائل في السجل",
+      "messageHistoryDescription": "عدد الرسائل التي سيتم الاحتفاظ بها في سجل المحادثة",
+      "settingsSaved": "تم حفظ إعدادات المحادثة بنجاح",
+      "errorSaving": "خطأ في حفظ إعدادات المحادثة"
+    },
+    "privacy": {
+      "title": "إعدادات الخصوصية",
+      "description": "إدارة تفضيلات الخصوصية الخاصة بك",
+      "saveHistory": "حفظ سجل المحادثات",
+      "saveHistoryDescription": "تخزين محادثاتك للرجوع إليها في المستقبل",
+      "allowUsage": "السماح ببيانات الاستخدام",
+      "allowUsageDescription": "ساعدنا في التحسين من خلال مشاركة إحصائيات استخدام مجهولة",
+      "allowErrors": "السماح بالإبلاغ عن الأخطاء",
+      "allowErrorsDescription": "إرسال تقارير الأخطاء تلقائيًا لمساعدتنا في إصلاح المشكلات",
+      "settingsSaved": "تم حفظ إعدادات الخصوصية بنجاح",
+      "errorSaving": "خطأ في حفظ إعدادات الخصوصية",
+      "deleteAccount": "حذف الحساب",
+      "deleteAccountDescription": "حذف حسابك نهائيًا وجميع البيانات المرتبطة به",
+      "deleteAccountButton": "حذف حسابي",
+      "deleteConfirmTitle": "هل أنت متأكد؟",
+      "deleteConfirmDescription": "لا يمكن التراجع عن هذا الإجراء. سيؤدي هذا إلى حذف حسابك نهائيًا وإزالة جميع بياناتك من خوادمنا.",
+      "deleting": "جارٍ الحذف...",
+      "confirmDelete": "نعم، احذف حسابي",
+      "errorDeleting": "خطأ في حذف الحساب"
+    }
+  },
+  "AccountLayout": {
+    "userAccountTitle": "حساب المستخدم",
+    "account": "حسابي",
+    "history": "سجل المحادثات",
+    "settings": "الإعدادات"
   }
 }

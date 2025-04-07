@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/lib/auth/auth-context";
 
 interface ChatMessageProps {
   message: Message;
@@ -14,10 +15,14 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message, locale }: ChatMessageProps) {
   const { theme } = useTheme();
+  const { profile, getProfileImageUrl } = useAuth();
   const t = useTranslations("Chat");
   const isUser = message.role === "user";
   const isRtl = locale === "ar";
   const [avatarSrc, setAvatarSrc] = useState("/dark-chat-avatar.png");
+  
+  // Get user profile picture
+  const userProfilePic = profile ? getProfileImageUrl(profile.photoUrl) : "/profile-default.jpg";
   
   // Reference for cursor animation at the end of streamed text
   const cursorRef = useRef<HTMLSpanElement>(null);
@@ -49,8 +54,14 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
     >
       <div className="flex-shrink-0">
         {isUser ? (
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-            <span className="text-sm font-medium">U</span>
+          <div className="h-8 w-8 rounded-full overflow-hidden">
+            <Image
+              src={userProfilePic}
+              alt="User"
+              width={32}
+              height={32}
+              className="h-full w-full object-cover"
+            />
           </div>
         ) : (
           <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">

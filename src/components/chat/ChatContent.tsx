@@ -10,11 +10,12 @@ import { cn } from "@/lib/utils";
 
 interface ChatContentProps {
   locale: string;
+  conversationId?: string;
   children?: React.ReactNode;
 }
 
-export function ChatContent({ locale, children }: ChatContentProps) {
-  const { messages, isLoading } = useChatContext();
+export function ChatContent({ locale, conversationId, children }: ChatContentProps) {
+  const { messages, isLoading } = useChatContext(conversationId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isRtl = locale === 'ar';
   

@@ -18,6 +18,17 @@ type ProfileData = {
   photoUrl: string | null;
   preferredLanguage: LanguagePreference;
   preferredTheme: ThemePreference;
+  chatSettings?: {
+    autoSendMessages: boolean;
+    enableSpeech: boolean;
+    enableSuggestions: boolean;
+    messageHistoryCount: number;
+  };
+  privacySettings?: {
+    saveConversationHistory: boolean;
+    allowUsageData: boolean;
+    allowErrorReporting: boolean;
+  };
 };
 
 type AuthContextType = {
@@ -31,6 +42,9 @@ type AuthContextType = {
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
   updateProfile: (data: Partial<ProfileData>) => Promise<{ error: any | null }>;
+  deleteAccount: () => Promise<void>;
+  getProfileImageUrl: (photoUrl: string | null) => string;
+  error: any | null;
 };
 
 // Create the context with a default value
@@ -42,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<any | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
@@ -86,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, email, photo_url, preferred_language, preferred_theme')
+        .select('first_name, last_name, email, photo_url, preferred_language, preferred_theme, chat_settings, privacy_settings')
         .eq('id', userId)
         .single();
 
@@ -103,6 +118,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           photoUrl: data.photo_url,
           preferredLanguage: data.preferred_language as LanguagePreference,
           preferredTheme: data.preferred_theme as ThemePreference,
+          chatSettings: data.chat_settings ? {
+            autoSendMessages: data.chat_settings.auto_send_messages ?? true,
+            enableSpeech: data.chat_settings.enable_speech ?? false,
+            enableSuggestions: data.chat_settings.enable_suggestions ?? true,
+            messageHistoryCount: data.chat_settings.message_history_count ?? 10,
+          } : undefined,
+          privacySettings: data.privacy_settings ? {
+            saveConversationHistory: data.privacy_settings.save_conversation_history ?? true,
+            allowUsageData: data.privacy_settings.allow_usage_data ?? true,
+            allowErrorReporting: data.privacy_settings.allow_error_reporting ?? true,
+          } : undefined,
         };
         
         setProfile(profileData);
@@ -119,40 +145,102 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Update user profile data
   const updateProfile = async (data: Partial<ProfileData>) => {
-    if (!user) return { error: new Error('User not authenticated') };
-    
     try {
-      // Convert from our camelCase to database snake_case
-      const dbData: Record<string, any> = {};
-      if (data.firstName !== undefined) dbData.first_name = data.firstName;
-      if (data.lastName !== undefined) dbData.last_name = data.lastName;
-      if (data.photoUrl !== undefined) dbData.photo_url = data.photoUrl;
-      if (data.preferredLanguage !== undefined) dbData.preferred_language = data.preferredLanguage;
-      if (data.preferredTheme !== undefined) dbData.preferred_theme = data.preferredTheme;
+      if (!user) {
+        return { error: new Error('No user logged in') };
+      }
+
+      const updates: any = {};
+
+      // Map our frontend keys to database column names
+      if (data.firstName !== undefined) updates.first_name = data.firstName;
+      if (data.lastName !== undefined) updates.last_name = data.lastName;
+      if (data.photoUrl !== undefined) updates.photo_url = data.photoUrl;
+      if (data.preferredLanguage !== undefined) updates.preferred_language = data.preferredLanguage;
+      if (data.preferredTheme !== undefined) updates.preferred_theme = data.preferredTheme;
       
-      // Add timestamp
-      dbData.updated_at = new Date().toISOString();
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update(dbData)
-        .eq('id', user.id);
-        
-      if (!error && profile) {
-        // Update local state
-        const updatedProfile = {
-          ...profile,
-          ...data
+      // Handle nested objects
+      if (data.chatSettings !== undefined) {
+        updates.chat_settings = {
+          auto_send_messages: data.chatSettings.autoSendMessages,
+          enable_speech: data.chatSettings.enableSpeech,
+          enable_suggestions: data.chatSettings.enableSuggestions,
+          message_history_count: data.chatSettings.messageHistoryCount,
         };
-        setProfile(updatedProfile);
-        cacheProfile(updatedProfile);
       }
       
-      return { error };
+      if (data.privacySettings !== undefined) {
+        updates.privacy_settings = {
+          save_conversation_history: data.privacySettings.saveConversationHistory,
+          allow_usage_data: data.privacySettings.allowUsageData,
+          allow_error_reporting: data.privacySettings.allowErrorReporting,
+        };
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) {
+        return { error };
+      }
+
+      // Update the local state
+      setProfile(profile => profile ? { ...profile, ...data } : null);
+
+      // Update the cache
+      if (profile) {
+        cacheProfile({ ...profile, ...data });
+      }
+
+      return { error: null };
     } catch (error) {
       console.error('Error updating profile:', error);
       return { error };
     }
+  };
+
+  // Delete user account
+  const deleteAccount = async () => {
+    try {
+      if (!user) return;
+      
+      // First, delete user data from any related tables (e.g., conversations)
+      const { error: dataError } = await supabase
+        .from('conversations')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('user_id', user.id);
+        
+      if (dataError) {
+        console.error('Error removing user data:', dataError);
+      }
+      
+      // Delete the user's account
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (error) {
+        console.error('Error deleting account:', error);
+        throw error;
+      }
+      
+      // Clear local state and cache
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      clearProfileCache();
+      
+      // Redirect to home
+      router.push('/');
+    } catch (error) {
+      console.error('Error in deleteAccount:', error);
+      throw error;
+    }
+  };
+
+  // Helper function to get profile image url with default fallback
+  const getProfileImageUrl = (photoUrl: string | null): string => {
+    return photoUrl || '/profile-default.jpg';
   };
 
   // Initialize the auth state
@@ -161,33 +249,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       
       try {
-        // First try to load cached profile for quick rendering
-        const cachedProfile = getCachedProfile();
-        if (cachedProfile) {
-          setProfile(cachedProfile);
-        }
-        
-        // Get the current session
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
+        setUser(session?.user || null);
         
         if (session?.user) {
-          setUser(session.user);
+          // Check if we have a user photo from OAuth
+          if (session.user.app_metadata?.provider === 'google' && 
+              !session.user.user_metadata?.avatar_url && 
+              session.user.user_metadata?.picture) {
+            
+            // Update user profile with Google profile picture
+            const { data, error } = await supabase
+              .from('profiles')
+              .update({ 
+                photo_url: session.user.user_metadata.picture,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', session.user.id);
+              
+            if (error) {
+              console.error('Error updating profile with Google photo:', error);
+            }
+          }
           
-          // If we already have a cached profile, fetch fresh data in the background
+          // Try to load cached profile first for fast rendering
+          const cachedProfile = getCachedProfile();
           if (cachedProfile) {
+            setProfile(cachedProfile);
+            // Then update in background
             fetchProfile(session.user.id).catch(console.error);
           } else {
-            // Otherwise wait for the profile fetch to complete
             await fetchProfile(session.user.id);
           }
         } else {
-          // Clear cache if no valid session
+          setProfile(null);
           clearProfileCache();
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        clearProfileCache();
+        setError(error);
       } finally {
         setIsLoading(false);
       }
@@ -328,7 +429,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUpWithEmail,
     signOut,
     refreshSession,
-    updateProfile
+    updateProfile,
+    deleteAccount,
+    getProfileImageUrl,
+    error
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

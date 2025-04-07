@@ -78,7 +78,11 @@ export default async function LocaleLayout({
       settings: messages.UserDropdown?.settings || "Settings",
       logOut: messages.UserDropdown?.logOut || "Log Out"
     },
-    Navbar: messages.Navbar
+    Navbar: messages.Navbar,
+    Account: messages.Account,
+    History: messages.History,
+    Settings: messages.Settings,
+    AccountLayout: messages.AccountLayout
   };
 
   return (
@@ -108,27 +112,6 @@ export default async function LocaleLayout({
               <div className="flex-grow">
                 {children}
               </div>
-              <footer className="py-6 md:py-0 md:px-8 md:h-16 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
-                  <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-                    2023 GPT IQ. {isRtl ? "جميع الحقوق محفوظة." : "All rights reserved."}
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <a
-                      href="/terms"
-                      className="text-sm font-medium underline-offset-4 hover:underline text-muted-foreground"
-                    >
-                      {isRtl ? "الشروط والأحكام" : "Terms & Conditions"}
-                    </a>
-                    <a
-                      href="/privacy"
-                      className="text-sm font-medium underline-offset-4 hover:underline text-muted-foreground"
-                    >
-                      {isRtl ? "سياسة الخصوصية" : "Privacy Policy"}
-                    </a>
-                  </div>
-                </div>
-              </footer>
             </div>
           </ClientProviders>
         </ThemeProvider>
