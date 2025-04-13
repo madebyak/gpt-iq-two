@@ -26,6 +26,16 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   
   // Reference for cursor animation at the end of streamed text
   const cursorRef = useRef<HTMLSpanElement>(null);
+  
+  // Debug message content
+  useEffect(() => {
+    console.log(`ChatMessage: Rendering message [${message.id.substring(0, 8)}...]`, {
+      role: message.role,
+      content_length: message.content?.length || 0,
+      content_preview: message.content?.substring(0, 30) + (message.content?.length > 30 ? '...' : '') || 'No content',
+      isRtl: isRtl
+    });
+  }, [message.id, message.role, message.content, isRtl]);
 
   // Set the correct avatar based on theme
   useEffect(() => {
@@ -44,6 +54,10 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
       return () => clearInterval(interval);
     }
   }, [message.content, isUser]);
+  
+  // Detect if message content contains Arabic text to apply appropriate text direction
+  const hasArabicContent = message.content && /[\u0600-\u06FF]/.test(message.content);
+  const messageTextDirection = hasArabicContent || isRtl ? "rtl" : "ltr";
 
   return (
     <div
@@ -82,7 +96,10 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
           isUser ? "bg-primary/80 text-primary-foreground" : "bg-card text-foreground"
         )}>
           {message.content ? (
-            <div className="whitespace-pre-wrap">
+            <div 
+              className="whitespace-pre-wrap"
+              style={{ direction: messageTextDirection }}
+            >
               {message.content}
             </div>
           ) : (
@@ -95,7 +112,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
                 <div className="absolute inset-0.5 rounded-full bg-primary/60"></div>
               </div>
               <span className="animate-gradient text-sm">
-                {t("thinking")}
+                {t("thinking") || "Thinking..."}
               </span>
             </div>
           )}

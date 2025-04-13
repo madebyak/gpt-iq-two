@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { StreamingTextResponse } from "ai";
+import { createClient } from "@/lib/supabase/server";
 
 // Initialize the Gemini API client
 const apiKey = process.env.GEMINI_API_KEY;
@@ -14,13 +15,13 @@ const genAI = new GoogleGenerativeAI(apiKey as string);
 
 // Generate stream handler for Gemini API
 export async function POST(req: NextRequest) {
-  const { messages } = await req.json();
+  const { messages, conversation_id } = await req.json();
 
   try {
     // Validate API key
     if (!apiKey || apiKey === "your_gemini_api_key_here") {
       // Create a stream with an error message
-      const fallbackMessage = "Sorry, the Gemini API key is not configured correctly. Please add a valid API key to the .env.local file.";
+      const fallbackMessage = "Sorry, our AI service is not configured correctly. Please contact support.";
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) {
@@ -65,6 +66,13 @@ export async function POST(req: NextRequest) {
     // Generate streaming response
     const result = await chatSession.sendMessageStream(latestMessage.parts[0].text);
     
+    // For API-level backup persistence
+    let fullResponse = "";
+    
+    // Include the conversation_id in response headers for tracking
+    const responseHeaders: Record<string, string> = conversation_id ? 
+      { 'X-Conversation-ID': conversation_id } : {};
+    
     // Convert Gemini stream to vercel AI SDK stream format
     const stream = new ReadableStream({
       async start(controller) {
@@ -72,19 +80,62 @@ export async function POST(req: NextRequest) {
         
         for await (const chunk of result.stream) {
           const text = chunk.text();
+          fullResponse += text; // Accumulate the full response
           controller.enqueue(encoder.encode(text));
+        }
+        
+        // At this point we have the complete AI response
+        // If we have a conversation ID, we could save the message as a backup strategy
+        if (conversation_id) {
+          try {
+            // Use our existing server client
+            const supabase = createClient();
+            
+            // Try to save the AI message directly as a backup strategy
+            const { error: msgError } = await supabase
+              .from('messages')
+              .insert({
+                id: `api-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                conversation_id,
+                role: 'assistant',
+                content: fullResponse,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                topic: 'default'
+              });
+              
+            if (msgError) {
+              console.error("API-level message insertion failed:", msgError);
+            } else {
+              // Update conversation last_message_preview
+              const { error: convoError } = await supabase
+                .from('conversations')
+                .update({
+                  last_message_preview: fullResponse.substring(0, 100),
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', conversation_id);
+                
+              if (convoError) {
+                console.error("API-level conversation update failed:", convoError);
+              }
+            }
+          } catch (error) {
+            // Log error but don't interrupt the stream response
+            console.error("API-level message persistence failed:", error);
+          }
         }
         
         controller.close();
       },
     });
 
-    return new StreamingTextResponse(stream);
+    return new StreamingTextResponse(stream, { headers: responseHeaders });
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("Error generating response:", error);
     
-    // Create a stream with an error message
-    const errorMessage = "An error occurred while communicating with the Gemini API. Please check the API key and try again.";
+    // Create a stream with an error message - generic, no mention of specific API
+    const errorMessage = "An error occurred while generating a response. Please try again later.";
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {

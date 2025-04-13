@@ -16,7 +16,6 @@ import { CircleFadingPlus, HelpCircle, History, Settings, AlertCircle, ArrowLeft
 interface SidebarProps {
   collapsed?: boolean;
   locale: string;
-  onToggle?: () => void;
 }
 
 interface Conversation {
@@ -30,26 +29,18 @@ interface Conversation {
   is_pinned: boolean;
 }
 
-export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
-  const t = useTranslations('Chat');
+export function Sidebar({ collapsed = false, locale }: SidebarProps) {
+  const t = useTranslations("Chat");
   const { user } = useAuth();
-  const [isCollapsed, setIsCollapsed] = useState(collapsed);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingConversationId, setLoadingConversationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   
   const isRtl = locale === 'ar';
   const dateLocale = isRtl ? ar : enUS;
-
-  // Toggle sidebar collapse
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-    if (onToggle) {
-      onToggle();
-    }
-  };
 
   // Fetch conversations when user changes
   const fetchConversations = useCallback(async () => {
@@ -86,19 +77,31 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
     }
   }, [user, fetchConversations]);
 
-  // Sync with parent collapsed state
-  useEffect(() => {
-    setIsCollapsed(collapsed);
-  }, [collapsed]);
-
   // Navigate to a conversation
   const navigateToConversation = (id: string) => {
-    router.push(`/${locale}/chat/${id}`);
+    // Set loading state before navigation
+    setLoadingConversationId(id);
+    
+    // Use router.prefetch to prepare the page before navigation
+    router.prefetch(`/chat/${id}`);
+    
+    // Use a small timeout to ensure the UI updates before navigation
+    setTimeout(() => {
+      router.push(`/chat/${id}`);
+      
+      // Reset loading after a delay to ensure user sees feedback
+      setTimeout(() => {
+        setLoadingConversationId(null);
+      }, 1000);
+    }, 50);
   };
 
   // Start a new chat
   const handleNewChat = () => {
-    router.push(`/${locale}/chat`);
+    router.prefetch('/chat');
+    setTimeout(() => {
+      router.push('/chat');
+    }, 50);
   };
 
   // Format date for display
@@ -121,59 +124,34 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
   return (
     <div 
       className={cn(
-        "flex flex-col h-full border-border/40 bg-muted/10 transition-all duration-300 ease-in-out",
+        "flex flex-col h-full border-border/40 bg-card transition-all duration-300 ease-in-out",
         isRtl ? "border-l" : "border-r",
-        isCollapsed ? "w-[4.5rem]" : "w-[30rem]"
+        collapsed ? "w-[4.5rem]" : "w-[30rem]"
       )}
     >
       {/* New Chat Button */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-4">
         <Button 
           variant="outline" 
           className={cn(
-            "w-full h-11 border-0 bg-card hover:bg-muted text-foreground",
-            isRtl ? "text-right" : "text-left",
-            isCollapsed && "justify-center p-0 h-10 w-10 mx-auto"
+            "border-0 bg-card hover:bg-muted/60 text-foreground",
+            collapsed ? "justify-center h-10 w-10 mx-auto p-0 rounded-md" : "h-10 rounded-md",
+            isRtl ? (collapsed ? "mx-auto" : "text-right max-w-[85%]") : (collapsed ? "mx-auto" : "text-left max-w-[85%]")
           )}
           onClick={handleNewChat}
         >
-          {isCollapsed ? (
+          {collapsed ? (
             <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
           ) : isRtl ? (
             <div className="w-full flex flex-row-reverse items-center">
-              <CircleFadingPlus className="h-4 w-4 mr-auto" aria-hidden="true" />
-              <span>{t('newChat')}</span>
+              <CircleFadingPlus className={cn("h-4 w-4 mr-auto")} aria-hidden="true" />
+              <span className="font-medium">{t('newChat')}</span>
             </div>
           ) : (
             <div className="w-full flex flex-row items-center">
               <CircleFadingPlus className="h-4 w-4 mr-2" aria-hidden="true" />
-              <span>{t('newChat')}</span>
+              <span className="font-medium">{t('newChat')}</span>
             </div>
-          )}
-        </Button>
-      </div>
-      
-      {/* Toggle Button */}
-      <div className={cn("px-2 mb-2", isCollapsed ? "flex justify-center" : "flex", isRtl ? "justify-end" : "justify-start")}>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={toggleSidebar}
-          aria-label={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          {isCollapsed ? (
-            isRtl ? (
-              <ArrowLeftFromLine className="h-4 w-4" />
-            ) : (
-              <ArrowRightFromLine className="h-4 w-4" />
-            )
-          ) : (
-            isRtl ? (
-              <ArrowRightFromLine className={cn("h-4 w-4", isRtl && "rtl-flip")} />
-            ) : (
-              <ArrowLeftFromLine className="h-4 w-4" />
-            )
           )}
         </Button>
       </div>
@@ -182,10 +160,10 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
       <div className="px-4 py-1 mt-2">
         <div className={cn(
           "text-xs font-medium text-muted-foreground uppercase tracking-wider", 
-          isCollapsed ? "text-center" : "",
-          isRtl && !isCollapsed ? "text-right w-full" : ""
+          collapsed ? "text-center" : "",
+          isRtl && !collapsed ? "text-right w-full" : ""
         )}>
-          {!isCollapsed && t('recent')}
+          {!collapsed && t('recent')}
         </div>
       </div>
       
@@ -193,58 +171,110 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
       <ScrollArea className="flex-1">
         <div className="px-2">
           <TooltipProvider>
-            {loading ? (
+            {/* Explicitly wait for initial load before rendering list states */}
+            {loading && (
               <div className="flex justify-center py-4">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               </div>
-            ) : error ? (
-              <div className={cn("px-4 py-2 text-sm text-muted-foreground", isCollapsed && "text-center")}>
-                {isCollapsed ? "!" : error}
+            )}
+            {!loading && error && (
+              // Show error only if not loading
+              <div className={cn("px-4 py-2 text-sm text-muted-foreground", collapsed && "text-center")}>
+                 {collapsed ? "!" : error}
               </div>
-            ) : !user ? (
-              <div className={cn("px-4 py-2 text-sm text-muted-foreground", isCollapsed && "text-center")}>
-                {isCollapsed ? "🔒" : t('signInToViewHistory')}
-              </div>
-            ) : recentChats.length === 0 ? (
-              <div className={cn("px-4 py-2 text-sm text-muted-foreground", isCollapsed && "text-center")}>
-                {isCollapsed ? "💬" : t('noConversations')}
-              </div>
-            ) : (
-              recentChats.map(chat => (
-                <Tooltip key={chat.id} delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full mb-1 h-9 py-1",
-                        isRtl ? "text-right" : "text-left",
-                        isCollapsed && "justify-center",
-                        pathname.includes(`/chat/${chat.id}`) && "bg-muted/50"
-                      )}
-                      onClick={() => navigateToConversation(chat.id)}
-                    >
-                      {isCollapsed ? (
-                        <History className="h-4 w-4" />
-                      ) : isRtl ? (
-                        <div className="w-full flex flex-row-reverse items-center">
-                          <History className="h-4 w-4 mr-auto" />
-                          <span className="truncate text-sm">{chat.title}</span>
-                        </div>
-                      ) : (
-                        <div className="w-full flex flex-row items-center">
-                          <History className="h-4 w-4 mr-2" />
-                          <span className="truncate text-sm">{chat.title}</span>
-                        </div>
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  {isCollapsed && (
-                    <TooltipContent side={isRtl ? "left" : "right"}>
-                      {chat.title}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              ))
+            )}
+            {!loading && !error && (
+              // Render content only after initial load and no error
+              <>
+                {!user ? (
+                  // User is definitively logged out
+                  <div className={cn("px-4 py-2 text-sm text-muted-foreground", collapsed && "text-center")}>
+                    {collapsed ? "🔒" : (t('signInToViewHistory') || "Sign in to view history")}
+                  </div>
+                ) : recentChats.length === 0 ? (
+                  // User is logged in, but no conversations found
+                  <div className={cn("px-4 py-2 text-sm text-muted-foreground", collapsed && "text-center")}>
+                    {collapsed ? "💬" : (t('noConversations') || "No conversations yet")}
+                  </div>
+                ) : (
+                  // User is logged in and has conversations
+                  recentChats.map((chat, index) => (
+                    <div key={chat.id} className={cn(
+                      "transition-colors duration-200",
+                      index !== 0 && "border-t border-border/20",
+                      pathname.includes(`/chat/${chat.id}`) && "bg-muted/30",
+                      "py-1"
+                    )}>
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                              "w-full py-2 px-3 h-auto relative",
+                              isRtl ? "text-right" : "text-left",
+                              collapsed && "justify-center",
+                              pathname.includes(`/chat/${chat.id}`) 
+                                ? "bg-muted hover:bg-muted/80 before:absolute before:top-0 before:bottom-0 before:w-[3px] before:bg-[#28e088] shadow-sm" 
+                                : "hover:bg-muted/30 transition-colors duration-200",
+                              isRtl 
+                                ? pathname.includes(`/chat/${chat.id}`) ? "before:right-0" : ""
+                                : pathname.includes(`/chat/${chat.id}`) ? "before:left-0" : ""
+                            )}
+                            onClick={() => navigateToConversation(chat.id)}
+                          >
+                            {collapsed ? (
+                              <History className="h-4 w-4" />
+                            ) : isRtl ? (
+                              <div className="w-full flex flex-row-reverse items-start">
+                                <History className={cn("h-4 w-4 mr-auto mt-0.5", isRtl && "rtl-flip")} />
+                                <div className="flex flex-col space-y-0.5">
+                                  <span className="truncate font-medium text-sm text-foreground">{chat.title}</span>
+                                  {chat.last_message_preview && (
+                                    <span className="truncate text-xs text-muted-foreground opacity-85 line-clamp-1">
+                                      {chat.last_message_preview.substring(0, 30)}
+                                      {chat.last_message_preview.length > 30 ? '...' : ''}
+                                    </span>
+                                  )}
+                                  <span className="text-xs text-muted-foreground opacity-70 mt-1">
+                                    {formatDate(chat.updated_at)}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-full flex flex-row items-start">
+                                <History className={cn("h-4 w-4 mr-2 mt-0.5", isRtl && "rtl-flip")} />
+                                <div className="flex flex-col space-y-0.5">
+                                  <span className="truncate font-medium text-sm text-foreground">{chat.title}</span>
+                                  {chat.last_message_preview && (
+                                    <span className="truncate text-xs text-muted-foreground opacity-85 line-clamp-1">
+                                      {chat.last_message_preview.substring(0, 30)}
+                                      {chat.last_message_preview.length > 30 ? '...' : ''}
+                                    </span>
+                                  )}
+                                  <span className="text-xs text-muted-foreground opacity-70 mt-1">
+                                    {formatDate(chat.updated_at)}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            {loadingConversationId === chat.id && (
+                              <div className={cn(
+                                "absolute top-0 bottom-0 w-2 bg-primary animate-pulse",
+                                isRtl ? "right-0" : "left-0"
+                              )} />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        {collapsed && (
+                          <TooltipContent side={isRtl ? "left" : "right"}>
+                            {chat.title}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </div>
+                  ))
+                )}
+              </>
             )}
           </TooltipProvider>
         </div>
@@ -260,16 +290,16 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
                 className={cn(
                   "w-full h-9 py-1",
                   isRtl ? "text-right" : "text-left",
-                  isCollapsed && "justify-center"
+                  collapsed && "justify-center"
                 )}
                 asChild
               >
                 <Link href={`/${locale}/help`}>
-                  {isCollapsed ? (
-                    <HelpCircle className="h-4 w-4" />
+                  {collapsed ? (
+                    <HelpCircle className={cn("h-4 w-4", isRtl && "rtl-flip")} />
                   ) : isRtl ? (
                     <div className="w-full flex flex-row-reverse items-center">
-                      <HelpCircle className="h-4 w-4 mr-auto" />
+                      <HelpCircle className={cn("h-4 w-4 mr-auto", isRtl && "rtl-flip")} />
                       <span className="text-sm">{t('help')}</span>
                     </div>
                   ) : (
@@ -281,7 +311,7 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
                 </Link>
               </Button>
             </TooltipTrigger>
-            {isCollapsed && (
+            {collapsed && (
               <TooltipContent side={isRtl ? "left" : "right"}>{t('help')}</TooltipContent>
             )}
           </Tooltip>
@@ -293,16 +323,16 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
                 className={cn(
                   "w-full h-9 py-1",
                   isRtl ? "text-right" : "text-left",
-                  isCollapsed && "justify-center"
+                  collapsed && "justify-center"
                 )}
                 asChild
               >
                 <Link href={`/${locale}/changelog`}>
-                  {isCollapsed ? (
-                    <AlertCircle className="h-4 w-4" />
+                  {collapsed ? (
+                    <AlertCircle className={cn("h-4 w-4", isRtl && "rtl-flip")} />
                   ) : isRtl ? (
                     <div className="w-full flex flex-row-reverse items-center">
-                      <AlertCircle className="h-4 w-4 mr-auto" />
+                      <AlertCircle className={cn("h-4 w-4 mr-auto", isRtl && "rtl-flip")} />
                       <span className="text-sm">{t('changelog')}</span>
                     </div>
                   ) : (
@@ -314,7 +344,7 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
                 </Link>
               </Button>
             </TooltipTrigger>
-            {isCollapsed && (
+            {collapsed && (
               <TooltipContent side={isRtl ? "left" : "right"}>{t('changelog')}</TooltipContent>
             )}
           </Tooltip>
@@ -326,16 +356,16 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
                 className={cn(
                   "w-full h-9 py-1",
                   isRtl ? "text-right" : "text-left",
-                  isCollapsed && "justify-center"
+                  collapsed && "justify-center"
                 )}
                 asChild
               >
                 <Link href={`/${locale}/settings`}>
-                  {isCollapsed ? (
-                    <Settings className="h-4 w-4" />
+                  {collapsed ? (
+                    <Settings className={cn("h-4 w-4", isRtl && "rtl-flip")} />
                   ) : isRtl ? (
                     <div className="w-full flex flex-row-reverse items-center">
-                      <Settings className="h-4 w-4 mr-auto" />
+                      <Settings className={cn("h-4 w-4 mr-auto", isRtl && "rtl-flip")} />
                       <span className="text-sm">{t('settings')}</span>
                     </div>
                   ) : (
@@ -347,7 +377,7 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
                 </Link>
               </Button>
             </TooltipTrigger>
-            {isCollapsed && (
+            {collapsed && (
               <TooltipContent side={isRtl ? "left" : "right"}>{t('settings')}</TooltipContent>
             )}
           </Tooltip>
@@ -355,7 +385,7 @@ export function Sidebar({ collapsed = false, locale, onToggle }: SidebarProps) {
       </div>
       
       {/* Footer Disclaimer */}
-      {!isCollapsed && (
+      {!collapsed && (
         <div className="p-2 border-t border-border/40">
           <p className={cn("text-xs text-muted-foreground", isRtl && "text-right")}>
             {t('disclaimer')} &copy; 2025 All rights reserved.

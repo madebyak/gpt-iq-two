@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   ResizablePanel, 
-  ResizablePanelGroup
+  ResizablePanelGroup,
+  ResizableHandle
 } from "@/components/ui/resizable";
 import * as ResizablePrimitive from "react-resizable-panels";
 import { Sidebar } from "@/components/chat/Sidebar";
@@ -14,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { NextIntlClientProvider } from 'next-intl';
 
 interface ChatLayoutProps {
   locale: string;
@@ -27,6 +29,9 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
   const isRtl = locale === 'ar';
   const [isMobile, setIsMobile] = useState(false);
   const panelRef = useRef<React.ElementRef<typeof ResizablePrimitive.Panel>>(null);
+
+  // Log the messages prop received by ChatLayout
+  console.log('ChatLayout received messages:', JSON.stringify(messages));
 
   // Check if we're on a mobile device
   useEffect(() => {
@@ -53,46 +58,11 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
       const isCurrentlyCollapsed = !isSidebarCollapsed;
       setIsSidebarCollapsed(isCurrentlyCollapsed);
       
-      // We need to force the ResizablePanel to actually collapse or expand
-      // The panel will still be there, but at minimum width (which is what we want)
-      if (document) {
-        const panelGroup = document.querySelector('[data-panel-group]');
-        if (panelGroup) {
-          // Force layout recalculation
-          if (isCurrentlyCollapsed) {
-            // When collapsing, add a class that will trigger the panel to collapse
-            panelGroup.setAttribute('data-collapsed', 'true');
-            
-            // Get the resizable handle and click it programmatically to ensure collapse
-            const resizableHandle = panelGroup.querySelector('[role="separator"]');
-            if (resizableHandle) {
-              // Simulate dragging the handle all the way to collapse
-              const event = new MouseEvent('mousedown', {
-                bubbles: true,
-                cancelable: true,
-              });
-              resizableHandle.dispatchEvent(event);
-              
-              // Now force the minimum size
-              setTimeout(() => {
-                if (panelRef.current) {
-                  // This forces the panel to its collapsed size
-                  const panel = panelRef.current as unknown as {resize: (size: number) => void};
-                  panel.resize?.(5);
-                }
-              }, 0);
-            }
-          } else {
-            // When expanding, remove the collapsed attribute
-            panelGroup.removeAttribute('data-collapsed');
-            
-            // Force resize to default expanded size
-            if (panelRef.current) {
-              const panel = panelRef.current as unknown as {resize: (size: number) => void};
-              panel.resize?.(20);
-            }
-          }
-        }
+      // Use the panel ref to resize directly
+      if (panelRef.current) {
+        const panel = panelRef.current as unknown as {resize: (size: number) => void};
+        // Set to minimum or default size based on collapse state
+        panel.resize?.(isCurrentlyCollapsed ? 5 : 20);
       }
     };
     
@@ -114,28 +84,32 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
           onExpand={() => setIsSidebarCollapsed(false)}
           className="flex"
         >
-          <div className="flex flex-col h-full">
-            <div className="px-4 py-2 flex">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className={cn(
-                  "h-8 w-8 rounded-md",
-                  isRtl && "mr-auto"
-                )}
-                onClick={toggleSidebarCollapse}
-                aria-label="Toggle sidebar"
-              >
-                <Menu className="h-4 w-4" />
-                <span className="sr-only">Toggle sidebar</span>
-              </Button>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <div className="flex flex-col h-full bg-card">
+              <div className="px-4 py-2 flex bg-card">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={cn(
+                    "h-8 w-8 rounded-md",
+                    isRtl && "mr-auto"
+                  )}
+                  onClick={toggleSidebarCollapse}
+                  aria-label="Toggle sidebar"
+                >
+                  <Menu className="h-4 w-4" />
+                  <span className="sr-only">Toggle sidebar</span>
+                </Button>
+              </div>
+              <Sidebar 
+                collapsed={isSidebarCollapsed} 
+                locale={locale}
+              />
             </div>
-            <Sidebar 
-              collapsed={isSidebarCollapsed} 
-              locale={locale}
-            />
-          </div>
+          </NextIntlClientProvider>
         </ResizablePanel>
+        
+        <ResizableHandle withHandle />
         
         {/* Main Content Panel */}
         <ResizablePanel defaultSize={80}>
@@ -170,8 +144,13 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
               <span className="sr-only">Toggle sidebar</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side={isRtl ? "right" : "left"} className="p-0">
-            <Sidebar collapsed={false} locale={locale} />
+          <SheetContent side={isRtl ? "right" : "left"} className="p-0 bg-card">
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <Sidebar 
+                collapsed={false} 
+                locale={locale}
+              />
+            </NextIntlClientProvider>
           </SheetContent>
         </Sheet>
       </div>

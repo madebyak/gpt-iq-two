@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, useEffect, ReactNode, useState, useRef } from "react";
 import { Message, useChat } from "@/lib/hooks/useChat";
 
 interface ChatContextProps {
@@ -33,12 +33,45 @@ export function ChatProvider({ children }: ChatProviderProps) {
 
 export function useChatContext(conversationId?: string) {
   const context = useContext(ChatContext);
+  const loadingRef = useRef(false);
+  const previousIdRef = useRef<string | undefined>(undefined);
+  
   if (context === undefined) {
     throw new Error("useChatContext must be used within a ChatProvider");
   }
   
-  // If a conversation ID is provided and it doesn't match the current one,
-  // load the conversation (this is handled by the useChat hook's useEffect)
+  useEffect(() => {
+    // Skip if no conversationId provided
+    if (!conversationId) {
+      previousIdRef.current = undefined;
+      return;
+    }
+    
+    // Prevent multiple simultaneous loading attempts
+    if (loadingRef.current) {
+      console.log(`Skipping redundant load attempt for ${conversationId}`);
+      return;
+    }
+    
+    // Check if this is a new conversation or a repeated request
+    if (conversationId !== previousIdRef.current) {
+      console.log(`Loading new conversation: ${conversationId}`);
+      
+      // Mark as loading to prevent redundant requests
+      loadingRef.current = true;
+      previousIdRef.current = conversationId;
+      
+      // Safely load the conversation
+      context.loadConversation(conversationId)
+        .catch(error => {
+          console.error(`Failed to load conversation ${conversationId}:`, error);
+        })
+        .finally(() => {
+          // Allow future loading attempts once this is complete
+          loadingRef.current = false;
+        });
+    }
+  }, [conversationId, context]);
   
   return context;
 }
