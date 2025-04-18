@@ -112,7 +112,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
                 <div className="absolute inset-0.5 rounded-full bg-primary/60"></div>
               </div>
               <span className="animate-gradient text-sm">
-                {t("thinking") || "Thinking..."}
+                {t("thinking")}
               </span>
             </div>
           )}

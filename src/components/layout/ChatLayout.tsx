@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { 
   ResizablePanel, 
   ResizablePanelGroup,
   ResizableHandle
 } from "@/components/ui/resizable";
-import * as ResizablePrimitive from "react-resizable-panels";
 import { Sidebar } from "@/components/chat/Sidebar";
 import { ChatContent } from "@/components/chat/ChatContent";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -16,6 +15,10 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { NextIntlClientProvider } from 'next-intl';
+import { useRtl } from "@/lib/hooks/useRtl";
+import { useResizablePanel } from "@/lib/hooks/useResizablePanel";
+import { logger } from "@/lib/utils/logger";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 interface ChatLayoutProps {
   locale: string;
@@ -25,13 +28,11 @@ interface ChatLayoutProps {
 }
 
 export function ChatLayout({ locale, messages, children, conversationId }: ChatLayoutProps) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const isRtl = locale === 'ar';
   const [isMobile, setIsMobile] = useState(false);
-  const panelRef = useRef<React.ElementRef<typeof ResizablePrimitive.Panel>>(null);
-
-  // Log the messages prop received by ChatLayout
-  console.log('ChatLayout received messages:', JSON.stringify(messages));
+  const { isRtl } = useRtl(locale);
+  
+  // Log the messages prop received by ChatLayout (using our structured logger)
+  logger.debug('ChatLayout received messages', { messageKeys: messages ? Object.keys(messages) : [] });
 
   // Check if we're on a mobile device
   useEffect(() => {
@@ -53,76 +54,96 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
 
   // Desktop layout with resizable panels
   function DesktopLayout() {
-    // Create a custom handler to toggle sidebar
-    const toggleSidebarCollapse = () => {
-      const isCurrentlyCollapsed = !isSidebarCollapsed;
-      setIsSidebarCollapsed(isCurrentlyCollapsed);
-      
-      // Use the panel ref to resize directly
-      if (panelRef.current) {
-        const panel = panelRef.current as unknown as {resize: (size: number) => void};
-        // Set to minimum or default size based on collapse state
-        panel.resize?.(isCurrentlyCollapsed ? 5 : 20);
-      }
-    };
+    // Use our custom resizable panel hook instead of direct DOM manipulation
+    const { 
+      isCollapsed: isSidebarCollapsed,
+      panelSize: sidebarSize,
+      toggleCollapse: toggleSidebarCollapse,
+      handleResize: handlePanelResize,
+      setIsCollapsed: setIsSidebarCollapsed
+    } = useResizablePanel({
+      defaultSize: 20,
+      minSize: 2,
+      maxSize: 30
+    });
+    
+    logger.debug(`Desktop layout rendered with sidebarSize=${sidebarSize}, collapsed=${isSidebarCollapsed}`);
     
     return (
       <ResizablePanelGroup
         direction="horizontal"
         className={cn("flex-grow", isRtl && "flex-row-reverse")}
-        data-panel-group
+        onLayout={handlePanelResize}
       >
         {/* Sidebar Panel */}
         <ResizablePanel
-          ref={panelRef}
           defaultSize={20}
-          minSize={15}
+          minSize={2}
           maxSize={30}
           collapsible
-          collapsedSize={5}
+          collapsedSize={2}
           onCollapse={() => setIsSidebarCollapsed(true)}
           onExpand={() => setIsSidebarCollapsed(false)}
           className="flex"
         >
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <div className="flex flex-col h-full bg-card">
-              <div className="px-4 py-2 flex bg-card">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className={cn(
-                    "h-8 w-8 rounded-md",
-                    isRtl && "mr-auto"
-                  )}
-                  onClick={toggleSidebarCollapse}
-                  aria-label="Toggle sidebar"
-                >
-                  <Menu className="h-4 w-4" />
-                  <span className="sr-only">Toggle sidebar</span>
-                </Button>
+          <ErrorBoundary
+            fallback={
+              <div className="flex flex-col h-full p-4 text-destructive">
+                Error loading sidebar. Please refresh the page.
               </div>
-              <Sidebar 
-                collapsed={isSidebarCollapsed} 
-                locale={locale}
-              />
-            </div>
-          </NextIntlClientProvider>
+            }
+            context="ChatLayout.Sidebar"
+          >
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              <div className="flex flex-col h-full bg-card">
+                <div className="px-4 py-2 flex bg-card">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={cn(
+                      "h-8 w-8 rounded-md",
+                      isRtl && "mr-auto"
+                    )}
+                    onClick={toggleSidebarCollapse}
+                    aria-label="Toggle sidebar"
+                  >
+                    <Menu className="h-4 w-4" />
+                    <span className="sr-only">Toggle sidebar</span>
+                  </Button>
+                </div>
+                <Sidebar 
+                  collapsed={isSidebarCollapsed} 
+                  locale={locale}
+                />
+              </div>
+            </NextIntlClientProvider>
+          </ErrorBoundary>
         </ResizablePanel>
         
         <ResizableHandle withHandle />
         
         {/* Main Content Panel */}
         <ResizablePanel defaultSize={80}>
-          <div className="flex flex-col h-full">
-            <div className="flex-grow overflow-auto">
-              <ChatContent locale={locale} conversationId={conversationId}>
-                {children}
-              </ChatContent>
+          <ErrorBoundary
+            fallback={
+              <div className="flex flex-col h-full p-8">
+                <h2 className="text-2xl font-bold text-destructive mb-4">Error loading chat content</h2>
+                <p>There was a problem loading the chat content. Please try refreshing the page.</p>
+              </div>
+            }
+            context="ChatLayout.Content"
+          >
+            <div className="flex flex-col h-full">
+              <div className="flex-grow overflow-auto">
+                <ChatContent locale={locale} conversationId={conversationId}>
+                  {children}
+                </ChatContent>
+              </div>
+              <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
+                <ChatInput locale={locale} />
+              </div>
             </div>
-            <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
-              <ChatInput locale={locale} />
-            </div>
-          </div>
+          </ErrorBoundary>
         </ResizablePanel>
       </ResizablePanelGroup>
     );

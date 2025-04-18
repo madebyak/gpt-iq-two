@@ -2,6 +2,7 @@ import { ChatLayout } from "@/components/layout/ChatLayout";
 import Navbar from "@/components/layout/navbar";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
+import { getMessages } from 'next-intl/server';
 
 // Check if the conversation exists before rendering
 export async function generateMetadata({ params }: { params: { locale: string; id: string } }) {
@@ -88,19 +89,21 @@ export default async function ConversationPage({
       }
     }
     
+    // Fetch all messages for the locale
+    const messages = await getMessages();
+    
     return (
       <>
         <Navbar />
         <ChatLayout 
           locale={params.locale}
           conversationId={params.id}
+          messages={messages}
         />
       </>
     );
   } catch (error) {
     console.error("Error in ConversationPage:", error);
-    
-    // Fallback rendering in case of error
     return (
       <>
         <Navbar />

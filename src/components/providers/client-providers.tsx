@@ -2,8 +2,7 @@
 
 import { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
-import { AuthProvider } from '@/lib/auth/auth-context';
-import { ChatProvider } from '@/components/providers/ChatProvider';
+import AppProviders from '@/components/AppProviders';
 
 interface ClientProvidersProps {
   messages: Record<string, Record<string, string>>;
@@ -16,16 +15,5 @@ export default function ClientProviders({
   children,
   locale 
 }: ClientProvidersProps) {
-  // Debug: Log the messages to see what's available
-  console.log('ClientProviders messages:', JSON.stringify(messages, null, 2));
-  
-  return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <AuthProvider>
-        <ChatProvider>
-          {children}
-        </ChatProvider>
-      </AuthProvider>
-    </NextIntlClientProvider>
-  );
+  return <AppProviders messages={messages} locale={locale}>{children}</AppProviders>;
 }

@@ -48,16 +48,6 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-// Helper function to pick specific keys from an object
-function pick(obj: Record<string, any>, keys: string[]): Record<string, any> {
-  return keys.reduce((acc, key) => {
-    if (obj && Object.prototype.hasOwnProperty.call(obj, key)) {
-      acc[key] = obj[key];
-    }
-    return acc;
-  }, {} as Record<string, any>);
-}
-
 export default async function LocaleLayout({
   children,
   params,
@@ -78,8 +68,8 @@ export default async function LocaleLayout({
   // Load all messages for the locale
   const messages = (await import(`../../../messages/${locale}.json`)).default;
 
-  // Select only the messages needed by global client components using the local pick function
-  const globalMessages = pick(messages, ['ThemeToggle', 'UserDropdown', 'Navbar', 'Common']);
+  // Use all locale messages for full translation coverage
+  const localeMessages = messages;
 
   return (
     <html 
@@ -101,8 +91,7 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          {/* Provide only essential global translations */}
-          <ClientProviders messages={globalMessages} locale={locale}>
+          <ClientProviders messages={localeMessages} locale={locale}>
             <div className="flex flex-col min-h-screen">
               {/* The Navbar component will be imported in the page files */}
               <div className="flex-grow">
