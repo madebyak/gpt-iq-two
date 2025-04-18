@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { logger } from '@/lib/utils/logger';
 import { handleApiError } from '@/lib/utils/error-handler';
 import { useFormHandler, FormValues, FieldValidation } from '@/lib/utils/form-handler';
@@ -61,8 +61,6 @@ export function useFormSubmission<T extends FormValues, R = any>(
         if (resetOnSuccess) {
           form.resetForm();
         }
-        
-        return result;
       } catch (error) {
         const errorMessage = handleApiError(error);
         
@@ -92,7 +90,7 @@ export function useFormSubmission<T extends FormValues, R = any>(
     submitError,
     submitResult,
     // Override the form's submit handler
-    handleSubmit: async (e) => {
+    handleSubmit: async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!form.validateForm()) {
         return;

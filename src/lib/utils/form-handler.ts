@@ -158,6 +158,7 @@ export function useFormHandler<T extends FormValues>(
     handleChange,
     handleCheckboxChange,
     handleSubmit,
+    validateForm,
     isSubmitting,
     submitError,
     resetForm,
