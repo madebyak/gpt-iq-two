@@ -9,6 +9,7 @@ import { Message } from "@/lib/hooks/useChat";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { useAuth } from "@/lib/auth/auth-context";
 
 interface ChatContentProps {
   locale: string;
@@ -17,10 +18,19 @@ interface ChatContentProps {
 }
 
 export function ChatContent({ locale, conversationId, children }: ChatContentProps) {
-  const { messages, isLoading, error } = useChatContext(conversationId);
+  const { messages, isLoading, error, clearMessages } = useChatContext(conversationId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isRtl = locale === 'ar';
   const router = useRouter();
+  const { user } = useAuth();
+  
+  // Effect to clear messages when navigating to a new chat (conversationId is undefined)
+  useEffect(() => {
+    if (conversationId === undefined) {
+      console.log("ChatContent: conversationId is undefined, calling clearMessages.");
+      clearMessages();
+    }
+  }, [conversationId, clearMessages]);
   
   // Debug the current state with more details
   useEffect(() => {
@@ -43,7 +53,27 @@ export function ChatContent({ locale, conversationId, children }: ChatContentPro
   }, [messages]);
 
   const renderContent = () => {
-    // For new conversations without messages, show the headline
+    // --- Personalized Greeting Logic ---
+    if (user && messages.length === 0 && !isLoading && !error) {
+      // Attempt to get first name, provide fallbacks
+      const firstName = user.user_metadata?.name?.split(' ')[0] 
+                       || user.email?.split('@')[0] 
+                       || (isRtl ? 'مرحباً' : 'Hello'); // Generic fallback
+
+      return (
+        <div className="h-full flex flex-col items-center justify-center text-center p-4">
+          <h2 className="text-3xl font-semibold tracking-tight text-foreground mb-2 headline-gradient py-1">
+            {isRtl ? `مرحباً ${firstName}` : `Hello, ${firstName}!`}
+          </h2>
+          <p className="text-muted-foreground">
+            {isRtl ? 'كيف يمكنني مساعدتك اليوم؟' : 'How can I help you today?'}
+          </p>
+        </div>
+      );
+    }
+    // --- End Personalized Greeting ---
+    
+    // Default Headline for logged-out users or when there are messages
     if (messages.length === 0 && !isLoading && !error) {
       return (
         <div className="h-full flex items-center justify-center">
@@ -110,22 +140,6 @@ export function ChatContent({ locale, conversationId, children }: ChatContentPro
           ))}
           <div ref={messagesEndRef} />
         </div>
-        
-        {/* Non-intrusive loading indicator */}
-        {isLoading && (
-          <div className={cn(
-            "fixed bottom-4 z-10 shadow-md bg-card/80 backdrop-blur-sm rounded-full p-2",
-            isRtl ? "left-4" : "right-4"
-          )}>
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-              {/* Loading text */}
-              <span className="text-xs text-muted-foreground">
-                {isRtl ? 'جاري التفكير...' : 'Thinking...'}
-              </span>
-            </div>
-          </div>
-        )}
         
         {/* Initial loading state - only show when no messages are available yet */}
         {isLoading && messages.length === 0 && (
