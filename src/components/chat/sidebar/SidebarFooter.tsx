@@ -26,7 +26,7 @@ function SidebarFooterComponent({ collapsed, locale }: SidebarFooterProps) {
     >
       <div
         dir={isRtl ? "rtl" : "ltr"}
-        className="border-t border-border/40 px-2 py-1 space-y-1"
+        className="border-t border-border/40 py-1 space-y-1"
       >
         <TooltipProvider>
           <SidebarAction collapsed={collapsed} locale={locale} href={`/${locale}/help`} label={t("help")} Icon={HelpCircle} />
@@ -35,8 +35,13 @@ function SidebarFooterComponent({ collapsed, locale }: SidebarFooterProps) {
         </TooltipProvider>
         {/* Disclaimer - only show when not collapsed */}
         {!collapsed && (
-          <div className="p-2 border-t border-border/40">
-            <p className={cn("text-xs text-muted-foreground", isRtl && "text-right")}>{t("disclaimer")}</p>
+          <div className="border-t border-border/40 px-4 py-2">
+            <p className={cn(
+              "text-xs text-muted-foreground",
+              isRtl && "text-right"
+            )}>
+              {t("disclaimer")}
+            </p>
           </div>
         )}
       </div>

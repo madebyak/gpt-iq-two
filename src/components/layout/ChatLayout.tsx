@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   ResizablePanel, 
   ResizablePanelGroup,
-  ResizableHandle
+  ResizableHandle,
 } from "@/components/ui/resizable";
+import { ImperativePanelHandle } from "react-resizable-panels";
 import { Sidebar } from "@/components/chat/Sidebar";
 import { ChatContent } from "@/components/chat/ChatContent";
 import { ChatInput } from "@/components/chat/ChatInput";
@@ -19,6 +20,7 @@ import { useRtl } from "@/lib/hooks/useRtl";
 import { useResizablePanel } from "@/lib/hooks/useResizablePanel";
 import { logger } from "@/lib/utils/logger";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { SidebarButton } from "@/components/chat/sidebar/SidebarButton";
 
 interface ChatLayoutProps {
   locale: string;
@@ -54,20 +56,20 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
 
   // Desktop layout with resizable panels
   function DesktopLayout() {
-    // Use our custom resizable panel hook instead of direct DOM manipulation
+    const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
+
     const { 
       isCollapsed: isSidebarCollapsed,
-      panelSize: sidebarSize,
       toggleCollapse: toggleSidebarCollapse,
-      handleResize: handlePanelResize,
-      setIsCollapsed: setIsSidebarCollapsed
+      handleResize: handlePanelResize
     } = useResizablePanel({
       defaultSize: 20,
-      minSize: 2,
-      maxSize: 30
+      minSize: 4,
+      maxSize: 20,
+      panelRef: sidebarPanelRef
     });
     
-    logger.debug(`Desktop layout rendered with sidebarSize=${sidebarSize}, collapsed=${isSidebarCollapsed}`);
+    logger.debug(`Desktop layout rendered with collapsed=${isSidebarCollapsed}`);
     
     return (
       <ResizablePanelGroup
@@ -77,14 +79,14 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
       >
         {/* Sidebar Panel */}
         <ResizablePanel
+          ref={sidebarPanelRef}
           defaultSize={20}
-          minSize={2}
-          maxSize={30}
+          minSize={4}
+          maxSize={20}
           collapsible
-          collapsedSize={2}
-          onCollapse={() => setIsSidebarCollapsed(true)}
-          onExpand={() => setIsSidebarCollapsed(false)}
-          className="flex"
+          collapsedSize={4}
+          className={cn("flex")}
+          id="sidebar-panel"
         >
           <ErrorBoundary
             fallback={
@@ -96,20 +98,17 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
           >
             <NextIntlClientProvider locale={locale} messages={messages}>
               <div className="flex flex-col h-full bg-card">
-                <div className="px-4 py-2 flex bg-card">
-                  <Button 
+                <div className="py-2 flex bg-card">
+                  <SidebarButton 
                     variant="ghost" 
-                    size="icon" 
-                    className={cn(
-                      "h-8 w-8 rounded-md",
-                      isRtl && "mr-auto"
-                    )}
+                    size="icon"
+                    Icon={Menu}
+                    label="Toggle sidebar"
+                    collapsed={isSidebarCollapsed}
+                    locale={locale}
                     onClick={toggleSidebarCollapse}
-                    aria-label="Toggle sidebar"
-                  >
-                    <Menu className="h-4 w-4" />
-                    <span className="sr-only">Toggle sidebar</span>
-                  </Button>
+                    iconOnlyWhenExpanded={true}
+                  />
                 </div>
                 <Sidebar 
                   collapsed={isSidebarCollapsed} 
@@ -120,10 +119,15 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
           </ErrorBoundary>
         </ResizablePanel>
         
-        <ResizableHandle withHandle />
+        <ResizableHandle withHandle className="bg-transparent w-0 border-0" />
         
         {/* Main Content Panel */}
-        <ResizablePanel defaultSize={80}>
+        <ResizablePanel 
+          defaultSize={80}
+          className={cn(
+            isRtl ? "border-r border-border/40" : "border-l border-border/40"
+          )}
+        >
           <ErrorBoundary
             fallback={
               <div className="flex flex-col h-full p-8">
@@ -151,14 +155,19 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
 
   // Mobile layout with sheet for sidebar
   const MobileLayout = () => (
-    <div className={cn("flex flex-col h-full", isRtl && "items-end")}>
-      <div className={cn("px-4 py-2 flex border-b border-border/40", isRtl && "w-full justify-end")}>
+    <div className={cn("flex flex-col h-full")}>
+      <div 
+        className={cn(
+          "px-4 py-2 border-b border-border/40",
+          "text-left rtl:text-right" 
+        )}
+      >
         <Sheet>
           <SheetTrigger asChild>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 rounded-md"
+              className={cn("h-8 w-8 rounded-md")}
               aria-label="Toggle sidebar"
             >
               <Menu className="h-4 w-4" />

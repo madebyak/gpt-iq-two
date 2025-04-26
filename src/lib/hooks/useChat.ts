@@ -23,7 +23,7 @@ export interface ConversationMeta {
 }
 
 export function useChat(initialConversationId?: string) {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const supabase = createClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -169,15 +169,28 @@ export function useChat(initialConversationId?: string) {
   
   // Load existing conversation if conversationId is provided
   useEffect(() => {
+    // Wait until authentication is resolved before deciding to load
+    if (isAuthLoading) {
+      console.log('[useChat] Waiting for auth state...');
+      return; // Don't proceed if auth is still loading
+    }
+
+    console.log(`[useChat] Auth resolved. User: ${user ? user.id : 'null'}, initialConversationId: ${initialConversationId}`);
+
     if (initialConversationId && user) {
+      console.log(`[useChat] Auth resolved and user exists, calling loadConversation(${initialConversationId})`);
       loadConversation(initialConversationId);
     } else {
-      // Reset messages if no conversation ID
+      // Reset messages if no conversation ID or no user after auth resolves
+      console.log('[useChat] Auth resolved but no user or no initialConversationId, resetting chat.');
       setMessages([]);
       setTitle("New Conversation");
       setConversationId(undefined);
+      setError(null); // Clear any previous errors
+      setIsLoading(false);
     }
-  }, [initialConversationId, user, loadConversation]);
+    // Ensure loadConversation is stable if included
+  }, [initialConversationId, user, isAuthLoading, loadConversation]);
   
   // Save conversation with debounce
   const saveConversation = useCallback(async () => {
@@ -521,7 +534,7 @@ export function useChat(initialConversationId?: string) {
         const assistantMessage = addMessage("assistant", "");
         
         // Send the request to the API in parallel with saving
-        const response = await fetch("/api/gemini", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

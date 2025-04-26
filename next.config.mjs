@@ -6,6 +6,17 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig = {
   // Add any other Next.js configuration options here
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        // port: '', // Optional: add if needed
+        // pathname: '/a/**', // Optional: be more specific if needed
+      },
+      // Add other patterns here if needed
+    ],
+  },
 };
 
 // Apply the next-intl plugin to the Next.js configuration

@@ -54,7 +54,7 @@ function ConversationListComponent({
       context="ConversationList"
     >
       <ScrollArea className="flex-1">
-        <div className="px-2">
+        <div className="px-4">
           <TooltipProvider>
             {/* Explicitly wait for initial load before rendering list states */}
             {loading && (
@@ -93,7 +93,7 @@ function ConversationListComponent({
                       <Button
                         variant="ghost"
                         className={cn(
-                          "w-full py-2 px-3 h-auto relative",
+                          "py-2 px-3 h-auto relative",
                           textAlign, // Use our RTL utility for text alignment
                           pathname.includes(`/chat/${chat.id}`) 
                             ? "bg-muted hover:bg-muted/80 before:absolute before:top-0 before:bottom-0 before:w-[3px] before:bg-[#28e088] shadow-sm" 
@@ -110,7 +110,6 @@ function ConversationListComponent({
                       >
                         {isRtl ? (
                           <div className="w-full flex flex-row-reverse items-start gap-x-2">
-                            {/* Use the rtl-flip utility class for icons in RTL mode */}
                             <History className={cn("h-4 w-4 rtl-flip", flipIcon)} />
                             <div className="flex flex-col space-y-0.5 text-right w-full">
                               <span className="truncate font-medium text-sm text-foreground">{chat.title}</span>

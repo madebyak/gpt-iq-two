@@ -46,7 +46,7 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
     if (collapsed) return null;
     
     return (
-      <div className="px-4 py-1 mt-2">
+      <div className="py-1 mt-2 px-4">
         <div className={cn(
           "text-xs font-medium text-muted-foreground uppercase tracking-wider", 
           isRtl && "text-right w-full"
@@ -64,10 +64,7 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
     >
       <div 
         className={cn(
-          "flex flex-col h-full border-border/40 bg-card transition-all duration-300 ease-in-out",
-          isRtl ? "border-l" : "border-r",
-          collapsed ? "w-[3.5rem] overflow-hidden" : "w-[19rem] md:w-[22rem] lg:w-[24rem] xl:w-[26rem] 2xl:w-[30rem]",
-          collapsed ? "min-w-0" : "min-w-[15rem]"
+          "flex flex-col h-full bg-card transition-all duration-300 ease-in-out"
         )}
       >
         {/* New Chat Button */}

@@ -30,7 +30,11 @@ export function useConversations({ locale }: UseConversationsOptions) {
   
   // Fetch conversations data
   const fetchConversations = useCallback(async () => {
-    if (!user) return;
+    // Only fetch if we have a user with an ID
+    if (!user || !user.id) {
+      console.log("Skipping fetchConversations: No user or user ID");
+      return;
+    }
     
     try {
       setLoading(true);
@@ -67,9 +71,13 @@ export function useConversations({ locale }: UseConversationsOptions) {
   
   // Fetch conversations when user changes
   useEffect(() => {
-    if (user) {
+    // Only fetch if we have a user with an ID
+    if (user && user.id) {
+      console.log("User detected, fetching conversations...");
       fetchConversations();
     } else {
+      // Clear conversations if user logs out or isn't fully loaded
+      console.log("No user or user ID, clearing conversations.");
       setConversations([]);
     }
   }, [user, fetchConversations]);

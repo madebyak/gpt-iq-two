@@ -3,7 +3,8 @@
  * Replaces direct DOM manipulation with proper React state management
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, RefObject } from 'react';
+import { ImperativePanelHandle } from 'react-resizable-panels';
 import { logger } from '../utils/logger';
 
 interface ResizablePanelOptions {
@@ -15,6 +16,9 @@ interface ResizablePanelOptions {
   
   /** Maximum allowed size (percentage) */
   maxSize: number;
+  
+  /** Ref to the ResizablePanel component */
+  panelRef: RefObject<ImperativePanelHandle>;
   
   /** Optional callback when panel is collapsed */
   onCollapse?: () => void;
@@ -33,6 +37,7 @@ export function useResizablePanel({
   defaultSize,
   minSize,
   maxSize,
+  panelRef,
   onCollapse,
   onExpand,
   rememberUserSize = true
@@ -52,61 +57,77 @@ export function useResizablePanel({
   // Toggle between collapsed and expanded states
   const toggleCollapse = useCallback(() => {
     const nextCollapsed = !isCollapsed;
-    logger.debug(`Toggle panel collapse: ${isCollapsed} -> ${nextCollapsed}`);
+    logger.debug(`Toggle panel collapse: ${isCollapsed} -> ${nextCollapsed}, panelRef: ${panelRef.current}`);
+    
+    // Get the imperative handle
+    const panel = panelRef.current;
+    if (!panel) {
+      logger.warn('Panel ref not available for imperative resize.');
+      return; // Exit if ref not attached yet
+    }
     
     if (nextCollapsed) {
-      // When collapsing, remember current size but don't change it yet
+      // COLLAPSING:
       if (!isCollapsed && rememberUserSize) {
-        userSizeRef.current = currentSize;
+        userSizeRef.current = panel.getSize(); // Get size directly from panel before collapse
       }
       setIsCollapsed(true);
+      // **Imperatively resize the panel**
+      panel.resize(minSize);
+      setCurrentSize(minSize); // Keep state in sync
       onCollapse?.();
     } else {
-      // When expanding, restore to user's previous size or default
-      setCurrentSize(rememberUserSize ? userSizeRef.current : defaultSize);
+      // EXPANDING:
+      const targetSize = rememberUserSize ? userSizeRef.current : defaultSize;
       setIsCollapsed(false);
+      // **Imperatively resize the panel**
+      panel.resize(targetSize);
+      setCurrentSize(targetSize); // Keep state in sync
       onExpand?.();
     }
-  }, [isCollapsed, defaultSize, currentSize, onCollapse, onExpand, rememberUserSize]);
+  }, [
+    isCollapsed, 
+    defaultSize, 
+    // currentSize, // CurrentSize state is less critical dependency now, resize sets it
+    onCollapse, 
+    onExpand, 
+    rememberUserSize, 
+    minSize, 
+    userSizeRef, 
+    panelRef // Add panelRef to dependencies
+  ]);
   
-  // Handle resize events from panels
+  // Handle resize events from panels (USER DRAGGING)
   const handleResize = useCallback((sizes: number[]) => {
-    // Only update if panel isn't collapsed and size changed
-    if (!isCollapsed && sizes[0] > minSize && sizes[0] !== currentSize) {
-      logger.debug(`Panel resized: ${currentSize} -> ${sizes[0]}`);
-      setCurrentSize(sizes[0]);
-      
-      // Remember user's manual size setting
-      if (rememberUserSize) {
-        userSizeRef.current = sizes[0];
-      }
-    }
-  }, [isCollapsed, minSize, currentSize, rememberUserSize]);
-  
-  // Effects to ensure consistent collapsed state based on size
-  useEffect(() => {
-    // If size becomes minSize and not already collapsed, update collapsed state
-    if (currentSize <= minSize && !isCollapsed) {
+    const newSize = sizes[0]; // Assuming sidebar is the first panel
+    logger.debug(`Panel resized by user drag: ${currentSize} -> ${newSize}`);
+    setCurrentSize(newSize); // Update internal size state
+    
+    // Update collapsed state based on drag
+    if (newSize <= minSize && !isCollapsed) {
+      logger.debug('Panel reached minSize by dragging, setting collapsed=true');
       setIsCollapsed(true);
       onCollapse?.();
-    } 
-    // If size becomes greater than minSize and is collapsed, update collapsed state
-    else if (currentSize > minSize && isCollapsed) {
+    } else if (newSize > minSize && isCollapsed) {
+      logger.debug('Panel expanded past minSize by dragging, setting collapsed=false');
       setIsCollapsed(false);
       onExpand?.();
     }
-  }, [currentSize, minSize, isCollapsed, onCollapse, onExpand]);
+    
+    // Remember user's manual size setting if not collapsed
+    if (newSize > minSize && rememberUserSize) {
+      userSizeRef.current = newSize;
+    }
+  }, [isCollapsed, minSize, currentSize, rememberUserSize, onCollapse, onExpand]); // Removed panelRef, not needed here
   
+  // Return minimum necessary values
   return {
     isCollapsed,
-    panelSize,
-    currentSize,
+    // panelSize, // Less relevant now
+    // currentSize, // Internal state mostly
     toggleCollapse,
     handleResize,
-    setIsCollapsed,
-    setCurrentSize: (size: number) => {
-      const clampedSize = Math.min(Math.max(size, minSize), maxSize);
-      setCurrentSize(clampedSize);
-    }
+    // setIsCollapsed, // Not needed externally
+    // setCurrentSize // Not needed externally
   };
 }

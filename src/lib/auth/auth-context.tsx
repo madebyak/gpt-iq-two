@@ -373,22 +373,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign up with email and password
   const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('[DEBUG] Starting signup process with email:', email);
+      
+      // First create the user with Supabase Auth
+      const result = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-          data: {
-            first_name: firstName,
-            last_name: lastName
-          }
+          data: { first_name: firstName, last_name: lastName }
         },
       });
-
-      return { error };
-    } catch (error) {
-      console.error('Error signing up with email:', error);
-      return { error };
+      
+      console.log('[DEBUG] Auth signup result:', {
+        user: result.data?.user ? 'Created' : 'Not created',
+        error: result.error ? result.error.message : 'None'
+      });
+      
+      // If user creation succeeded, manually create a profile entry
+      if (result.data?.user && !result.error) {
+        try {
+          console.log('[DEBUG] Creating profile for user:', result.data.user.id);
+          
+          // Create a profile record with exact schema match to your existing database
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              first_name: firstName || null,
+              last_name: lastName || null,
+              email: email,
+              photo_url: null,
+              preferred_language: 'en',
+              preferred_theme: 'system',
+              is_active: true,
+              last_login: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              is_deleted: false,
+              token_usage: 0,
+              deleted_at: null,
+              chat_settings: null,
+              privacy_settings: null
+            });
+          
+          if (profileError) {
+            console.error('[DEBUG] Error creating profile:', profileError.message, profileError);
+          } else {
+            console.log('[DEBUG] Profile created successfully');
+          }
+        } catch (profileErr) {
+          console.error('[DEBUG] Exception creating profile:', profileErr);
+        }
+      }
+      
+      if (result.error) {
+        console.error('[DEBUG] Auth error details:', {
+          name: result.error.name,
+          status: (result.error as any).status,
+          message: result.error.message,
+          details: (result.error as any).details,
+          hint: (result.error as any).hint
+        });
+      }
+      
+      return { error: result.error };
+    } catch (err) {
+      console.error('[DEBUG] Exception in signUpWithEmail:', err);
+      return { error: err as any };
     }
   };
 

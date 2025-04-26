@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth/auth-context";
+import { logger } from "@/lib/utils/logger";
 
 interface ChatMessageProps {
   message: Message;
@@ -58,6 +59,29 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   // Detect if message content contains Arabic text to apply appropriate text direction
   const hasArabicContent = message.content && /[\u0600-\u06FF]/.test(message.content);
   const messageTextDirection = hasArabicContent || isRtl ? "rtl" : "ltr";
+
+  // --- BEGIN LOGGING ---
+  if (!message.content && !isUser) {
+    try {
+      const thinkingText = t("thinking");
+      logger.debug('[ChatMessage] Attempting to render thinking indicator.', { 
+        locale, 
+        messageId: message.id.substring(0, 8),
+        translationResult: thinkingText,
+        translationAvailable: true
+      });
+    } catch (error) {
+      logger.error('[ChatMessage] Error retrieving "thinking" translation JUST before render.', { 
+        locale, 
+        messageId: message.id.substring(0, 8),
+        errorMessage: error instanceof Error ? error.message : String(error),
+        translationAvailable: false 
+      });
+       // Optionally log the entire t object's keys if helpful, but might be large
+       // logger.debug('[ChatMessage] Keys available in t:', { keys: Object.keys(t) }); 
+    }
+  }
+  // --- END LOGGING ---
 
   return (
     <div

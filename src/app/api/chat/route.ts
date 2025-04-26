@@ -1,7 +1,19 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
-import { StreamingTextResponse } from "ai";
+import { StreamingTextResponse, Message as VercelAIMessage } from "ai";
 import { createClient } from "@/lib/supabase/server";
+import { z } from 'zod';
+
+// Zod schema for input validation
+const messageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string().min(1).max(10000), // Add reasonable length limits
+});
+
+const requestBodySchema = z.object({
+  messages: z.array(messageSchema).min(1), // Ensure at least one message
+  conversation_id: z.string().uuid().optional(), // Validate UUID if present
+});
 
 // Initialize the Gemini API client
 const apiKey = process.env.GEMINI_API_KEY;
@@ -15,7 +27,41 @@ const genAI = new GoogleGenerativeAI(apiKey as string);
 
 // Generate stream handler for Gemini API
 export async function POST(req: NextRequest) {
-  const { messages, conversation_id } = await req.json();
+  // 1. Authentication Check
+  const supabase = createClient();
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    console.error("API Route: Unauthorized access attempt.", sessionError);
+    return new NextResponse('Unauthorized', { status: 401 });
+  }
+
+  // Logged-in user ID for potential use
+  const userId = session.user.id;
+  console.log(`[API /gemini] Request received from user: ${userId}`);
+
+  // 2. Input Validation
+  let parsedBody;
+  try {
+    const rawBody = await req.json();
+    parsedBody = requestBodySchema.parse(rawBody);
+  } catch (error) {
+    console.error("[API /gemini] Invalid request body:", error);
+    // Handle zod errors specifically for better messages if needed
+    if (error instanceof z.ZodError) {
+      return new NextResponse(JSON.stringify({ error: "Invalid request format", details: error.errors }), { 
+        status: 400, 
+        headers: { 'Content-Type': 'application/json' } 
+      });
+    }
+    return new NextResponse(JSON.stringify({ error: "Invalid request body" }), { 
+      status: 400, 
+      headers: { 'Content-Type': 'application/json' } 
+    });
+  }
+
+  // Use validated data from here on
+  const { messages, conversation_id } = parsedBody;
 
   try {
     // Validate API key
@@ -34,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Map AI messages format to Gemini format
-    const geminiMessages = messages.map((message: { role: string; content: string }) => ({
+    const geminiMessages = messages.map((message: { role: "user" | "assistant"; content: string }) => ({
       role: message.role === "user" ? "user" : "model",
       parts: [{ text: message.content }],
     }));
@@ -89,7 +135,7 @@ export async function POST(req: NextRequest) {
         if (conversation_id) {
           try {
             // Use our existing server client
-            const supabase = createClient();
+            // const supabase = createClient(); <--- REMOVE redundant initialization
             
             // Try to save the AI message directly as a backup strategy
             const { error: msgError } = await supabase

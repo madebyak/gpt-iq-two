@@ -73,7 +73,7 @@ export default function SignupPage({ params }: SignupPageProps) {
     
     try {
       // Sign up with Supabase
-      const { error: signUpError } = await signUpWithEmail(email, password);
+      const { error: signUpError } = await signUpWithEmail(email, password, firstName, lastName);
       
       if (signUpError) {
         throw signUpError;

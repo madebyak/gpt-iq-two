@@ -80,11 +80,11 @@ export function HeadlineAR() {
           className="inline-block"
         >
           <h1 className="text-4xl font-bold tracking-tight flex items-center justify-center gap-2">
-            <span className="headline-gradient">الله بالخير{userName ? ` ${userName}` : ""} ، خلي</span>
+            <span className="headline-gradient py-2">الله بالخير{userName ? ` ${userName}` : ""} ، خلي</span>
             <span className="relative h-[1.5em] w-48 overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.span
-                  className="headline-gradient absolute inset-0 flex items-center"
+                  className="headline-gradient absolute inset-0 flex items-center py-2"
                   key={currentWordIndex}
                   variants={wordVariants}
                   initial="enter"
