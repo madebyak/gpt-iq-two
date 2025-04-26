@@ -125,8 +125,9 @@ export async function POST(req: NextRequest) {
         const encoder = new TextEncoder();
         
         for await (const chunk of result.stream) {
-          const text = chunk.text();
-          fullResponse += text; // Accumulate the full response
+          let text = chunk.text();
+          
+          fullResponse += text; 
           controller.enqueue(encoder.encode(text));
         }
         

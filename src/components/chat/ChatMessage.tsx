@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Message } from "@/lib/hooks/useChat";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -8,6 +8,13 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/auth/auth-context";
 import { logger } from "@/lib/utils/logger";
+import { Button } from "@/components/ui/button";
+import { Copy, Share2 } from "lucide-react";
+import { toast } from "react-hot-toast";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vs, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface ChatMessageProps {
   message: Message;
@@ -21,6 +28,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   const isUser = message.role === "user";
   const isRtl = locale === "ar";
   const [avatarSrc, setAvatarSrc] = useState("/dark-chat-avatar.png");
+  const [canShare, setCanShare] = useState(false);
   
   // Get user profile picture
   const userProfilePic = profile ? getProfileImageUrl(profile.photoUrl) : "/profile-default.jpg";
@@ -83,12 +91,156 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   }
   // --- END LOGGING ---
 
+  // Check for Share API support on mount (client-side only)
+  useEffect(() => {
+    setCanShare(typeof navigator !== 'undefined' && !!navigator.share);
+  }, []);
+
+  // Handler for copying text
+  const handleCopy = async () => {
+    if (!message.content) return;
+    try {
+      await navigator.clipboard.writeText(message.content);
+      toast.success(isRtl ? "تم النسخ إلى الحافظة" : "Copied to clipboard");
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      toast.error(isRtl ? "فشل نسخ النص" : "Failed to copy text");
+    }
+  };
+
+  // Handler for sharing text
+  const handleShare = async () => {
+    if (!message.content || !navigator.share) return;
+    try {
+      await navigator.share({
+        text: message.content,
+        title: isRtl ? "مشاركة من GPT IQ" : "Shared from GPT IQ", // Optional title
+      });
+    } catch (err) {
+      // Handle errors (e.g., user cancellation) - often silent is fine
+      console.error('Failed to share text: ', err);
+      // Optional: Show toast only for specific errors, not cancellation
+      // if (err.name !== 'AbortError') {
+      //   toast.error(isRtl ? "فشل مشاركة النص" : "Failed to share text");
+      // }
+    }
+  };
+
+  // --- Custom Code Renderer with dynamic theme and customStyle ---
+  const CodeRenderer = useMemo(() => ({
+    code({ node, inline, className, children, ...props }: any) {
+      const match = /language-(\w+)/.exec(className || '');
+      const language = match ? match[1] : null;
+
+      const inlineStyle = {
+        background: 'hsl(var(--muted) / 0.2)',
+        padding: '0.1em 0.3em',
+        borderRadius: 'var(--radius, 0.3rem)',
+        fontFamily: 'var(--font-mono, monospace)'
+      };
+
+      if (!inline && language) {
+        const syntaxTheme = theme === 'dark' ? vscDarkPlus : vs;
+        const codeString = String(children).replace(/\n$/, '');
+
+        // Specific copy handler for this code block
+        const handleCodeCopy = async () => {
+          try {
+            await navigator.clipboard.writeText(codeString);
+            toast.success(isRtl ? "تم نسخ الكود" : "Code copied");
+          } catch (err) {
+            console.error('Failed to copy code: ', err);
+            toast.error(isRtl ? "فشل نسخ الكود" : "Failed to copy code");
+          }
+        };
+
+        // Style for the language name header div
+        const langHeaderStyle: React.CSSProperties = {
+          fontSize: '0.8rem',
+          color: 'hsl(var(--muted-foreground))',
+          padding: '0.5rem 1.25rem 0.5rem 0.75rem', 
+          fontFamily: 'var(--font-ibm-plex-sans)',
+          borderBottom: '1px solid hsl(var(--muted-foreground))',
+          display: 'flex',
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexDirection: isRtl ? 'row-reverse' : 'row', 
+        };
+
+        // Styles for the outer wrapper div
+        const wrapperStyle: React.CSSProperties = {
+          backgroundColor: 'hsl(var(--muted))', // Back to solid muted
+          borderRadius: 'var(--radius, 0.5rem)',
+          margin: '0.5rem 0', 
+          overflow: 'hidden',
+          border: 'none',
+        };
+
+        // Custom style for the SyntaxHighlighter
+        const highlighterStyle: React.CSSProperties = {
+          background: 'transparent',
+          padding: '1rem 1.25rem', // Use this for code padding
+          margin: 0, 
+          overflowX: 'auto',
+          border: 'none', // Ensure no border here
+        };
+
+        return (
+          <div style={wrapperStyle}>
+            {/* Header: Items visually reversed via flexDirection in RTL */}
+            <div style={langHeaderStyle}>
+              {/* Span will inherit text-align from parent */}
+              <span>{language}</span> 
+              <Button 
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-70 hover:opacity-100" 
+                onClick={handleCodeCopy}
+                aria-label={isRtl ? "نسخ الكود" : "Copy code"}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            {/* Highlighter */}
+            <SyntaxHighlighter
+              style={syntaxTheme} 
+              customStyle={highlighterStyle}
+              language={language}
+              PreTag="div"
+              {...props}
+            >
+              {codeString} 
+            </SyntaxHighlighter>
+          </div>
+        );
+      }
+
+      return (
+        <code 
+          className={className} 
+          style={inline ? inlineStyle : { fontFamily: 'var(--font-mono, monospace)' }}
+          {...props}
+        >
+          {children}
+        </code>
+      );
+    }
+  }), [theme]); // Depend on the app theme
+  // --- End Custom Code Renderer ---
+
+  // Apply link cleanup regex before rendering
+  // Looks for: Punctuation -> Optional Space -> Slash -> Optional Space -> URL
+  // Replaces with: Punctuation -> Single Space -> URL
+  const linkCleanupRegex = /([:,.!?;])\s*\/\s*(https?:\/\/[^\s<>]+)/g;
+  const cleanedContent = message.content ? message.content.replace(linkCleanupRegex, '$1 $2') : '';
+
   return (
     <div
       className={cn(
-        "flex w-full items-start gap-x-4 py-4",
-        isRtl ? "flex-row-reverse text-right" : "flex-row text-left"
+        "flex w-full items-start gap-x-4 py-4", 
+        isRtl ? "text-right" : "text-left" 
       )}
+      dir={isRtl ? "rtl" : "ltr"}
     >
       <div className="flex-shrink-0">
         {isUser ? (
@@ -114,17 +266,26 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
         )}
       </div>
       
-      <div className="flex-1 space-y-2">
+      <div className={cn(
+          "flex-1 flex flex-col", 
+          "items-start" // Always align items (bubble) to the start (left)
+        )}
+      >
         <div className={cn(
           "inline-block rounded-lg px-4 py-2 max-w-prose",
           isUser ? "bg-primary/80 text-primary-foreground" : "bg-card text-foreground"
         )}>
           {message.content ? (
             <div 
-              className="whitespace-pre-wrap"
               style={{ direction: messageTextDirection }}
+              className="markdown-content"
             >
-              {message.content}
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]} 
+                components={CodeRenderer}
+              >
+                {cleanedContent}
+              </ReactMarkdown>
             </div>
           ) : (
             <div className={cn(
@@ -141,6 +302,36 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
             </div>
           )}
         </div>
+        
+        {!isUser && message.content && (
+          <div 
+            className={cn(
+              "mt-1 flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity",
+              "justify-start"
+            )}
+          >
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6"
+              onClick={handleCopy}
+              aria-label={isRtl ? "نسخ النص" : "Copy text"}
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+            {canShare && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={handleShare}
+                aria-label={isRtl ? "مشاركة النص" : "Share text"}
+              >
+                <Share2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

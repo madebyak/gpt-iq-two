@@ -100,7 +100,7 @@ export function ChatContent({ locale, conversationId, children }: ChatContentPro
               }
             </p>
             <button 
-              onClick={() => router.push('/chat')}
+              onClick={() => window.location.href = `/${locale}` }
               className={cn(
                 "bg-primary text-primary-foreground px-4 py-2 rounded text-sm",
                 "flex items-center mx-auto"

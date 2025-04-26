@@ -19,10 +19,11 @@ const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 interface ChatProviderProps {
   children: ReactNode;
+  conversationId?: string;
 }
 
-export function ChatProvider({ children }: ChatProviderProps) {
-  const chatState = useChat();
+export function ChatProvider({ children, conversationId }: ChatProviderProps) {
+  const chatState = useChat(conversationId);
 
   return (
     <ChatContext.Provider value={chatState}>

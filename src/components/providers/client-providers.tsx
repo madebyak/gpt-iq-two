@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import AppProviders from '@/components/AppProviders';
 
 interface ClientProvidersProps {
+  
   messages: Record<string, Record<string, string>>;
   children: ReactNode;
   locale: string;

@@ -21,6 +21,7 @@ import { useResizablePanel } from "@/lib/hooks/useResizablePanel";
 import { logger } from "@/lib/utils/logger";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { SidebarButton } from "@/components/chat/sidebar/SidebarButton";
+import { ChatProvider } from "@/components/providers/ChatProvider";
 
 interface ChatLayoutProps {
   locale: string;
@@ -137,16 +138,18 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
             }
             context="ChatLayout.Content"
           >
-            <div className="flex flex-col h-full">
-              <div className="flex-grow overflow-auto">
-                <ChatContent locale={locale} conversationId={conversationId}>
-                  {children}
-                </ChatContent>
+            <ChatProvider conversationId={conversationId}>
+              <div className="flex flex-col h-full">
+                <div className="flex-grow overflow-auto">
+                  <ChatContent locale={locale} conversationId={conversationId}>
+                    {children}
+                  </ChatContent>
+                </div>
+                <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
+                  <ChatInput locale={locale} />
+                </div>
               </div>
-              <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
-                <ChatInput locale={locale} />
-              </div>
-            </div>
+            </ChatProvider>
           </ErrorBoundary>
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -185,15 +188,17 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
         </Sheet>
       </div>
       
-      <div className="flex-grow overflow-auto">
-        <ChatContent locale={locale} conversationId={conversationId}>
-          {children}
-        </ChatContent>
-      </div>
-      
-      <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
-        <ChatInput locale={locale} />
-      </div>
+      {/* Wrap the remaining content and input areas with ChatProvider */}
+      <ChatProvider conversationId={conversationId}>
+        <div className="flex-grow overflow-auto">
+          <ChatContent locale={locale} conversationId={conversationId}>
+            {children}
+          </ChatContent>
+        </div>
+        <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
+          <ChatInput locale={locale} />
+        </div>
+      </ChatProvider>
     </div>
   );
 

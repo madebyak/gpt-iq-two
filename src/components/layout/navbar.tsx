@@ -30,11 +30,11 @@ import { UserDropdown } from "@/components/auth/user-dropdown";
 const getLanguageInfo = (localeCode: string) => {
   switch (localeCode) {
     case 'ar':
-      return { flag: '🇮🇶', name: 'العربية' };
+      return { flagPath: '/iraq-svg.svg', name: 'العربية' };
     case 'en':
-      return { flag: '🇬🇧', name: 'English' };
+      return { flagPath: '/uk-svg.svg', name: 'English' };
     default:
-      return { flag: '🇮🇶', name: 'العربية' };
+      return { flagPath: '/iraq-svg.svg', name: 'العربية' };
   }
 };
 
@@ -43,6 +43,10 @@ const Navbar = () => {
   const locale = useLocale();
   const pathname = usePathname();
   const { user, profile, signOut, isLoading } = useAuth();
+  
+  // --- Add Logging ---
+  console.log('[Navbar] Rendering with pathname:', pathname, 'and locale:', locale);
+  // --- End Logging ---
   
   // Default fallback values
   const defaultLabels = {
@@ -172,7 +176,13 @@ const Navbar = () => {
                 variant="outline" 
                 className="flex items-center gap-2 h-11 px-4 py-2"
               >
-                <span className="text-base">{currentLanguage.flag}</span>
+                <Image 
+                  src={currentLanguage.flagPath}
+                  alt={`${currentLanguage.name} flag`}
+                  width={20}
+                  height={15}
+                  className="h-auto"
+                />
                 <span>{currentLanguage.name}</span>
                 <ChevronDown className="h-4 w-4 opacity-70" />
               </Button>
@@ -180,13 +190,25 @@ const Navbar = () => {
             <DropdownMenuContent align="end">
               <IntlLink href={pathname} locale="ar">
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                  <span className="text-base">🇮🇶</span>
+                  <Image 
+                    src="/iraq-svg.svg"
+                    alt="Arabic flag"
+                    width={20} 
+                    height={15}
+                    className="h-auto"
+                  />
                   <span>العربية</span>
                 </DropdownMenuItem>
               </IntlLink>
               <IntlLink href={pathname} locale="en">
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                  <span className="text-base">🇬🇧</span>
+                  <Image 
+                    src="/uk-svg.svg"
+                    alt="English flag"
+                    width={20} 
+                    height={15}
+                    className="h-auto"
+                  />
                   <span>English</span>
                 </DropdownMenuItem>
               </IntlLink>

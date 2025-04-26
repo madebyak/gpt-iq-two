@@ -247,18 +247,36 @@ export function useChat(initialConversationId?: string) {
           }
         } else {
           // Update existing conversation
+          // Ensure last_message_preview has a fallback if content is missing
+          const lastMessageContent = messages[messages.length - 1]?.content;
+          let preview = lastMessageContent ? lastMessageContent.substring(0, 100) : '';
+          
+          // Sanitize preview: Remove Unicode surrogate pairs (often emojis) that might break JSON parsing
+          preview = preview.replace(/[\uD800-\uDFFF]/g, ''); 
+          
+          // --- BEGIN DEBUG LOGGING ---
+          const updatePayload = {
+            title: currentTitle,
+            last_message_preview: preview,
+            message_count: messages.length,
+            updated_at: new Date().toISOString()
+          };
+          console.log("[DEBUG] Attempting conversation update:", {
+            conversationId: currentConversationId,
+            payload: updatePayload
+          });
+          // --- END DEBUG LOGGING ---
+          
           const { error } = await supabase
             .from('conversations')
-            .update({
-              title: currentTitle,
-              last_message_preview: messages[messages.length - 1].content.substring(0, 100),
-              message_count: messages.length,
-              updated_at: new Date().toISOString()
-            })
+            .update(updatePayload) // Use the payload object
             .eq('id', currentConversationId);
             
           if (error) {
+            // Log the payload again specifically on error
             console.error("Error updating conversation:", error);
+            console.error("[DEBUG] Update failed. Conversation ID:", currentConversationId);
+            console.error("[DEBUG] Update failed. Payload was:", updatePayload);
             throw error;
           }
         }
@@ -701,14 +719,6 @@ export function useChat(initialConversationId?: string) {
     setMessages([]);
     setTitle("New Conversation");
     setConversationId(undefined);
-    
-    // Update URL if in browser
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      const pathSegments = url.pathname.split('/');
-      const locale = pathSegments[1]; // Assuming first segment is locale
-      window.history.replaceState({}, '', `/${locale}/chat`);
-    }
   }, []);
 
   return {

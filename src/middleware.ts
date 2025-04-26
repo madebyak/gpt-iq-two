@@ -34,7 +34,7 @@ async function middleware(request: NextRequest) {
   const intlMiddleware = createIntlMiddleware({
     locales,
     defaultLocale,
-    localePrefix: 'as-needed',
+    localePrefix: 'always',
     localeDetection: true
   });
   

@@ -215,3 +215,69 @@
 .shadow-glow {
   box-shadow: 0 0 5px rgba(40, 224, 136, 0.2), 0 0 20px rgba(40, 224, 136, 0.1);
 }
+
+/* Add styles for rendered Markdown content */
+.markdown-content p {
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content a {
+  color: hsl(var(--primary)); /* Use primary color variable */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-content a:hover {
+  color: hsl(var(--primary) / 0.9); /* Slightly darker */
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  list-style: revert;
+  margin-left: 1.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Add this rule specifically for unordered lists */
+.markdown-content ul {
+  list-style-position: inside;
+}
+
+/* Add this rule specifically for ordered lists */
+.markdown-content ol {
+  list-style-position: inside;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content code {
+  /* Keep only mono font family for general inline code */
+  font-family: var(--font-mono, monospace);
+}
+
+.markdown-content table {
+  width: auto;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid hsl(var(--muted-foreground) / 0.5);
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid hsl(var(--muted-foreground) / 0.5);
+  padding: 0.4rem 0.7rem;
+  text-align: inherit;
+}
+
+.markdown-content th {
+  font-weight: 600;
+  background-color: hsl(var(--muted) / 0.8);
+}
+
+.markdown-content strong {
+  font-weight: 600;
+}
