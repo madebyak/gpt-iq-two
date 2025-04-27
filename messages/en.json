@@ -480,5 +480,11 @@
   "light": "light",
   "dark": "dark",
   "first_name, last_name, email, photo_url, preferred_language, preferred_theme, chat_settings, privacy_settings": "first_name, last_name, email, photo_url, preferred_language, preferred_theme, chat_settings, privacy_settings",
-  "returnUrl": "returnUrl"
+  "returnUrl": "returnUrl",
+  "Onboarding": {
+    "step1": {
+      "headline": "Welcome to the New Jahiz.Ai!",
+      "subheading": "From promising experiment to powerful beta – experience the next generation of AI conversation, enhanced just for you."
+    }
+  }
 }

@@ -35,7 +35,7 @@ async function middleware(request: NextRequest) {
     locales,
     defaultLocale,
     localePrefix: 'always',
-    localeDetection: true
+    localeDetection: false
   });
   
   // Get the pathname without the locale prefix

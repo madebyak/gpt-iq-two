@@ -7,6 +7,8 @@ import "../globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { cn } from "@/lib/utils";
 import ClientProviders from "@/components/providers/client-providers";
+import React from 'react';
+import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
 
 // Load IBM Plex Sans for Latin (English) text
 const ibmPlexSans = IBM_Plex_Sans({
@@ -48,6 +50,7 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Make function async again
 export default async function LocaleLayout({
   children,
   params,
@@ -65,10 +68,8 @@ export default async function LocaleLayout({
   // Determine text direction based on locale
   const isRtl = locale === 'ar';
 
-  // Load all messages for the locale
+  // Restore message loading
   const messages = (await import(`../../../messages/${locale}.json`)).default;
-
-  // Use all locale messages for full translation coverage
   const localeMessages = messages;
 
   return (
@@ -82,7 +83,6 @@ export default async function LocaleLayout({
     >
       <body className={cn(
         `${ibmPlexSans.variable} ${ibmPlexSansArabic.variable} antialiased min-h-screen flex flex-col`,
-        // Use appropriate font family based on locale
         isRtl ? "font-ibm-plex-sans-arabic" : "font-sans"
       )}>
         <ThemeProvider
@@ -91,12 +91,13 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
+          {/* Pass loaded messages again */}
           <ClientProviders messages={localeMessages} locale={locale}>
             <div className="flex flex-col min-h-screen">
-              {/* The Navbar component will be imported in the page files */}
               <div className="flex-grow">
                 {children}
               </div>
+              <OnboardingTrigger />
             </div>
           </ClientProviders>
         </ThemeProvider>
