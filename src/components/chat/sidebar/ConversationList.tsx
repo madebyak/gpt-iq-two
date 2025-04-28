@@ -53,7 +53,7 @@ function ConversationListComponent({
       fallback={<div className="flex-1 p-4 text-destructive">Error loading conversations</div>}
       context="ConversationList"
     >
-      <ScrollArea className="flex-1">
+      <ScrollArea>
         <div className="px-4">
           <TooltipProvider>
             {/* Explicitly wait for initial load before rendering list states */}

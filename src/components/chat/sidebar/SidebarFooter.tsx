@@ -29,9 +29,9 @@ function SidebarFooterComponent({ collapsed, locale }: SidebarFooterProps) {
         className="border-t border-border/40 py-1 space-y-1"
       >
         <TooltipProvider>
-          <SidebarAction collapsed={collapsed} locale={locale} href={`/${locale}/help`} label={t("help")} Icon={HelpCircle} />
-          <SidebarAction collapsed={collapsed} locale={locale} href={`/${locale}/changelog`} label={t("changelog")} Icon={AlertCircle} />
-          <SidebarAction collapsed={collapsed} locale={locale} href={`/${locale}/settings`} label={t("settings")} Icon={Settings} />
+          <SidebarAction collapsed={collapsed} locale={locale} href="/help" label={t("help")} Icon={HelpCircle} />
+          <SidebarAction collapsed={collapsed} locale={locale} href="/changelog" label={t("changelog")} Icon={AlertCircle} />
+          <SidebarAction collapsed={collapsed} locale={locale} href="/settings" label={t("settings")} Icon={Settings} />
         </TooltipProvider>
         {/* Disclaimer - only show when not collapsed */}
         {!collapsed && (

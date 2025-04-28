@@ -60,11 +60,11 @@ export function AccountLayout({ children, title, description, activeItem = 'acco
 
   if (isMobile) {
     return (
-      <div dir={isRtl ? 'rtl' : 'ltr'}>
+      <div dir={isRtl ? 'rtl' : 'ltr'} className="flex flex-col h-screen">
         <Navbar />
-        <Container className="py-6 px-4 pb-20">
+        <main className="flex-grow overflow-y-auto py-6 px-4 pb-16">
           {children}
-        </Container>
+        </main>
         <MobileNav activeItem={activeItem} />
       </div>
     );

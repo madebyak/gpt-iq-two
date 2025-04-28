@@ -64,15 +64,17 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
     >
       <div 
         className={cn(
-          "flex flex-col h-full bg-card transition-all duration-300 ease-in-out"
+          "flex flex-col bg-card transition-all duration-300 ease-in-out"
         )}
       >
-        {/* New Chat Button */}
-        <SidebarHeader
-          collapsed={collapsed}
-          locale={locale}
-          onNewChat={handleNewChat}
-        />
+        {/* New Chat Button - Wrapped for margin */}
+        <div className="mt-10">
+          <SidebarHeader
+            collapsed={collapsed}
+            locale={locale}
+            onNewChat={handleNewChat}
+          />
+        </div>
         
         {/* Recent Section Label */}
         {renderRecentLabel}

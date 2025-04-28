@@ -177,7 +177,10 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
               <span className="sr-only">Toggle sidebar</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side={isRtl ? "right" : "left"} className="p-0 bg-card">
+          <SheetContent 
+            side={isRtl ? "right" : "left"} 
+            className="p-0 bg-card h-screen overflow-y-auto"
+          >
             <NextIntlClientProvider locale={locale} messages={messages}>
               <Sidebar 
                 collapsed={false} 

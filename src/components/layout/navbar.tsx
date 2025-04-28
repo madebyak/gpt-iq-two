@@ -296,7 +296,10 @@ const Navbar = () => {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side={locale === 'ar' ? 'left' : 'right'} className="w-[300px] sm:w-[400px]">
+              <SheetContent 
+                side={locale === 'ar' ? 'left' : 'right'} 
+                className="w-[300px] sm:w-[400px] h-full overflow-y-auto"
+              >
                 <nav className="flex flex-col gap-4 mt-6">
                   <Button 
                     variant="outline" 

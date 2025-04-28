@@ -73,7 +73,10 @@ export function UserDropdown({ user, onLogout }: UserDropdownProps) {
           <ChevronDown className="h-4 w-4 opacity-70" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent 
+        align="end" 
+        className="w-56 max-h-[calc(100vh-100px)] overflow-y-auto"
+      >
         <IntlLink href="/account">
           <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
             <UserRound className="h-4 w-4" />
