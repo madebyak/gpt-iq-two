@@ -25,6 +25,16 @@ export default function SettingsPage() {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
+  // Fetch tab translations unconditionally at the top level
+  const tabLabels = {
+    profile: t("tabs.profile"),
+    security: t("tabs.security"),
+    appearance: t("tabs.appearance"),
+    language: t("tabs.language"),
+    chat: t("tabs.chat"),
+    privacy: t("tabs.privacy"),
+  };
+
   // Redirect if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
@@ -55,12 +65,12 @@ export default function SettingsPage() {
     <Tabs defaultValue="profile" className="w-full">
       <TabsList className="h-9 p-0.5">
         <div className="whitespace-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <TabsTrigger value="profile">{t("tabs.profile")}</TabsTrigger>
-          <TabsTrigger value="security">{t("tabs.security")}</TabsTrigger>
-          <TabsTrigger value="appearance">{t("tabs.appearance")}</TabsTrigger>
-          <TabsTrigger value="language">{t("tabs.language")}</TabsTrigger>
-          <TabsTrigger value="chat">{t("tabs.chat")}</TabsTrigger>
-          <TabsTrigger value="privacy">{t("tabs.privacy")}</TabsTrigger>
+          <TabsTrigger value="profile">{tabLabels.profile}</TabsTrigger>
+          <TabsTrigger value="security">{tabLabels.security}</TabsTrigger>
+          <TabsTrigger value="appearance">{tabLabels.appearance}</TabsTrigger>
+          <TabsTrigger value="language">{tabLabels.language}</TabsTrigger>
+          <TabsTrigger value="chat">{tabLabels.chat}</TabsTrigger>
+          <TabsTrigger value="privacy">{tabLabels.privacy}</TabsTrigger>
         </div>
       </TabsList>
       <TabsContent value="profile" className="mt-6"><ProfileSection /></TabsContent>
