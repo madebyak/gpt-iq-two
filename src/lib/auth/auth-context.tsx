@@ -297,30 +297,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // Set up the auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: Session | null) => {
+      console.log(`[Auth Context] onAuthStateChange event: ${event}`);
       setSession(session);
-      setUser(session?.user || null);
+      const currentUser = session?.user || null;
+      setUser(currentUser);
       
-      if (session?.user) {
-        // On sign in/sign up/token refresh
-        if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
-          // Try to load cached profile first for fast rendering
-          const cachedProfile = getCachedProfile();
-          if (cachedProfile) {
-            setProfile(cachedProfile);
-            // Then update in background
-            fetchProfile(session.user.id).catch(console.error);
-          } else {
-            await fetchProfile(session.user.id);
-          }
+      if (currentUser) {
+        const cachedProfile = getCachedProfile();
+        if (cachedProfile) {
+          setProfile(cachedProfile);
         }
       } else {
-        // User signed out
         setProfile(null);
         clearProfileCache();
       }
       
       setIsLoading(false);
+
+      if (currentUser) {
+        setTimeout(() => {
+            console.log(`[Auth Context] Triggering profile fetch for user ${currentUser.id}`);
+            fetchProfile(currentUser.id).catch(err => {
+                console.error("[Auth Context] Background profile fetch failed:", err);
+            });
+        }, 0);
+      }
     });
 
     // Clean up the subscription
