@@ -70,13 +70,14 @@ const Navbar = () => {
     getStarted: "Get Started"
   };
   
-  // Create a labels object
+  // Declare labels with defaults first
   let labels = { ...defaultLabels };
-  let t: ReturnType<typeof useTranslations> | undefined = undefined;
 
-  // Try to get translated labels
+  // Call hook unconditionally
+  const t = useTranslations('Navbar');
+
+  // Try to assign translated labels, potentially overwriting defaults
   try {
-    t = useTranslations('Navbar');
     labels = {
       openMainMenu: t('openMainMenu') || defaultLabels.openMainMenu,
       newChat: t('newChat') || defaultLabels.newChat,
@@ -91,8 +92,9 @@ const Navbar = () => {
       getStarted: t('getStarted') || defaultLabels.getStarted
     };
   } catch (error) {
-    console.error("Error in navbar translations:", error);
-    // Keep using the default labels
+    console.error("Error assigning navbar translations (hook call was successful):", error);
+    // Explicitly reset to defaults just in case assignment failed partially
+    labels = { ...defaultLabels }; 
   }
 
   const currentLanguage = getLanguageInfo(locale);
