@@ -308,7 +308,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
               <div className="h-4 w-4">
                 <div id="loading-animation"></div>
               </div>
-              <span className="animate-gradient">GPT-IQ is thinking...</span>
+              <span className="animate-gradient">Jahiz Bot is thinking...</span>
             </div>
           )}
         </div>

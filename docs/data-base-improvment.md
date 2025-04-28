@@ -1,7 +1,7 @@
-# GPT-IQ Database Schema Analysis & Recommendations
+# Jahiz Bot Database Schema Analysis & Recommendations
 
-**Date:** April 9, 2025
-**Context:** Analysis of the Supabase database schema for the GPT-IQ application, designed to store conversations between users and the Gemini AI.
+**Project:** Jahiz Bot
+**Context:** Analysis of the Supabase database schema for the Jahiz Bot application, designed to store conversations between users and the Gemini AI.
 
 ## 1. Identified Issue
 
@@ -102,6 +102,14 @@ Implementing this schema enables several crucial features and aligns with best p
 * **Gemini Internal Systems:** Google uses highly complex, proprietary, large-scale database systems for its core services like Gemini. They do *not* use Supabase internally.
 * **Best Practice:** The recommended two-table structure is the standard, robust, and professional way to model one-to-many relationships (like conversations-to-messages) in relational databases like PostgreSQL, which powers Supabase.
 
-## Conclusion
+## 7. JSONB vs. Dedicated Tables
 
-By restructuring your database according to the recommended two-table schema and implementing the associated best practices (especially RLS, indexing, and correct querying), you will resolve the message archiving issue and establish a scalable, secure, and maintainable foundation for your GPT-IQ application's conversation storage.
+*   **Current:** `metadata` and `message_feedback` are JSONB.
+*   **Analysis:** While flexible, querying specific fields within JSONB can be less performant and indexing is more complex than dedicated columns/tables.
+*   **Recommendation:** 
+    *   **`metadata`:** If certain keys within `metadata` are frequently queried or essential for filtering (e.g., `model_used`, `token_count`), consider promoting them to dedicated columns on the `conversations` table for better performance and indexing.
+    *   **`message_feedback`:** If feedback structure becomes complex or requires relational queries (e.g., linking feedback to user actions), consider a separate `feedback` table linked to `messages`. For simple like/dislike, JSONB is likely acceptable.
+
+## 8. Conclusion
+
+The current Supabase schema provides a good starting point. By implementing the suggested indexing strategies, considering data types carefully (especially for timestamps and potential enums), enforcing relationships with foreign keys, and potentially refining the use of JSONB based on query patterns, you can build a more robust, performant, secure, and maintainable foundation for your Jahiz Bot application's conversation storage.

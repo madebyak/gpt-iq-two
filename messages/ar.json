@@ -32,19 +32,19 @@
   },
   "Chat": {
     "newChat": "محادثة جديدة",
-    "recent": "المحادثات الأخيرة",
+    "recent": "الأخيرة",
     "help": "المساعدة",
-    "changelog": "سجل التغييرات",
+    "changelog": "ما الجديد",
     "settings": "الإعدادات",
-    "disclaimer": "يمكن أن يرتكب GPT-IQ أخطاء، بما في ذلك معلومات عن الأشخاص، لذا يرجى التحقق من ردوده.",
+    "disclaimer": "هذا مساعد ذكاء اصطناعي. قد لا تكون المعلومات دقيقة دائمًا.",
     "chatPlaceholder": "اكتب رسالة...",
     "sendMessage": "إرسال رسالة",
-    "enterToSend": "اضغط Enter للإرسال، Shift + Enter لإدخال سطر جديد",
-    "headlineTitle": "GPT-IQ",
-    "headlineSubtitle": "مساعدك الذكي مدعوم بالذكاء الاصطناعي المتقدم. اطرح الأسئلة واحصل على الإجابات واكتشف الرؤى.",
-    "thinking": "جاري التفكير...",
+    "enterToSend": "اضغط على Enter للإرسال، Shift + Enter لسطر جديد",
+    "headlineTitle": "بوت جاهز",
+    "headlineSubtitle": "مساعدك الذكي المدعوم بالذكاء الاصطناعي المتقدم. اطرح الأسئلة واحصل على الإجابات واكتشف الرؤى.",
+    "thinking": "جارٍ التفكير...",
     "noConversations": "لا توجد محادثات بعد",
-    "signInToViewHistory": "سجل دخول لعرض سجل المحادثات"
+    "signInToViewHistory": "سجل الدخول لعرض سجل محادثاتك"
   },
   "AuthNavbar": {
     "backToHome": "العودة إلى الرئيسية",
@@ -208,7 +208,9 @@
     "confirmDelete": "نعم، احذف",
     "cancel": "إلغاء",
     "noMessagePreview": "لا تتوفر معاينة للرسالة",
-    "errorLoading": "خطأ في تحميل المحادثات"
+    "errorLoading": "خطأ في تحميل المحادثات",
+    "openConversation": "فتح المحادثة",
+    "messageCount": "{count, plural, zero {0 رسائل} one {رسالة واحدة} two {رسالتان} few {{count} رسائل} many {{count} رسالة} other {{count} رسالة}}"
   },
   "Settings": {
     "title": "الإعدادات",

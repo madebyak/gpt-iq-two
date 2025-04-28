@@ -8,6 +8,7 @@ import { useRtl } from "@/lib/hooks/useRtl";
 import { HelpCircle, AlertCircle, Settings } from "lucide-react";
 import { memo } from "react";
 import { SidebarAction } from "./SidebarAction";
+import { Fragment } from "react";
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -18,6 +19,30 @@ function SidebarFooterComponent({ collapsed, locale }: SidebarFooterProps) {
   // Use our custom RTL hook for consistent RTL behavior
   const { isRtl, side } = useRtl(locale);
   const t = useTranslations("Chat");
+  
+  // Function to render disclaimer with gradient on brand name
+  const renderDisclaimer = () => {
+    const fullDisclaimer = t("disclaimer");
+    const brandNameEn = "Jahiz Bot";
+    const brandNameAr = "بوت جاهز";
+    const targetBrandName = locale === 'ar' ? brandNameAr : brandNameEn;
+
+    const parts = fullDisclaimer.split(targetBrandName);
+
+    if (parts.length === 2) {
+      // Brand name found, render with gradient
+      return (
+        <>
+          {parts[0]}
+          <span className="jahiz-gradient-text">{targetBrandName}</span>
+          {parts[1]}
+        </>
+      );
+    } else {
+      // Brand name not found or occurs multiple times unexpectedly, render normally
+      return fullDisclaimer;
+    }
+  };
   
   return (
     <ErrorBoundary
@@ -40,7 +65,7 @@ function SidebarFooterComponent({ collapsed, locale }: SidebarFooterProps) {
               "text-xs text-muted-foreground",
               isRtl && "text-right"
             )}>
-              {t("disclaimer")}
+              {renderDisclaimer()}
             </p>
           </div>
         )}

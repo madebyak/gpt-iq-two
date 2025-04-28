@@ -243,7 +243,7 @@ export function ConversationsList({
       {conversations.map((conversation) => {
         const formattedDate = format(
           new Date(conversation.updated_at), 
-          'PPP', 
+          'd MMMM yyyy',
           { locale: dateLocale }
         );
         
@@ -269,8 +269,23 @@ export function ConversationsList({
                   </Badge>
                 )}
               </div>
-              <CardDescription className={isRtl ? "text-right" : ""}>
-                {formattedDate} • {t("messageCount", { count: conversation.message_count })}
+              <CardDescription className={cn(
+                "flex items-center gap-x-1.5 text-xs text-muted-foreground",
+                isRtl ? "flex-row-reverse justify-end" : "justify-start"
+              )}>
+                {isRtl ? (
+                  <>
+                    <span>{t("messageCount", { count: conversation.message_count })}</span>
+                    <span>•</span>
+                    <span>{formattedDate}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{formattedDate}</span>
+                    <span>•</span>
+                    <span>{t("messageCount", { count: conversation.message_count })}</span>
+                  </>
+                )}
               </CardDescription>
             </CardHeader>
             <CardFooter className={cn(

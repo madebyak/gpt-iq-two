@@ -108,10 +108,10 @@ const Navbar = () => {
         <div className="flex items-center">
           <IntlLink href="/" className="flex items-center">
             <Image
-              src="/logo-vertical-3.svg"
-              alt="GPT IQ Logo"
-              width={154}
-              height={58}
+              src="/jahiz-logo.svg"
+              alt="Jahiz Logo"
+              width={100}
+              height={28}
               priority
             />
           </IntlLink>
@@ -315,7 +315,10 @@ const Navbar = () => {
                   
                   <Separator />
 
-                  <h4 className="font-medium text-sm">{labels.resources}</h4>
+                  {/* <h4 className="font-medium text-sm">{labels.resources}</h4> */}
+                  <SheetClose asChild>
+                    <IntlLink href="/resources" className="block p-2 rounded hover:bg-accent">{labels.resources}</IntlLink>
+                  </SheetClose>
                   <SheetClose asChild>
                     <IntlLink href="/changelog" className="block p-2 rounded hover:bg-accent">{labels.changelog}</IntlLink>
                   </SheetClose>

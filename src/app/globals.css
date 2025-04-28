@@ -201,6 +201,18 @@
   animation: gradient 4s ease infinite;
 }
 
+/* Jahiz Bot Gradient */
+.jahiz-gradient-text {
+  background: linear-gradient(90deg, #d916ef, #fb191b, #0606fe);
+  background-size: 200% auto; /* Adjust size as needed */
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback */
+  /* Optional: add animation if desired */
+  /* animation: gradient 4s ease infinite; */
+}
+
 /* Blinking cursor animation for streamed text */
 @keyframes blink {
   0%, 100% { opacity: 1; }

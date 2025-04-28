@@ -45,7 +45,7 @@
     "chatPlaceholder": "Type a message...",
     "sendMessage": "Send message",
     "enterToSend": "Press Enter to send, Shift + Enter for a new line",
-    "headlineTitle": "GPT-IQ",
+    "headlineTitle": "Jahiz Bot",
     "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights."
   },
   "AuthNavbar": {
@@ -211,7 +211,9 @@
     "confirmDelete": "Yes, delete",
     "cancel": "Cancel",
     "noMessagePreview": "No message preview available",
-    "errorLoading": "Error loading conversations"
+    "errorLoading": "Error loading conversations",
+    "messageCount": "{count, plural, =0 {0 messages} =1 {1 message} other {# messages}}",
+    "openConversation": "Open conversation"
   },
   "Settings": {
     "title": "Settings",
