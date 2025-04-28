@@ -26,6 +26,13 @@ import {
 import { Link as IntlLink, usePathname } from '@/i18n/navigation'; 
 import { useAuth } from "@/lib/auth/auth-context";
 import { UserDropdown } from "@/components/auth/user-dropdown";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 
 const getLanguageInfo = (localeCode: string) => {
   switch (localeCode) {
@@ -50,6 +57,7 @@ const Navbar = () => {
   
   // Default fallback values
   const defaultLabels = {
+    openMainMenu: "Open main menu",
     newChat: "New Chat",
     resources: "Resources",
     changelog: "Changelog",
@@ -64,21 +72,23 @@ const Navbar = () => {
   
   // Create a labels object
   let labels = { ...defaultLabels };
-  
+  let t: ReturnType<typeof useTranslations> | undefined = undefined;
+
   // Try to get translated labels
   try {
-    const t = useTranslations('Navbar');
+    t = useTranslations('Navbar');
     labels = {
-      newChat: t('newChat'),
-      resources: t('resources'),
-      changelog: t('changelog'),
-      changelogDescription: t('changelogDescription'),
-      featureRequest: t('featureRequest'),
-      featureRequestDescription: t('featureRequestDescription'),
-      aboutUs: t('aboutUs'),
-      aboutUsDescription: t('aboutUsDescription'),
-      signIn: t('signIn'),
-      getStarted: t('getStarted')
+      openMainMenu: t('openMainMenu') || defaultLabels.openMainMenu,
+      newChat: t('newChat') || defaultLabels.newChat,
+      resources: t('resources') || defaultLabels.resources,
+      changelog: t('changelog') || defaultLabels.changelog,
+      changelogDescription: t('changelogDescription') || defaultLabels.changelogDescription,
+      featureRequest: t('featureRequest') || defaultLabels.featureRequest,
+      featureRequestDescription: t('featureRequestDescription') || defaultLabels.featureRequestDescription,
+      aboutUs: t('aboutUs') || defaultLabels.aboutUs,
+      aboutUsDescription: t('aboutUsDescription') || defaultLabels.aboutUsDescription,
+      signIn: t('signIn') || defaultLabels.signIn,
+      getStarted: t('getStarted') || defaultLabels.getStarted
     };
   } catch (error) {
     console.error("Error in navbar translations:", error);
@@ -105,17 +115,17 @@ const Navbar = () => {
           </IntlLink>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <Button 
             variant="outline" 
             size="default" 
-            className="hidden sm:flex gap-2 items-center h-11 px-4 py-2"
+            className="gap-2 items-center h-11 px-4 py-2"
           >
             <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
             {labels.newChat}
           </Button>
 
-          <NavigationMenu className="hidden md:block">
+          <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-background border border-input hover:bg-accent hover:text-accent-foreground">
@@ -168,7 +178,7 @@ const Navbar = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden md:block h-6 w-px bg-border/60" aria-hidden="true" />
+          <div className="h-6 w-px bg-border/60" aria-hidden="true" />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -271,6 +281,135 @@ const Navbar = () => {
             <Menu className="h-5 w-5" />
           </Button>
         </div>
+
+        <div className="md:hidden flex items-center gap-2"> 
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-11 w-11" 
+                  aria-label={labels.openMainMenu}
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side={locale === 'ar' ? 'left' : 'right'} className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col gap-4 mt-6">
+                  <Button 
+                    variant="outline" 
+                    size="default" 
+                    className="w-full flex gap-2 items-center h-11 px-4 py-2"
+                    asChild
+                  >
+                    <IntlLink href="/chat"> 
+                      <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
+                      {labels.newChat}
+                    </IntlLink>
+                  </Button>
+                  
+                  <Separator />
+
+                  <h4 className="font-medium text-sm">{labels.resources}</h4>
+                  <SheetClose asChild>
+                    <IntlLink href="/changelog" className="block p-2 rounded hover:bg-accent">{labels.changelog}</IntlLink>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <IntlLink href="/feature-request" className="block p-2 rounded hover:bg-accent">{labels.featureRequest}</IntlLink>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <IntlLink href="/about" className="block p-2 rounded hover:bg-accent">{labels.aboutUs}</IntlLink>
+                  </SheetClose>
+
+                  <Separator />
+
+                  <h4 className="font-medium text-sm">Language</h4>
+                   <SheetClose asChild>
+                      <IntlLink href={pathname} locale="ar">
+                        <Button variant="ghost" className="w-full justify-start flex items-center gap-2 cursor-pointer">
+                           <Image src="/iraq-svg.svg" alt="Arabic flag" width={20} height={15} className="h-auto"/>
+                           <span>العربية</span>
+                        </Button>
+                      </IntlLink>
+                   </SheetClose>
+                   <SheetClose asChild>
+                      <IntlLink href={pathname} locale="en">
+                         <Button variant="ghost" className="w-full justify-start flex items-center gap-2 cursor-pointer">
+                           <Image src="/uk-svg.svg" alt="English flag" width={20} height={15} className="h-auto"/>
+                           <span>English</span>
+                         </Button>
+                      </IntlLink>
+                   </SheetClose>
+
+                  <Separator />
+
+                  {/* Theme Toggle */}
+                  <div className="flex items-center justify-between">
+                     <h4 className="font-medium text-sm">Theme</h4>
+                     <ThemeToggle />
+                  </div>
+
+                  <Separator />
+
+                  {!isLoading && (
+                    <>
+                      {isLoggedIn ? (
+                         <>
+                           <h4 className="font-medium text-sm">Account</h4>
+                           <UserDropdown 
+                             user={{
+                               firstName: profile?.firstName || user.email?.split('@')[0] || 'User',
+                               lastName: profile?.lastName || '',
+                               photoUrl: profile?.photoUrl || undefined
+                             }}
+                             onLogout={() => {
+                               signOut();
+                             }}
+                           />
+                         </>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                           <SheetClose asChild>
+                             <Button 
+                               variant="outline" 
+                               className="w-full h-11 px-4 py-2"
+                               asChild
+                             >
+                               <IntlLink href="/auth/login">
+                                 {labels.signIn}
+                               </IntlLink>
+                             </Button>
+                           </SheetClose>
+                           <SheetClose asChild>
+                             <Button 
+                               className="w-full h-11 px-4 py-2"
+                               asChild
+                             >
+                               <IntlLink href="/auth/signup">
+                                 {labels.getStarted}
+                               </IntlLink>
+                             </Button>
+                           </SheetClose>
+                        </div>
+                      )}
+                    </>
+                  )}
+                   {isLoading && (
+                      <Button 
+                        variant="outline" 
+                        className="flex items-center gap-2 h-11 px-4 py-2 cursor-wait animate-pulse w-full"
+                        disabled
+                      >
+                        <div className="h-5 w-5 rounded-full bg-muted/80 animate-pulse"></div>
+                        <div className="h-4 w-16 bg-muted/80 rounded animate-pulse"></div>
+                      </Button>
+                  )}
+
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div> 
+
       </Container>
     </header>
   );

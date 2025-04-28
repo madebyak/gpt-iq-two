@@ -92,7 +92,11 @@
       "termsText": "I agree to the",
       "termsLink": "Terms of Service",
       "hasAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "passwordsMismatch": "Passwords do not match. Please try again.",
+      "acceptTerms": "You must accept the Terms of Service.",
+      "passwordTooShort": "Password must be at least 8 characters long.",
+      "verifyEmail": "Success! Please check your email to verify your account."
     },
     "ForgotPassword": {
       "title": "Forgot password?",

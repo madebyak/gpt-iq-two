@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl';
+import { cn } from "@/lib/utils";
 
 export function HeadlineAR() {
   const t = useTranslations('Chat');
@@ -69,7 +70,7 @@ export function HeadlineAR() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="text-center space-y-6"
+      className="text-center space-y-4 md:space-y-6 px-4"
       dir="rtl"
     >
       {isLoaded && (
@@ -79,12 +80,19 @@ export function HeadlineAR() {
           animate="animate"
           className="inline-block"
         >
-          <h1 className="text-4xl font-bold tracking-tight flex items-center justify-center gap-2">
-            <span className="headline-gradient py-2">الله بالخير{userName ? ` ${userName}` : ""} ، خلي</span>
-            <span className="relative h-[1.5em] w-48 overflow-hidden">
+          <h1 className={cn(
+            "font-bold tracking-tight text-center",
+            "text-2xl sm:text-3xl md:text-4xl"
+          )}>
+            <span className="headline-gradient py-1 md:py-2 inline-block align-middle">الله بالخير{userName ? ` ${userName}` : ""}، خلي</span>
+
+            <span className={cn(
+              "relative h-[1.5em] overflow-hidden inline-block align-middle",
+              "w-28 sm:w-36 md:w-48"
+            )}>
               <AnimatePresence mode="wait">
                 <motion.span
-                  className="headline-gradient absolute inset-0 flex items-center py-2"
+                  className="headline-gradient absolute inset-0 flex items-center justify-start px-2 py-1 md:py-2"
                   key={currentWordIndex}
                   variants={wordVariants}
                   initial="enter"

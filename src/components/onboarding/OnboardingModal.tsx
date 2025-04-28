@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { motion, PanInfo } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ interface OnboardingModalProps {
   onBack: () => void;
   headline: string;
   subheading: string;
+  isRtl: boolean;
   // Add other step-specific props if needed, e.g., children: React.ReactNode
 }
 
@@ -33,46 +35,70 @@ export function OnboardingModal({
   onBack,
   headline,
   subheading,
+  isRtl,
 }: OnboardingModalProps) {
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
 
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipeThreshold = 50;
+    const swipeVelocityThreshold = 0.3;
+    const offset = info.offset.x;
+    const velocity = info.velocity.x;
+
+    const swipedLeft = offset < -swipeThreshold || velocity < -swipeVelocityThreshold;
+    const swipedRight = offset > swipeThreshold || velocity > swipeVelocityThreshold;
+
+    if (isRtl) {
+      if (swipedRight && !isLastStep) {
+        onNext();
+      } else if (swipedLeft && !isFirstStep) {
+        onBack();
+      }
+    } else {
+      if (swipedLeft && !isLastStep) {
+        onNext();
+      } else if (swipedRight && !isFirstStep) {
+        onBack();
+      }
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90vw] max-w-[500px] aspect-square flex flex-col overflow-hidden [&>button]:hidden p-0">
-        {/* Removed Header component, can be added back if needed */}
-        {/* <DialogHeader className="flex-shrink-0 h-8 p-6"> </DialogHeader> */}
+        <motion.div
+          className="flex flex-col flex-grow"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          onDragEnd={handleDragEnd}
+          dragElastic={0.1}
+        >
+          <div className="w-full h-1/2 flex-shrink-0 bg-muted flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">Video/GIF Placeholder (1/2 height)</span>
+          </div>
+          
+          <div className="pt-6 px-6 flex-grow overflow-y-auto space-y-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <h2 className="text-2xl font-semibold text-center">
+              {headline}
+            </h2>
+            <p className="text-lg text-muted-foreground text-center">
+              {subheading}
+            </p>
+          </div>
+        </motion.div>
 
-        {/* --- Video/GIF Placeholder --- */}
-        <div className="w-full h-1/2 flex-shrink-0 bg-muted flex items-center justify-center">
-          <span className="text-sm text-muted-foreground">Video/GIF Placeholder (1/2 height)</span>
-        </div>
-        {/* --- End Placeholder --- */}
-        
-        {/* Content Area */}
-        <div className="pt-6 px-6 flex-grow overflow-y-auto space-y-4">
-          <h2 className="text-2xl font-semibold text-center">
-            {headline}
-          </h2>
-          <p className="text-lg text-muted-foreground text-center">
-            {subheading}
-          </p>
-          {/* Add other step-specific content/children here */}
-        </div>
-
-        {/* Footer Area - Dots moved between buttons using order */}
-        <DialogFooter className="flex-shrink-0 px-6 pb-6 flex items-center"> {/* No justify-between */}
-          <Button 
+        <DialogFooter className="flex-shrink-0 px-6 pb-6 flex items-center">
+          <Button
             variant="ghost"
-            onClick={onBack} 
+            onClick={onBack}
             disabled={isFirstStep}
-            className="order-1 rtl:order-3 hover:bg-transparent" // Back: First in LTR, Last in RTL
+            className="order-1 rtl:order-3 hover:bg-transparent hidden md:inline-flex"
           >
             Back
           </Button>
 
-          {/* Pagination Dots Container - Moved inside footer, middle order */}
-          <div className="flex justify-center space-x-2 rtl:space-x-reverse order-2 flex-grow"> {/* Added order-2, flex-grow */}
+          <div className="flex justify-center space-x-2 rtl:space-x-reverse order-2 flex-grow">
             {Array.from({ length: totalSteps }).map((_, index) => (
               <div
                 key={index}
@@ -84,11 +110,10 @@ export function OnboardingModal({
             ))}
           </div>
 
-          {/* Spacer div removed */}
-          <Button 
+          <Button
             variant="ghost"
             onClick={onNext}
-            className="order-3 rtl:order-1 hover:bg-transparent" // Next: Last in LTR, First in RTL
+            className="order-3 rtl:order-1 hover:bg-transparent hidden md:inline-flex"
           >
             {isLastStep ? "Finish" : "Next"}
           </Button>

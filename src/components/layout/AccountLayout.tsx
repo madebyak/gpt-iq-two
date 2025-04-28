@@ -62,7 +62,9 @@ export function AccountLayout({ children, title, description, activeItem = 'acco
     return (
       <div dir={isRtl ? 'rtl' : 'ltr'}>
         <Navbar />
-        <Container className="py-6 px-4">{children}</Container>
+        <Container className="py-6 px-4 pb-20">
+          {children}
+        </Container>
         <MobileNav activeItem={activeItem} />
       </div>
     );

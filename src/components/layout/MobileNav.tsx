@@ -22,8 +22,8 @@ export const MobileNav: FC<MobileNavProps> = ({ activeItem }) => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border py-2 z-50">
-      <div className="flex justify-around items-center">
+    <nav className="fixed bottom-0 left-0 right-0 w-full bg-background border-t border-border py-2 z-50">
+      <div className="flex justify-evenly items-center">
         {items.map((item) => {
           const Icon = item.icon;
           return (
@@ -32,7 +32,7 @@ export const MobileNav: FC<MobileNavProps> = ({ activeItem }) => {
               href={item.href}
               prefetch={true}
               className={cn(
-                "flex flex-col items-center p-2 rounded-md transition-colors",
+                "flex flex-col items-center p-2 rounded-md transition-colors flex-1",
                 item.active
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"

@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { OnboardingModal } from './OnboardingModal';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export function OnboardingTrigger() {
   const t = useTranslations('Onboarding');
+  const locale = useLocale();
+  const isRtl = locale === 'ar';
 
   // Define content for each step
   const onboardingSteps = [
@@ -75,6 +77,7 @@ export function OnboardingTrigger() {
       onBack={handlePrevStep}
       headline={currentStepContent.headline}
       subheading={currentStepContent.subheading}
+      isRtl={isRtl}
     />
   );
 } 

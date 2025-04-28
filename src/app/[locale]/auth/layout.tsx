@@ -54,7 +54,11 @@ export default async function AuthLayout({
         termsText: authSignupT('termsText'),
         termsLink: authSignupT('termsLink'),
         hasAccount: authSignupT('hasAccount'),
-        loginLink: authSignupT('loginLink')
+        loginLink: authSignupT('loginLink'),
+        passwordsMismatch: authSignupT('passwordsMismatch'),
+        acceptTerms: authSignupT('acceptTerms'),
+        passwordTooShort: authSignupT('passwordTooShort'),
+        verifyEmail: authSignupT('verifyEmail')
       },
       ForgotPassword: {
         title: authForgotPasswordT('title'),
