@@ -77,10 +77,7 @@ export function ChatSettings() {
           isRtl ? "text-right" : "text-left"
         )}>
           {/* Auto-send messages setting */}
-          <div className={cn(
-            "flex items-center justify-between",
-            isRtl ? "flex-row-reverse" : ""
-          )}>
+          <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="auto-send">{t("chat.autoSend")}</Label>
               <p className="text-sm text-muted-foreground">
@@ -96,10 +93,7 @@ export function ChatSettings() {
           </div>
           
           {/* Enable speech setting */}
-          <div className={cn(
-            "flex items-center justify-between",
-            isRtl ? "flex-row-reverse" : ""
-          )}>
+          <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="enable-speech">{t("chat.enableSpeech")}</Label>
               <p className="text-sm text-muted-foreground">
@@ -115,10 +109,7 @@ export function ChatSettings() {
           </div>
           
           {/* Enable suggestions setting */}
-          <div className={cn(
-            "flex items-center justify-between",
-            isRtl ? "flex-row-reverse" : ""
-          )}>
+          <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="enable-suggestions">{t("chat.enableSuggestions")}</Label>
               <p className="text-sm text-muted-foreground">

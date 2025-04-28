@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { motion, PanInfo } from 'framer-motion';
+import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -66,26 +66,37 @@ export function OnboardingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] max-w-[500px] aspect-square flex flex-col overflow-hidden [&>button]:hidden p-0">
-        <motion.div
-          className="flex flex-col flex-grow"
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          onDragEnd={handleDragEnd}
-          dragElastic={0.1}
-        >
+      <DialogContent className="w-[90vw] max-w-[500px] aspect-square flex flex-col overflow-hidden [&>button]:hidden p-0 focus-visible:outline-none focus-visible:ring-0">
+        <motion.div className="flex flex-col flex-grow">
           <div className="w-full h-1/2 flex-shrink-0 bg-muted flex items-center justify-center">
             <span className="text-sm text-muted-foreground">Video/GIF Placeholder (1/2 height)</span>
           </div>
           
-          <div className="pt-6 px-6 flex-grow overflow-y-auto space-y-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <h2 className="text-2xl font-semibold text-center">
-              {headline}
-            </h2>
-            <p className="text-lg text-muted-foreground text-center">
-              {subheading}
-            </p>
-          </div>
+          <motion.div 
+            className="flex-grow overflow-hidden relative" 
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }} 
+            onDragEnd={handleDragEnd}
+            dragElastic={0.1}
+          >
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={currentStep}
+                className="absolute inset-0 pt-6 px-6 flex flex-col items-center justify-center space-y-4"
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+                transition={{ ease: "easeInOut", duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-semibold text-center">
+                  {headline}
+                </h2>
+                <p className="text-lg text-muted-foreground text-center">
+                  {subheading}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
         </motion.div>
 
         <DialogFooter className="flex-shrink-0 px-6 pb-6 flex items-center">
