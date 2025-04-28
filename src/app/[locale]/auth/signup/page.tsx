@@ -37,24 +37,35 @@ export default function SignupPage({ params }: SignupPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
+  // Fetch translations unconditionally
+  const messages = {
+    fieldsRequired: commonT('fieldsRequired'),
+    passwordsMismatch: t('passwordsMismatch'),
+    acceptTerms: t('acceptTerms'),
+    passwordTooShort: t('passwordTooShort'),
+    verifyEmail: t('verifyEmail'),
+    errorOccurred: commonT('errorOccurred'),
+    loading: commonT('loading')
+  };
+  
   const validateForm = () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError(commonT('fieldsRequired'));
+      setError(messages.fieldsRequired);
       return false;
     }
     
     if (password !== confirmPassword) {
-      setError(t('passwordsMismatch'));
+      setError(messages.passwordsMismatch);
       return false;
     }
     
     if (!termsAccepted) {
-      setError(t('acceptTerms'));
+      setError(messages.acceptTerms);
       return false;
     }
     
     if (password.length < 8) {
-      setError(t('passwordTooShort'));
+      setError(messages.passwordTooShort);
       return false;
     }
     
@@ -80,7 +91,7 @@ export default function SignupPage({ params }: SignupPageProps) {
       }
       
       // Show success message
-      setSuccessMessage(t('verifyEmail'));
+      setSuccessMessage(messages.verifyEmail);
       
       // Clear form
       setFirstName('');
@@ -92,7 +103,7 @@ export default function SignupPage({ params }: SignupPageProps) {
       
     } catch (err: any) {
       console.error('Signup error:', err);
-      setError(err.message || commonT('errorOccurred'));
+      setError(err.message || messages.errorOccurred);
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +118,7 @@ export default function SignupPage({ params }: SignupPageProps) {
       // Redirect happens automatically after OAuth flow
     } catch (err) {
       console.error('Google signup error:', err);
-      setError(commonT('errorOccurred'));
+      setError(messages.errorOccurred);
       setGoogleLoading(false);
     }
   };
@@ -255,7 +266,7 @@ export default function SignupPage({ params }: SignupPageProps) {
           disabled={isLoading || googleLoading}
           aria-disabled={isLoading || googleLoading}
         >
-          {isLoading ? commonT('loading') : t('signupButton')}
+          {isLoading ? messages.loading : t('signupButton')}
         </Button>
         
         {/* Login Link */}
