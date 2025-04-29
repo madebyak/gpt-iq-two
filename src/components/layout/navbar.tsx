@@ -237,10 +237,6 @@ const Navbar = () => {
               <div className="h-4 w-16 bg-muted/80 rounded animate-pulse"></div>
             </Button>
           )}
-
-          <Button variant="ghost" size="icon" className="md:hidden h-11 w-11">
-            <Menu className="h-5 w-5" />
-          </Button>
         </div>
 
         <div className="md:hidden flex items-center gap-2"> 
