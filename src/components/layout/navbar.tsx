@@ -50,53 +50,12 @@ const Navbar = () => {
   const locale = useLocale();
   const pathname = usePathname();
   const { user, profile, signOut, isLoading } = useAuth();
+  const t = useTranslations('Navbar');
   
   // --- Add Logging ---
   console.log('[Navbar] Rendering with pathname:', pathname, 'and locale:', locale);
   // --- End Logging ---
   
-  // Default fallback values
-  const defaultLabels = {
-    openMainMenu: "Open main menu",
-    newChat: "New Chat",
-    resources: "Resources",
-    changelog: "Changelog",
-    changelogDescription: "See what's new in our latest updates",
-    featureRequest: "Feature Request",
-    featureRequestDescription: "Request new features or improvements",
-    aboutUs: "About Us",
-    aboutUsDescription: "Learn more about our team and mission",
-    signIn: "Sign In",
-    getStarted: "Get Started"
-  };
-  
-  // Declare labels with defaults first
-  let labels = { ...defaultLabels };
-
-  // Call hook unconditionally
-  const t = useTranslations('Navbar');
-
-  // Try to assign translated labels, potentially overwriting defaults
-  try {
-    labels = {
-      openMainMenu: t('openMainMenu') || defaultLabels.openMainMenu,
-      newChat: t('newChat') || defaultLabels.newChat,
-      resources: t('resources') || defaultLabels.resources,
-      changelog: t('changelog') || defaultLabels.changelog,
-      changelogDescription: t('changelogDescription') || defaultLabels.changelogDescription,
-      featureRequest: t('featureRequest') || defaultLabels.featureRequest,
-      featureRequestDescription: t('featureRequestDescription') || defaultLabels.featureRequestDescription,
-      aboutUs: t('aboutUs') || defaultLabels.aboutUs,
-      aboutUsDescription: t('aboutUsDescription') || defaultLabels.aboutUsDescription,
-      signIn: t('signIn') || defaultLabels.signIn,
-      getStarted: t('getStarted') || defaultLabels.getStarted
-    };
-  } catch (error) {
-    console.error("Error assigning navbar translations (hook call was successful):", error);
-    // Explicitly reset to defaults just in case assignment failed partially
-    labels = { ...defaultLabels }; 
-  }
-
   const currentLanguage = getLanguageInfo(locale);
   
   // User is logged in when we have a user and their profile
@@ -124,14 +83,14 @@ const Navbar = () => {
             className="gap-2 items-center h-11 px-4 py-2"
           >
             <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
-            {labels.newChat}
+            {t('newChat')}
           </Button>
 
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-background border border-input hover:bg-accent hover:text-accent-foreground">
-                  {labels.resources}
+                  {t('resources')}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[200px] gap-3 p-4">
@@ -141,9 +100,9 @@ const Navbar = () => {
                           href="/changelog"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
-                          <div className="text-sm font-medium">{labels.changelog}</div>
+                          <div className="text-sm font-medium">{t('changelog')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {labels.changelogDescription}
+                            {t('changelogDescription')}
                           </p>
                         </IntlLink>
                       </NavigationMenuLink>
@@ -154,9 +113,9 @@ const Navbar = () => {
                           href="/feature-request"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
-                          <div className="text-sm font-medium">{labels.featureRequest}</div>
+                          <div className="text-sm font-medium">{t('featureRequest')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {labels.featureRequestDescription}
+                            {t('featureRequestDescription')}
                           </p>
                         </IntlLink>
                       </NavigationMenuLink>
@@ -167,9 +126,9 @@ const Navbar = () => {
                           href="/about"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
-                          <div className="text-sm font-medium">{labels.aboutUs}</div>
+                          <div className="text-sm font-medium">{t('aboutUs')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            {labels.aboutUsDescription}
+                            {t('aboutUsDescription')}
                           </p>
                         </IntlLink>
                       </NavigationMenuLink>
@@ -252,7 +211,7 @@ const Navbar = () => {
                     asChild
                   >
                     <IntlLink href="/auth/login">
-                      {labels.signIn}
+                      {t('signIn')}
                     </IntlLink>
                   </Button>
 
@@ -261,7 +220,7 @@ const Navbar = () => {
                     asChild
                   >
                     <IntlLink href="/auth/signup">
-                      {labels.getStarted}
+                      {t('getStarted')}
                     </IntlLink>
                   </Button>
                 </>
@@ -291,7 +250,7 @@ const Navbar = () => {
                   variant="ghost" 
                   size="icon" 
                   className="h-11 w-11 bg-transparent hover:bg-transparent focus:bg-transparent"
-                  aria-label={labels.openMainMenu}
+                  aria-label={t('openMainMenu')}
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -309,24 +268,23 @@ const Navbar = () => {
                   >
                     <IntlLink href="/chat"> 
                       <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
-                      {labels.newChat}
+                      {t('newChat')}
                     </IntlLink>
                   </Button>
                   
                   <Separator />
 
-                  {/* <h4 className="font-medium text-sm">{labels.resources}</h4> */}
                   <SheetClose asChild>
-                    <IntlLink href="/resources" className="block p-2 rounded hover:bg-accent">{labels.resources}</IntlLink>
+                    <IntlLink href="/resources" className="block p-2 rounded hover:bg-accent">{t('resources')}</IntlLink>
                   </SheetClose>
                   <SheetClose asChild>
-                    <IntlLink href="/changelog" className="block p-2 rounded hover:bg-accent">{labels.changelog}</IntlLink>
+                    <IntlLink href="/changelog" className="block p-2 rounded hover:bg-accent">{t('changelog')}</IntlLink>
                   </SheetClose>
                   <SheetClose asChild>
-                    <IntlLink href="/feature-request" className="block p-2 rounded hover:bg-accent">{labels.featureRequest}</IntlLink>
+                    <IntlLink href="/feature-request" className="block p-2 rounded hover:bg-accent">{t('featureRequest')}</IntlLink>
                   </SheetClose>
                   <SheetClose asChild>
-                    <IntlLink href="/about" className="block p-2 rounded hover:bg-accent">{labels.aboutUs}</IntlLink>
+                    <IntlLink href="/about" className="block p-2 rounded hover:bg-accent">{t('aboutUs')}</IntlLink>
                   </SheetClose>
 
                   <Separator />
@@ -351,7 +309,6 @@ const Navbar = () => {
 
                   <Separator />
 
-                  {/* Theme Toggle */}
                   <div className="flex items-center justify-between">
                      <h4 className="font-medium text-sm">Theme</h4>
                      <ThemeToggle />
@@ -384,7 +341,7 @@ const Navbar = () => {
                                asChild
                              >
                                <IntlLink href="/auth/login">
-                                 {labels.signIn}
+                                 {t('signIn')}
                                </IntlLink>
                              </Button>
                            </SheetClose>
@@ -394,7 +351,7 @@ const Navbar = () => {
                                asChild
                              >
                                <IntlLink href="/auth/signup">
-                                 {labels.getStarted}
+                                 {t('getStarted')}
                                </IntlLink>
                              </Button>
                            </SheetClose>

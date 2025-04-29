@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   Dialog,
   DialogContent,
@@ -67,6 +68,10 @@ export function OnboardingModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90vw] max-w-[500px] aspect-square flex flex-col overflow-hidden [&>button]:hidden p-0 focus-visible:outline-none focus-visible:ring-0">
+        <DialogTitle asChild>
+          <VisuallyHidden>{headline}</VisuallyHidden>
+        </DialogTitle>
+
         <motion.div className="flex flex-col flex-grow">
           <div className="w-full h-1/2 flex-shrink-0 bg-muted flex items-center justify-center">
             <span className="text-sm text-muted-foreground">Video/GIF Placeholder (1/2 height)</span>

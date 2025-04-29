@@ -9,7 +9,8 @@
     "aboutUs": "من نحن",
     "aboutUsDescription": "تعرف على فريقنا ومهمتنا",
     "signIn": "تسجيل الدخول",
-    "getStarted": "ابدأ الآن"
+    "getStarted": "ابدأ الآن",
+    "openMainMenu": "فتح القائمة الرئيسية"
   },
   "ThemeToggle": {
     "light": "فاتح",
