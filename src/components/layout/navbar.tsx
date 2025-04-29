@@ -290,7 +290,7 @@ const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-11 w-11" 
+                  className="h-11 w-11 bg-transparent hover:bg-transparent focus:bg-transparent"
                   aria-label={labels.openMainMenu}
                 >
                   <Menu className="h-5 w-5" />
