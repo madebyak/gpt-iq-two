@@ -63,42 +63,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Try to load cached profile data for faster rendering
   const getCachedProfile = useCallback(() => {
-    try {
-      const cachedProfile = localStorage.getItem(PROFILE_CACHE_KEY);
-      if (cachedProfile) {
-        return JSON.parse(cachedProfile) as ProfileData;
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedProfile = localStorage.getItem(PROFILE_CACHE_KEY);
+        if (cachedProfile) {
+          return JSON.parse(cachedProfile) as ProfileData;
+        }
+      } catch (error) {
+        console.error('Error reading cached profile:', error);
       }
-    } catch (error) {
-      console.error('Error reading cached profile:', error);
     }
     return null;
   }, []);
 
   // Save profile to cache
   const cacheProfile = useCallback((profileData: ProfileData) => {
-    try {
-      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profileData));
-    } catch (error) {
-      console.error('Error caching profile:', error);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profileData));
+      } catch (error) {
+        console.error('Error caching profile:', error);
+      }
     }
   }, []);
 
   // Clear profile cache
   const clearProfileCache = useCallback(() => {
-    try {
-      localStorage.removeItem(PROFILE_CACHE_KEY);
-      localStorage.removeItem(USER_ID_CACHE_KEY);
-    } catch (error) {
-      console.error('Error clearing profile cache:', error);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(PROFILE_CACHE_KEY);
+        localStorage.removeItem(USER_ID_CACHE_KEY);
+      } catch (error) {
+        console.error('Error clearing profile cache:', error);
+      }
     }
   }, []);
 
   // Fetch profile data for the user - wrapped in useCallback to avoid recreating on every render
   const fetchProfile = useCallback(async (userId: string) => {
+    if (typeof window !== 'undefined') {
+      try {
+        // Save userId to cache for potential quick loading on next visit
+        localStorage.setItem(USER_ID_CACHE_KEY, userId);
+      } catch (error) {
+        console.warn('Could not set USER_ID_CACHE_KEY in localStorage', error);
+      }
+    }
+    
     try {
-      // Save userId to cache for potential quick loading on next visit
-      localStorage.setItem(USER_ID_CACHE_KEY, userId);
-      
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, email, photo_url, preferred_language, preferred_theme, chat_settings, privacy_settings')

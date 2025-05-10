@@ -39,3 +39,5 @@ next-env.d.ts
 # IDE files
 .idea
 .vscode
+
+.vercel
