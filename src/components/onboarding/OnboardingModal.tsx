@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Lottie from 'lottie-react';
+// import Lottie from 'lottie-react'; // Will be dynamically imported
 import secondAnimationData from '../../../public/onbording/second3.json';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -16,6 +16,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+// Dynamically import Lottie component
+import dynamic from 'next/dynamic';
+const LottiePlayer = dynamic(() => import('lottie-react'), { 
+  ssr: false,
+  // Optional: add a simple loading state for Lottie
+  loading: () => <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%'}}><p>Loading animation...</p></div>
+});
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -86,7 +94,7 @@ export function OnboardingModal({
                 priority
               />
             ) : currentStep === 1 ? (
-              <Lottie 
+              <LottiePlayer 
                 animationData={secondAnimationData} 
                 loop={true} 
                 style={{ height: '100%', width: '100%', transform: 'scale(1.1)' }}
