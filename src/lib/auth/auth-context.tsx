@@ -22,7 +22,6 @@ type ProfileData = {
     autoSendMessages: boolean;
     enableSpeech: boolean;
     enableSuggestions: boolean;
-    messageHistoryCount: number;
   };
   privacySettings?: {
     saveConversationHistory: boolean;
@@ -122,7 +121,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             autoSendMessages: data.chat_settings.auto_send_messages ?? true,
             enableSpeech: data.chat_settings.enable_speech ?? false,
             enableSuggestions: data.chat_settings.enable_suggestions ?? true,
-            messageHistoryCount: data.chat_settings.message_history_count ?? 10,
           } : undefined,
           privacySettings: data.privacy_settings ? {
             saveConversationHistory: data.privacy_settings.save_conversation_history ?? true,
@@ -165,7 +163,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           auto_send_messages: data.chatSettings.autoSendMessages,
           enable_speech: data.chatSettings.enableSpeech,
           enable_suggestions: data.chatSettings.enableSuggestions,
-          message_history_count: data.chatSettings.messageHistoryCount,
         };
       }
       
