@@ -227,7 +227,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
         </code>
       );
     }
-  }), [theme]); // Depend on the app theme
+  }), [theme, isRtl]); // Depend on the app theme and isRtl
   // --- End Custom Code Renderer ---
 
   // Apply link cleanup regex before rendering
