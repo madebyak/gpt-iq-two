@@ -2,14 +2,22 @@
 
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
+import dynamic from 'next/dynamic';
 import { useAuth } from "@/lib/auth/auth-context";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
-import Navbar from "@/components/layout/navbar";
+// import Navbar from "@/components/layout/navbar";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils";
 import { SidebarNav } from "./SidebarNav";
 import { MobileNav } from "./MobileNav";
 import { Breadcrumbs } from "./Breadcrumbs";
+
+// Dynamically import Navbar with SSR turned off
+const Navbar = dynamic(() => import('@/components/layout/navbar'), { 
+  ssr: false,
+  // You might want a placeholder for Navbar if it causes layout shifts
+  // loading: () => <div className=\"h-16 border-b flex items-center justify-between px-4 animate-pulse bg-muted/60\"><div classname=\"h-7 w-24 bg-muted animate-pulse rounded-md\"></div><div classname=\"h-9 w-40 bg-muted animate-pulse rounded-md\"></div></div>
+});
 
 interface AccountLayoutProps {
   children: React.ReactNode;
