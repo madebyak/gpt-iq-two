@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import ClientProviders from "@/components/providers/client-providers";
 import React from 'react';
 import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
+import { Toaster } from 'react-hot-toast';
 
 // Load IBM Plex Sans for Latin (English) text
 const ibmPlexSans = IBM_Plex_Sans({
@@ -91,8 +92,8 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          {/* Pass loaded messages again */}
           <ClientProviders messages={localeMessages} locale={locale}>
+            <Toaster position="top-center" reverseOrder={false} />
             <div className="flex flex-col min-h-screen">
               <div className="flex-grow">
                 {children}
