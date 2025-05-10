@@ -95,7 +95,10 @@ export default async function LocaleLayout({
           <ClientProviders messages={localeMessages} locale={locale}>
             <div className="flex flex-col flex-1">
               <div className="flex-grow overflow-y-auto">
-                {children}
+                {/* Render children only on client-side to prevent SSR errors */}
+                <div suppressHydrationWarning>
+                  {typeof window === 'undefined' ? null : children}
+                </div>
               </div>
               <OnboardingTrigger />
             </div>
