@@ -13,9 +13,19 @@ import { LanguageSettings } from "@/components/settings/language-settings";
 import { ChatSettings } from "@/components/settings/chat-settings";
 import { PrivacySettings } from "@/components/settings/privacy-settings";
 import { SecuritySection } from "@/components/account/security-section";
-import { ProfileSection } from "@/components/account/profile-section";
 import { AccountLayout } from "@/components/layout/AccountLayout";
 import { Card } from "@/components/ui/card";
+import dynamic from 'next/dynamic';
+
+// Dynamically import ProfileSection with SSR turned off
+const ProfileSection = dynamic(
+  () => import('@/components/account/profile-section').then(mod => mod.ProfileSection),
+  { 
+    ssr: false,
+    // Optional: add a loading component
+    // loading: () => <div className="p-4 md:p-6"><div className="h-64 bg-muted/60 rounded-lg animate-pulse"></div></Card>
+  }
+);
 
 export default function SettingsPage() {
   const { user, isLoading } = useAuth();
