@@ -1,6 +1,9 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
+import Lottie from 'lottie-react';
+import secondAnimationData from '../../../public/onbording/second3.json';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -67,14 +70,30 @@ export function OnboardingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] max-w-[500px] aspect-square flex flex-col overflow-hidden [&>button]:hidden p-0 focus-visible:outline-none focus-visible:ring-0">
+      <DialogContent className="w-[90vw] max-w-[500px] aspect-square flex flex-col overflow-hidden [&>button]:hidden p-0 focus-visible:outline-none focus-visible:ring-0 border-0">
         <DialogTitle asChild>
           <VisuallyHidden>{headline}</VisuallyHidden>
         </DialogTitle>
 
         <motion.div className="flex flex-col flex-grow">
-          <div className="w-full h-1/2 flex-shrink-0 bg-muted flex items-center justify-center">
-            <span className="text-sm text-muted-foreground">Video/GIF Placeholder (1/2 height)</span>
+          <div className="relative w-full h-1/2 flex-shrink-0 flex items-center justify-center overflow-hidden">
+            {currentStep === 0 ? (
+              <Image
+                src="/onbording/first.jpg"
+                alt="Jahiz AI Onboarding Step 1"
+                layout="fill"
+                objectFit="cover"
+                priority
+              />
+            ) : currentStep === 1 ? (
+              <Lottie 
+                animationData={secondAnimationData} 
+                loop={true} 
+                style={{ height: '100%', width: '100%', transform: 'scale(1.1)' }}
+              />
+            ) : (
+              <span className="text-sm text-muted-foreground">Placeholder (Step {currentStep + 1})</span>
+            )}
           </div>
           
           <motion.div 

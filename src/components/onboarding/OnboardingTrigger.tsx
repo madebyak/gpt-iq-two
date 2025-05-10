@@ -16,8 +16,8 @@ export function OnboardingTrigger() {
       subheading: t('step1.subheading'),
     },
     {
-      headline: "Choose Your Interaction Style",
-      subheading: "How do you prefer to talk to the AI? (Step 2/5)",
+      headline: t('step2.headline'),
+      subheading: t('step2.subheading'),
     },
     {
       headline: "Select Your Interests",

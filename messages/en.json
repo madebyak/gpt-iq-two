@@ -1,7 +1,8 @@
 {
   "Navbar": {
     "newChat": "New Chat",
-    "resources": "Resources",
+    "resources": "Resources:",
+    "sponsorship": "Sponsorship",
     "changelog": "Changelog",
     "changelogDescription": "See what's new in our latest updates",
     "featureRequest": "Feature Request",
@@ -489,8 +490,16 @@
   "returnUrl": "returnUrl",
   "Onboarding": {
     "step1": {
-      "headline": "Welcome to the New Jahiz.Ai!",
-      "subheading": "From promising experiment to powerful beta – experience the next generation of AI conversation, enhanced just for you."
+      "headline": "Meet Jahiz AI: Your Ready & Resourceful Bot.",
+      "subheading": "Evolved from our experimental phase, Jahiz AI is here – smarter, more capable, and always ready to explore ideas with you."
+    },
+    "step2": {
+      "headline": "Seamless Conversations, Instantly Ready.",
+      "subheading": "With a refined interface (Light/Dark!), conversation history, and continuous context, Jahiz AI keeps your workflow smooth and ready to resume."
     }
+  },
+  "SponsorshipPage": {
+    "title": "Sponsorship",
+    "contentPlaceholder": "Sponsorship details coming soon."
   }
 }

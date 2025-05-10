@@ -162,7 +162,8 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
       <div 
         className={cn(
           "px-4 py-2 border-b border-border/40",
-          "text-left rtl:text-right" 
+          "text-left rtl:text-right",
+          "sticky top-0 z-10 bg-background"
         )}
       >
         <Sheet>

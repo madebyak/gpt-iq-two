@@ -19,6 +19,7 @@ export default async function HomePage({ params }: PageProps) {
     Navbar: {
       newChat: navbarT('newChat'),
       resources: navbarT('resources'),
+      sponsorship: navbarT('sponsorship'),
       changelog: navbarT('changelog'),
       changelogDescription: navbarT('changelogDescription'),
       featureRequest: navbarT('featureRequest'),
