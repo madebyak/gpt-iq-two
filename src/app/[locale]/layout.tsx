@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import ClientProviders from "@/components/providers/client-providers";
 import React from 'react';
 import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
-import dynamic from 'next/dynamic';
 
 // Load IBM Plex Sans for Latin (English) text
 const ibmPlexSans = IBM_Plex_Sans({
@@ -26,16 +25,6 @@ const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   display: "swap",
   variable: "--font-ibm-plex-sans-arabic",
 });
-
-// Create a client-only wrapper component with type-safe props
-const ClientOnlyWrapper = dynamic(
-  () => Promise.resolve(({ children }: { children: React.ReactNode }) => (
-    <div suppressHydrationWarning>
-      {typeof window === 'undefined' ? null : children}
-    </div>
-  )),
-  { ssr: false }
-);
 
 // Generate static metadata
 export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
@@ -104,12 +93,9 @@ export default async function LocaleLayout({
         >
           {/* Pass loaded messages again */}
           <ClientProviders messages={localeMessages} locale={locale}>
-            <div className="flex flex-col flex-1">
-              <div className="flex-grow overflow-y-auto">
-                {/* Use a simple wrapper that only renders on client side */}
-                <ClientOnlyWrapper>
-                  {children}
-                </ClientOnlyWrapper>
+            <div className="flex flex-col min-h-screen">
+              <div className="flex-grow">
+                {children}
               </div>
               <OnboardingTrigger />
             </div>

@@ -3,17 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { AccountLayout } from "@/components/layout/AccountLayout";
-import dynamic from 'next/dynamic';
-
-// Dynamically import ProfileSection with SSR turned off
-const ProfileSection = dynamic(
-  () => import('@/components/account/profile-section').then(mod => mod.ProfileSection),
-  { 
-    ssr: false,
-    // Optional: add a loading component if ProfileSection takes time to load or if there's a visual flash
-    // loading: () => <div className="h-64 bg-muted/60 rounded-lg animate-pulse"></div> 
-  }
-);
+import { ProfileSection } from "@/components/account/profile-section";
 
 export default function AccountPage() {
   const t = useTranslations("Account");

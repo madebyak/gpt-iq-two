@@ -109,16 +109,40 @@ export function ChatHistory() {
         </div>
       </div>
 
-      {/* Remove Tabs, TabsList, and TabsTriggers for pinned/archived */}
-      {/* Directly render the 'all' conversations list */}
-      <div className="mt-6"> {/* Added a div to maintain similar spacing as TabsContent */}
-        <ConversationsList 
-          filterType="all" 
-          searchQuery={searchQuery} 
-          selectedDate={selectedDate}
-          locale={locale} 
-        />
-      </div>
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList>
+          <TabsTrigger value="all">{t("tabs.all")}</TabsTrigger>
+          <TabsTrigger value="pinned">{t("tabs.pinned")}</TabsTrigger>
+          <TabsTrigger value="archived">{t("tabs.archived")}</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="mt-6">
+          <ConversationsList 
+            filterType="all" 
+            searchQuery={searchQuery} 
+            selectedDate={selectedDate}
+            locale={locale} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="pinned" className="mt-6">
+          <ConversationsList 
+            filterType="pinned" 
+            searchQuery={searchQuery} 
+            selectedDate={selectedDate}
+            locale={locale} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="archived" className="mt-6">
+          <ConversationsList 
+            filterType="archived" 
+            searchQuery={searchQuery} 
+            selectedDate={selectedDate}
+            locale={locale} 
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

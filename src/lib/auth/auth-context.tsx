@@ -22,6 +22,7 @@ type ProfileData = {
     autoSendMessages: boolean;
     enableSpeech: boolean;
     enableSuggestions: boolean;
+    messageHistoryCount: number;
   };
   privacySettings?: {
     saveConversationHistory: boolean;
@@ -62,49 +63,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Try to load cached profile data for faster rendering
   const getCachedProfile = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cachedProfile = localStorage.getItem(PROFILE_CACHE_KEY);
-        if (cachedProfile) {
-          return JSON.parse(cachedProfile) as ProfileData;
-        }
-      } catch (error) {
-        console.error('Error reading cached profile:', error);
+    try {
+      const cachedProfile = localStorage.getItem(PROFILE_CACHE_KEY);
+      if (cachedProfile) {
+        return JSON.parse(cachedProfile) as ProfileData;
       }
+    } catch (error) {
+      console.error('Error reading cached profile:', error);
     }
     return null;
   }, []);
 
   // Save profile to cache
   const cacheProfile = useCallback((profileData: ProfileData) => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profileData));
-      } catch (error) {
-        console.error('Error caching profile:', error);
-      }
+    try {
+      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profileData));
+    } catch (error) {
+      console.error('Error caching profile:', error);
     }
   }, []);
 
   // Clear profile cache
   const clearProfileCache = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem(PROFILE_CACHE_KEY);
-        localStorage.removeItem(USER_ID_CACHE_KEY);
-      } catch (error) {
-        console.error('Error clearing profile cache:', error);
-      }
+    try {
+      localStorage.removeItem(PROFILE_CACHE_KEY);
+      localStorage.removeItem(USER_ID_CACHE_KEY);
+    } catch (error) {
+      console.error('Error clearing profile cache:', error);
     }
   }, []);
 
   // Fetch profile data for the user - wrapped in useCallback to avoid recreating on every render
   const fetchProfile = useCallback(async (userId: string) => {
     try {
-      if (typeof window !== 'undefined') {
-        // Save userId to cache for potential quick loading on next visit
-        localStorage.setItem(USER_ID_CACHE_KEY, userId);
-      }
+      // Save userId to cache for potential quick loading on next visit
+      localStorage.setItem(USER_ID_CACHE_KEY, userId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -129,6 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             autoSendMessages: data.chat_settings.auto_send_messages ?? true,
             enableSpeech: data.chat_settings.enable_speech ?? false,
             enableSuggestions: data.chat_settings.enable_suggestions ?? true,
+            messageHistoryCount: data.chat_settings.message_history_count ?? 10,
           } : undefined,
           privacySettings: data.privacy_settings ? {
             saveConversationHistory: data.privacy_settings.save_conversation_history ?? true,
@@ -138,9 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         
         setProfile(profileData);
-        if (typeof window !== 'undefined') {
-          cacheProfile(profileData);
-        }
+        cacheProfile(profileData);
         return profileData;
       }
       
@@ -173,6 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           auto_send_messages: data.chatSettings.autoSendMessages,
           enable_speech: data.chatSettings.enableSpeech,
           enable_suggestions: data.chatSettings.enableSuggestions,
+          message_history_count: data.chatSettings.messageHistoryCount,
         };
       }
       
@@ -256,24 +249,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       
       try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-
-        if (currentSession?.user) {
-          let cachedProfileData = null;
-          if (typeof window !== 'undefined') {
-            cachedProfileData = getCachedProfile();
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user || null);
+        
+        if (session?.user) {
+          // Check if we have a user photo from OAuth
+          if (session.user.app_metadata?.provider === 'google' && 
+              !session.user.user_metadata?.avatar_url && 
+              session.user.user_metadata?.picture) {
+            
+            // Update user profile with Google profile picture
+            const { data, error } = await supabase
+              .from('profiles')
+              .update({ 
+                photo_url: session.user.user_metadata.picture,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', session.user.id);
+              
+            if (error) {
+              console.error('Error updating profile with Google photo:', error);
+            }
           }
           
-          if (cachedProfileData && cachedProfileData.email === currentSession.user.email) {
-            setProfile(cachedProfileData);
+          // Try to load cached profile first for fast rendering
+          const cachedProfile = getCachedProfile();
+          if (cachedProfile) {
+            setProfile(cachedProfile);
+            // Then update in background
+            fetchProfile(session.user.id).catch(console.error);
           } else {
-            await fetchProfile(currentSession.user.id);
+            await fetchProfile(session.user.id);
           }
+        } else {
+          setProfile(null);
+          clearProfileCache();
         }
-      } catch (e) {
-        setError(e);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setError(error);
       } finally {
         setIsLoading(false);
       }
@@ -281,25 +296,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initializeAuth();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
+    // Set up the auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: Session | null) => {
+      console.log(`[Auth Context] onAuthStateChange event: ${event}`);
+      setSession(session);
+      const currentUser = session?.user || null;
+      setUser(currentUser);
       
-      if (newSession?.user) {
-        await fetchProfile(newSession.user.id);
-      } else {
-        if (typeof window !== 'undefined') {
-          clearProfileCache();
+      if (currentUser) {
+        const cachedProfile = getCachedProfile();
+        if (cachedProfile) {
+          setProfile(cachedProfile);
         }
+      } else {
         setProfile(null);
+        clearProfileCache();
       }
+      
       setIsLoading(false);
+
+      if (currentUser) {
+        setTimeout(() => {
+            console.log(`[Auth Context] Triggering profile fetch for user ${currentUser.id}`);
+            fetchProfile(currentUser.id).catch(err => {
+                console.error("[Auth Context] Background profile fetch failed:", err);
+            });
+        }, 0);
+      }
     });
 
+    // Clean up the subscription
     return () => {
-      authListener?.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
-  }, [supabase, fetchProfile, getCachedProfile, clearProfileCache, router, pathname]);
+  }, [supabase, fetchProfile, getCachedProfile, clearProfileCache]);
 
   // Sign in with Google
   const signInWithGoogle = async () => {

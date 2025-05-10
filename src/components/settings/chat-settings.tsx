@@ -35,6 +35,9 @@ export function ChatSettings() {
   const [enableSuggestions, setEnableSuggestions] = useState(
     profile?.chatSettings?.enableSuggestions ?? true
   );
+  const [messageHistoryCount, setMessageHistoryCount] = useState(
+    profile?.chatSettings?.messageHistoryCount ?? 10
+  );
 
   const saveSettings = async () => {
     try {
@@ -45,6 +48,7 @@ export function ChatSettings() {
           autoSendMessages,
           enableSpeech,
           enableSuggestions,
+          messageHistoryCount
         };
         
         const { error } = await updateProfile({ chatSettings });
@@ -117,6 +121,34 @@ export function ChatSettings() {
               checked={enableSuggestions}
               onCheckedChange={setEnableSuggestions}
               disabled={saving}
+            />
+          </div>
+          
+          {/* Message history count setting */}
+          <div className="space-y-4">
+            <div className="space-y-0.5">
+              <div className={cn(
+                "flex items-center justify-between",
+                isRtl ? "flex-row-reverse" : ""
+              )}>
+                <Label htmlFor="message-history">{t("chat.messageHistory")}</Label>
+                <span className="text-sm font-medium">
+                  {messageHistoryCount}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {t("chat.messageHistoryDescription")}
+              </p>
+            </div>
+            <Slider
+              id="message-history"
+              min={5}
+              max={50}
+              step={5}
+              value={[messageHistoryCount]}
+              onValueChange={([value]) => setMessageHistoryCount(value)}
+              disabled={saving}
+              className={isRtl ? "rtl-flip" : ""}
             />
           </div>
           
