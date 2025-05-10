@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
+import dynamic from 'next/dynamic';
 import { useRouter } from "@/i18n/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
@@ -13,9 +14,14 @@ import { LanguageSettings } from "@/components/settings/language-settings";
 import { ChatSettings } from "@/components/settings/chat-settings";
 import { PrivacySettings } from "@/components/settings/privacy-settings";
 import { SecuritySection } from "@/components/account/security-section";
-import { ProfileSection } from "@/components/account/profile-section";
 import { AccountLayout } from "@/components/layout/AccountLayout";
 import { Card } from "@/components/ui/card";
+
+// Dynamically import ProfileSection with SSR turned off
+const ProfileSection = dynamic(() => import('@/components/account/profile-section').then(mod => mod.ProfileSection), {
+  ssr: false,
+  loading: () => <p>Loading profile settings...</p>
+});
 
 export default function SettingsPage() {
   const { user, isLoading } = useAuth();

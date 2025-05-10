@@ -3,10 +3,17 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
+import dynamic from 'next/dynamic';
 import { useRouter } from "@/i18n/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { AccountLayout } from "@/components/layout/AccountLayout";
-import { ChatHistory } from "@/components/chat/ChatHistory";
+// import { ChatHistory } from "@/components/chat/ChatHistory";
+
+// Dynamically import ChatHistory with SSR turned off
+const ChatHistory = dynamic(() => import('@/components/chat/ChatHistory').then(mod => mod.ChatHistory), {
+  ssr: false,
+  loading: () => <p>Loading chat history...</p> // Optional: add a loading component
+});
 
 export default function HistoryPage() {
   const { user, isLoading } = useAuth();
