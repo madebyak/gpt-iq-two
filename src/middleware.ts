@@ -1,5 +1,5 @@
 import createIntlMiddleware from 'next-intl/middleware';
-import { locales, defaultLocale } from './i18n/config';
+import { locales, defaultLocale } from './i18n';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
