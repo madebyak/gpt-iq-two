@@ -195,12 +195,14 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
 
         // Styles for the outer wrapper div
         const wrapperStyle: React.CSSProperties = {
-          backgroundColor: 'hsl(var(--muted))', // Back to solid muted
+          backgroundColor: 'hsl(var(--muted))',
           borderRadius: 'var(--radius, 0.5rem)',
           margin: '0.5rem 0', 
-          overflow: 'hidden',
           border: 'none',
           direction: 'ltr',
+          maxWidth: '100%',
+          wordBreak: 'break-all',
+          boxSizing: 'border-box'
         };
 
         // Custom style for the SyntaxHighlighter
@@ -209,10 +211,12 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
           padding: '1rem 1.25rem', // Use this for code padding
           margin: 0, 
           whiteSpace: 'pre-wrap',    
-          wordWrap: 'break-word',    
+          wordBreak: 'break-all',
           border: 'none',           
           textAlign: 'left',      
           direction: 'ltr',
+          display: 'block',
+          boxSizing: 'border-box'
         };
 
         return (
@@ -236,7 +240,6 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
               style={syntaxTheme} 
               customStyle={highlighterStyle}
               language={language}
-              PreTag="div"
               {...props}
             >
               {codeString} 
@@ -328,7 +331,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
       >
         <div 
           className={cn(
-            "flex-grow rounded-lg px-4 py-3 shadow-sm text-sm",
+            "flex-grow rounded-lg px-4 py-3 shadow-sm text-sm max-w-full",
             isUser 
               ? "bg-primary text-primary-foreground text-right"
               : "bg-card text-foreground",
@@ -341,7 +344,10 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
               dir={hasArabicContent ? "rtl" : "ltr"}
               className="markdown-content"
               style={{
-                textAlign: hasArabicContent ? 'right' : 'left'
+                textAlign: hasArabicContent ? 'right' : 'left',
+                wordBreak: 'break-all',
+                maxWidth: '100%',
+                boxSizing: 'border-box'
               }}
             >
               <ReactMarkdown 
