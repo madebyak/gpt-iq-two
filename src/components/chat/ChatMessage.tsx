@@ -15,6 +15,33 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vs, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Components } from 'react-markdown';
+
+// ADDED: Helper components for LTR Markdown blocks
+interface LtrBlockProps {
+  children?: React.ReactNode;
+  as?: React.ElementType;
+  [key: string]: any; // Allow other HTML attributes
+}
+
+const LtrMarkdownBlock: React.FC<LtrBlockProps> = ({ children, as: Tag = 'p', ...props }) => {
+  return (
+    <Tag dir="ltr" style={{ textAlign: 'left', unicodeBidi: 'embed' }} {...props}>
+      {children}
+    </Tag>
+  );
+};
+
+const LtrP: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="p" {...props} />;
+const LtrLi: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="li" {...props} />;
+const LtrOl: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="ol" {...props} />;
+const LtrUl: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="ul" {...props} />;
+const LtrH1: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="h1" {...props} />;
+const LtrH2: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="h2" {...props} />;
+const LtrH3: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="h3" {...props} />;
+const LtrH4: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="h4" {...props} />;
+const LtrH5: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="h5" {...props} />;
+const LtrH6: React.FC<LtrBlockProps> = (props) => <LtrMarkdownBlock as="h6" {...props} />;
 
 interface ChatMessageProps {
   message: Message;
@@ -66,7 +93,6 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   
   // Detect if message content contains Arabic text to apply appropriate text direction
   const hasArabicContent = message.content && /[\u0600-\u06FF]/.test(message.content);
-  const messageTextDirection = hasArabicContent || isRtl ? "rtl" : "ltr";
 
   // --- BEGIN LOGGING ---
   if (!message.content && !isUser) {
@@ -127,8 +153,8 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   };
 
   // --- Custom Code Renderer with dynamic theme and customStyle ---
-  const CodeRenderer = useMemo(() => ({
-    code({ node, inline, className, children, ...props }: any) {
+  const CodeRenderer = useMemo(() => {
+    return function CodeComponent({ node, inline, className, children, ...props }: any) {
       const match = /language-(\w+)/.exec(className || '');
       const language = match ? match[1] : null;
 
@@ -174,6 +200,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
           margin: '0.5rem 0', 
           overflow: 'hidden',
           border: 'none',
+          direction: 'ltr',
         };
 
         // Custom style for the SyntaxHighlighter
@@ -181,10 +208,11 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
           background: 'transparent',
           padding: '1rem 1.25rem', // Use this for code padding
           margin: 0, 
-          // overflowX: 'auto', // Remove this to prioritize wrapping
-          whiteSpace: 'pre-wrap',    // Allow wrapping while preserving whitespace
-          wordWrap: 'break-word',    // Allow breaking long words if necessary (maps to overflow-wrap)
-          border: 'none',           // Ensure no border here
+          whiteSpace: 'pre-wrap',    
+          wordWrap: 'break-word',    
+          border: 'none',           
+          textAlign: 'left',      
+          direction: 'ltr',
         };
 
         return (
@@ -227,8 +255,31 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
         </code>
       );
     }
-  }), [theme]); // Depend on the app theme
+  }, [theme, isRtl]);
   // --- End Custom Code Renderer ---
+
+  // ADDED: Memoized components for ReactMarkdown based on content direction
+  const mdComponents = useMemo(() => {
+    let componentsConfig: Partial<Components> = { 
+      code: CodeRenderer, 
+    };
+
+    // If the AI message is NOT Arabic, force LTR rendering for its text blocks
+    // This specifically targets AI messages because user messages already have their markdown-content dir set by content.
+    if (!isUser && !hasArabicContent) { 
+      componentsConfig = {
+        ...componentsConfig,
+        p: LtrP,
+        li: LtrLi,
+        ol: LtrOl,
+        ul: LtrUl,
+        h1: LtrH1, h2: LtrH2, h3: LtrH3, h4: LtrH4, h5: LtrH5, h6: LtrH6,
+      };
+    }
+    // When isUser or hasArabicContent (for AI), we don't override p, li, etc.
+    // They will inherit from the markdown-content div's dir and text-align.
+    return componentsConfig;
+  }, [isUser, hasArabicContent, CodeRenderer]);
 
   // Apply link cleanup regex before rendering
   // Looks for: Punctuation -> Optional Space -> Slash -> Optional Space -> URL
@@ -239,10 +290,12 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
   return (
     <div
       className={cn(
-        "flex w-full items-start gap-x-4 py-4", 
-        isRtl ? "text-right" : "text-left" 
+        "flex w-full items-start gap-x-4 py-4",
+        isUser 
+          ? "justify-end" // User messages: group on the right
+          : (hasArabicContent ? "justify-end" : "justify-start") // AI: group on right if Arabic (no reverse), left if LTR
       )}
-      dir={isRtl ? "rtl" : "ltr"}
+      dir={isUser ? "rtl" : "ltr"}
     >
       <div className="flex-shrink-0">
         {isUser ? (
@@ -273,18 +326,27 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
           "items-start" // Always align items (bubble) to the start (left)
         )}
       >
-        <div className={cn(
-          "block rounded-lg px-4 py-2 max-w-prose max-w-full",
-          isUser ? "bg-primary/80 text-primary-foreground" : "bg-card text-foreground"
-        )}>
+        <div 
+          className={cn(
+            "flex-grow rounded-lg px-4 py-3 shadow-sm text-sm",
+            isUser 
+              ? "bg-primary text-primary-foreground text-right"
+              : "bg-card text-foreground",
+            !isUser && (hasArabicContent ? "text-right" : "text-left") 
+          )}
+          dir={isUser ? "rtl" : (hasArabicContent ? "rtl" : "ltr")}
+        >
           {message.content ? (
             <div 
-              style={{ direction: messageTextDirection }}
+              dir={hasArabicContent ? "rtl" : "ltr"}
               className="markdown-content"
+              style={{
+                textAlign: hasArabicContent ? 'right' : 'left'
+              }}
             >
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]} 
-                components={CodeRenderer}
+                components={mdComponents}
               >
                 {cleanedContent}
               </ReactMarkdown>
