@@ -293,3 +293,10 @@
 .markdown-content strong {
   font-weight: 600;
 }
+
+/* Added to prevent the main page (outer) scrollbar */
+/* This logic should not be removed without re-evaluating the page layout */
+html,
+body {
+  overflow: hidden;
+}

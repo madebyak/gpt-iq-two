@@ -90,9 +90,11 @@ export function ChatInput({ locale, isMobile }: ChatInputProps) {
           placeholder={t('chatPlaceholder')}
           disabled={isLoading}
           className={cn(
-            "min-h-[60px] w-full resize-none",
+            "w-full resize-none",
+            "min-h-[48px] md:min-h-[56px]",
             isOverflowing ? "overflow-y-auto" : "overflow-hidden",
-            "overflow-x-hidden border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-4",
+            "overflow-x-hidden border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+            "py-2 md:py-3",
             isRtl ? "text-right pr-4 pl-14" : "text-left pl-4 pr-14",
             "rounded-2xl text-base placeholder:text-muted-foreground/60",
             isLoading && "opacity-70"
