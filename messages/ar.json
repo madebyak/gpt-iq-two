@@ -42,6 +42,7 @@
     "chatPlaceholder": "اكتب رسالة...",
     "sendMessage": "إرسال رسالة",
     "enterToSend": "اضغط على Enter للإرسال، Shift + Enter لسطر جديد",
+    "sendMessageHintMobile": "اضغط على زر الإرسال للإرسال.",
     "headlineTitle": "بوت جاهز",
     "headlineSubtitle": "مساعدك الذكي المدعوم بالذكاء الاصطناعي المتقدم. اطرح الأسئلة واحصل على الإجابات واكتشف الرؤى.",
     "thinking": "جارٍ التفكير...",

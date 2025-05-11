@@ -46,6 +46,7 @@
     "chatPlaceholder": "Type a message...",
     "sendMessage": "Send message",
     "enterToSend": "Press Enter to send, Shift + Enter for a new line",
+    "sendMessageHintMobile": "Tap the send button to send.",
     "headlineTitle": "Jahiz Bot",
     "headlineSubtitle": "Your intelligent assistant powered by advanced AI. Ask questions, get answers, and discover insights."
   },

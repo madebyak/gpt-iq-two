@@ -9,9 +9,10 @@ import { useChatContext } from "@/components/providers/ChatProvider";
 
 interface ChatInputProps {
   locale: string;
+  isMobile: boolean;
 }
 
-export function ChatInput({ locale }: ChatInputProps) {
+export function ChatInput({ locale, isMobile }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [isComposing, setIsComposing] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -54,9 +55,25 @@ export function ChatInput({ locale }: ChatInputProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing && !isLoading) {
-      e.preventDefault();
-      handleSubmit(e);
+    if (e.key === 'Enter' && !isComposing && !isLoading) {
+      if (isMobile) {
+        // On mobile, if Shift is pressed, allow newline (default behavior).
+        // If only Enter is pressed, also allow newline (don't prevent default, don't submit).
+        // The user must use the send button to submit on mobile.
+        if (e.shiftKey) {
+          return; // Allow default Shift+Enter behavior (newline)
+        }
+        // For Enter alone on mobile, we also want a newline, so we don't preventDefault.
+        // No special action needed here; it will insert a newline by default.
+        return;
+      } else {
+        // Desktop: Enter without Shift submits the form.
+        if (!e.shiftKey) {
+          e.preventDefault();
+          handleSubmit(e);
+        }
+        // Desktop: Shift+Enter will naturally create a newline if not prevented.
+      }
     }
   };
 
@@ -104,9 +121,16 @@ export function ChatInput({ locale }: ChatInputProps) {
           />
         </button>
       </div>
-      <p className="text-xs text-muted-foreground mt-2 text-center">
-        {t('enterToSend')}
-      </p>
+      {!isMobile && (
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          {t('enterToSend')}
+        </p>
+      )}
+      {isMobile && (
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          {t('sendMessageHintMobile', { defaultValue: 'Tap the send button to send.' })}
+        </p>
+      )}
     </form>
   );
 }

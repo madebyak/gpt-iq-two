@@ -146,7 +146,7 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
                   </ChatContent>
                 </div>
                 <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
-                  <ChatInput locale={locale} />
+                  <ChatInput locale={locale} isMobile={isMobile} />
                 </div>
               </div>
             </ChatProvider>
@@ -200,7 +200,7 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
           </ChatContent>
         </div>
         <div className="sticky bottom-0 p-4 bg-background/80 backdrop-blur-sm">
-          <ChatInput locale={locale} />
+          <ChatInput locale={locale} isMobile={isMobile} />
         </div>
       </ChatProvider>
     </div>
