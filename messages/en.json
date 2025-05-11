@@ -209,6 +209,8 @@
     "archiveConversation": "Archive conversation",
     "unarchiveConversation": "Unarchive conversation",
     "deleteConversation": "Delete conversation",
+    "confirmDeleteTitle": "Delete Conversation?",
+    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the conversation and all its messages.",
     "confirmDelete": "Yes, delete",
     "cancel": "Cancel",
     "noMessagePreview": "No message preview available",

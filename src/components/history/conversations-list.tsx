@@ -20,6 +20,16 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { useAuth } from "@/lib/auth/auth-context";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ConversationsListProps {
   filterType: 'all' | 'pinned' | 'archived';
@@ -51,6 +61,9 @@ export function ConversationsList({
   const isRtl = locale === "ar";
   const dateLocale = locale === "ar" ? ar : enUS;
   const supabase = createClient();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchConversations() {
@@ -168,23 +181,30 @@ export function ConversationsList({
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm(t("deleteConfirmation"))) return;
+  const executeDelete = async () => {
+    if (!conversationToDelete) return;
     
     try {
       const { error } = await supabase
         .from('conversations')
         .delete()
-        .eq('id', id)
+        .eq('id', conversationToDelete)
         .eq('user_id', user?.id);
       
       if (error) throw error;
       
-      // Remove from local state
-      setConversations(prev => prev.filter(conv => conv.id !== id));
+      setConversations(prev => prev.filter(conv => conv.id !== conversationToDelete));
     } catch (error) {
-      console.error('Error deleting conversation:', error);
+      console.error(`Error deleting conversation ${conversationToDelete}:`, error);
+    } finally {
+      setIsConfirmOpen(false);
+      setConversationToDelete(null);
     }
+  };
+
+  const promptDeleteConfirmation = (id: string) => {
+    setConversationToDelete(id);
+    setIsConfirmOpen(true);
   };
 
   if (loading) {
@@ -324,7 +344,7 @@ export function ConversationsList({
                   variant="ghost" 
                   size="icon"
                   className="h-9 w-9 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
-                  onClick={() => handleDelete(conversation.id)}
+                  onClick={() => promptDeleteConfirmation(conversation.id)}
                   title={t("deleteConversation")}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -347,6 +367,24 @@ export function ConversationsList({
           </Card>
         );
       })}
+      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <AlertDialogContent dir={isRtl ? "rtl" : "ltr"}>
+          <AlertDialogHeader>
+            <AlertDialogTitle className={isRtl ? "text-right" : "text-left"}>
+              {t("confirmDeleteTitle", { defaultValue: "Delete Conversation?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription className={isRtl ? "text-right" : "text-left"}>
+              {t("confirmDeleteDescription", { defaultValue: "This action cannot be undone. This will permanently delete the conversation and all its messages." })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className={isRtl ? "flex-row-reverse" : ""}>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={executeDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+              {t("confirmDelete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

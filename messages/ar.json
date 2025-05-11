@@ -207,6 +207,8 @@
     "archiveConversation": "أرشفة المحادثة",
     "unarchiveConversation": "إلغاء أرشفة المحادثة",
     "deleteConversation": "حذف المحادثة",
+    "confirmDeleteTitle": "حذف المحادثة؟",
+    "confirmDeleteDescription": "سيؤدي هذا إلى حذف هذه المحادثة وجميع رسائلها نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
     "confirmDelete": "نعم، احذف",
     "cancel": "إلغاء",
     "noMessagePreview": "لا تتوفر معاينة للرسالة",
