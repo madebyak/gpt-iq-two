@@ -78,6 +78,9 @@ export function OnboardingTrigger() {
       headline={currentStepContent.headline}
       subheading={currentStepContent.subheading}
       isRtl={isRtl}
+      backButtonText={t('backButton')}
+      nextButtonText={t('nextButton')}
+      finishButtonText={t('finishButton')}
     />
   );
 } 

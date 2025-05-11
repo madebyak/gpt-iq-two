@@ -496,7 +496,10 @@
     "step2": {
       "headline": "Seamless Conversations, Instantly Ready.",
       "subheading": "With a refined interface (Light/Dark!), conversation history, and continuous context, Jahiz AI keeps your workflow smooth and ready to resume."
-    }
+    },
+    "backButton": "Back",
+    "nextButton": "Next",
+    "finishButton": "Finish"
   },
   "SponsorshipPage": {
     "title": "Sponsorship",

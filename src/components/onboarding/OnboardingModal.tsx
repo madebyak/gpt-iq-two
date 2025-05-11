@@ -36,6 +36,9 @@ interface OnboardingModalProps {
   subheading: string;
   isRtl: boolean;
   // Add other step-specific props if needed, e.g., children: React.ReactNode
+  backButtonText: string;
+  nextButtonText: string;
+  finishButtonText: string;
 }
 
 export function OnboardingModal({
@@ -48,6 +51,9 @@ export function OnboardingModal({
   headline,
   subheading,
   isRtl,
+  backButtonText,
+  nextButtonText,
+  finishButtonText,
 }: OnboardingModalProps) {
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
@@ -138,7 +144,7 @@ export function OnboardingModal({
             disabled={isFirstStep}
             className="order-1 rtl:order-3 hover:bg-transparent hidden md:inline-flex"
           >
-            Back
+            {backButtonText}
           </Button>
 
           <div className="flex justify-center space-x-2 rtl:space-x-reverse order-2 flex-grow">
@@ -158,7 +164,7 @@ export function OnboardingModal({
             onClick={onNext}
             className="order-3 rtl:order-1 hover:bg-transparent hidden md:inline-flex"
           >
-            {isLastStep ? "Finish" : "Next"}
+            {isLastStep ? finishButtonText : nextButtonText}
           </Button>
         </DialogFooter>
       </DialogContent>

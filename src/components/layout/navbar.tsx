@@ -33,6 +33,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { useConversationNavigation } from "@/lib/hooks/useConversationNavigation";
 
 const getLanguageInfo = (localeCode: string) => {
   switch (localeCode) {
@@ -51,6 +52,8 @@ const Navbar = () => {
   const pathname = usePathname();
   const { user, profile, signOut, isLoading } = useAuth();
   const t = useTranslations('Navbar');
+  
+  const { handleNewChat } = useConversationNavigation();
   
   // --- Add Logging ---
   console.log('[Navbar] Rendering with pathname:', pathname, 'and locale:', locale);
@@ -81,6 +84,7 @@ const Navbar = () => {
             variant="outline" 
             size="default" 
             className="gap-2 items-center h-11 px-4 py-2"
+            onClick={handleNewChat}
           >
             <CircleFadingPlus className="h-4 w-4" aria-hidden="true" />
             {t('newChat')}
