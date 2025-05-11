@@ -345,7 +345,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
               className="markdown-content"
               style={{
                 textAlign: hasArabicContent ? 'right' : 'left',
-                wordBreak: 'break-all',
+                overflowWrap: 'break-word',
                 maxWidth: '100%',
                 boxSizing: 'border-box'
               }}
