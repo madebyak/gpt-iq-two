@@ -190,6 +190,11 @@
     "searchPlaceholder": "Search conversations...",
     "filterByDate": "Filter by date",
     "applyFilters": "Apply Filters",
+    "clearFilter": "Clear Date Filter",
+    "presetToday": "Today",
+    "presetLast7Days": "Last 7 days",
+    "presetLast30Days": "Last 30 days",
+    "presetAllTime": "All Time",
     "startNewChat": "Start New Chat",
     "tabs": {
       "all": "All Conversations",

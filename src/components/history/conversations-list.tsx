@@ -35,6 +35,8 @@ interface ConversationsListProps {
   filterType: 'all' | 'pinned' | 'archived';
   searchQuery: string;
   selectedDate?: Date;
+  startDate?: Date;
+  endDate?: Date;
   locale: string;
 }
 
@@ -52,8 +54,11 @@ export function ConversationsList({
   filterType, 
   searchQuery,
   selectedDate,
+  startDate,
+  endDate,
   locale 
 }: ConversationsListProps) {
+  console.log('[DEBUG ConversationsList] Received props - startDate:', startDate);
   const { user } = useAuth();
   const t = useTranslations("History");
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -106,6 +111,41 @@ export function ConversationsList({
             .lte('created_at', endOfDay.toISOString());
         }
         
+        // Apply date range filter if provided
+        if (startDate) {
+          // const queryStart = new Date(startDate); // Old logic - to be removed
+          // queryStart.setHours(0, 0, 0, 0); // Old logic - to be removed
+          
+          // const queryEnd = endDate ? new Date(endDate) : new Date(startDate); // Old logic - to be removed
+          // queryEnd.setHours(23, 59, 59, 999); // Old logic - to be removed
+
+          // --- Calculate start/end based on UTC components --- 
+          const startYear = startDate.getFullYear();
+          const startMonth = startDate.getMonth(); // 0-indexed
+          const startDay = startDate.getDate();
+
+          const utcStart = new Date(Date.UTC(startYear, startMonth, startDay, 0, 0, 0, 0));
+
+          // Use end date if provided, otherwise use end of start date
+          const endReferenceDate = endDate || startDate;
+          const endYear = endReferenceDate.getFullYear();
+          const endMonth = endReferenceDate.getMonth();
+          const endDay = endReferenceDate.getDate();
+          const utcEnd = new Date(Date.UTC(endYear, endMonth, endDay, 23, 59, 59, 999));
+          // --- End UTC calculation --- 
+          
+          // --- Add console logs for debugging --- // add-line
+          console.log('[DEBUG] Date Filter - UTC Start:', utcStart.toISOString()); // add-line
+          console.log('[DEBUG] Date Filter - UTC End:', utcEnd.toISOString()); // add-line
+          // --- End console logs --- // add-line
+
+          query = query
+            // .gte('created_at', queryStart.toISOString()) // Old logic - to be removed
+            // .lte('created_at', queryEnd.toISOString()); // Old logic - to be removed
+            .gte('created_at', utcStart.toISOString())
+            .lte('created_at', utcEnd.toISOString());
+        }
+        
         // Order by pinned first, then by updated_at
         const { data, error } = await query
           .order('is_pinned', { ascending: false })
@@ -125,7 +165,7 @@ export function ConversationsList({
     }
     
     fetchConversations();
-  }, [user, filterType, searchQuery, selectedDate, supabase]);
+  }, [user, filterType, searchQuery, startDate, endDate, supabase]);
 
   const handlePinToggle = async (id: string, currentPinned: boolean) => {
     try {
@@ -236,7 +276,7 @@ export function ConversationsList({
           <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium">{t("noConversationsTitle")}</h3>
           <p className="text-muted-foreground mt-1 mb-6 max-w-md">
-            {searchQuery || selectedDate 
+            {searchQuery || startDate 
               ? t("noMatchingConversations") 
               : filterType === 'pinned' 
                 ? t("noPinnedConversations") 
@@ -262,7 +302,7 @@ export function ConversationsList({
     <div className="space-y-4">
       {conversations.map((conversation) => {
         const formattedDate = format(
-          new Date(conversation.updated_at), 
+          new Date(conversation.created_at),
           'd MMMM yyyy',
           { locale: dateLocale }
         );

@@ -188,6 +188,11 @@
     "searchPlaceholder": "البحث في المحادثات...",
     "filterByDate": "تصفية حسب التاريخ",
     "applyFilters": "تطبيق الفلاتر",
+    "clearFilter": "مسح فلتر التاريخ",
+    "presetToday": "اليوم",
+    "presetLast7Days": "آخر 7 أيام",
+    "presetLast30Days": "آخر 30 يومًا",
+    "presetAllTime": "كل الأوقات",
     "startNewChat": "بدء محادثة جديدة",
     "tabs": {
       "all": "جميع المحادثات",
