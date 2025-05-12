@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
@@ -109,40 +108,12 @@ export function ChatHistory() {
         </div>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList>
-          <TabsTrigger value="all">{t("tabs.all")}</TabsTrigger>
-          <TabsTrigger value="pinned">{t("tabs.pinned")}</TabsTrigger>
-          <TabsTrigger value="archived">{t("tabs.archived")}</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all" className="mt-6">
-          <ConversationsList 
-            filterType="all" 
-            searchQuery={searchQuery} 
-            selectedDate={selectedDate}
-            locale={locale} 
-          />
-        </TabsContent>
-        
-        <TabsContent value="pinned" className="mt-6">
-          <ConversationsList 
-            filterType="pinned" 
-            searchQuery={searchQuery} 
-            selectedDate={selectedDate}
-            locale={locale} 
-          />
-        </TabsContent>
-        
-        <TabsContent value="archived" className="mt-6">
-          <ConversationsList 
-            filterType="archived" 
-            searchQuery={searchQuery} 
-            selectedDate={selectedDate}
-            locale={locale} 
-          />
-        </TabsContent>
-      </Tabs>
+      <ConversationsList 
+        filterType="all" 
+        searchQuery={searchQuery} 
+        selectedDate={selectedDate}
+        locale={locale} 
+      />
     </div>
   );
 }
