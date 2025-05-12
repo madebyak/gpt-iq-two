@@ -215,7 +215,9 @@
     "noMessagePreview": "لا تتوفر معاينة للرسالة",
     "errorLoading": "خطأ في تحميل المحادثات",
     "openConversation": "فتح المحادثة",
-    "messageCount": "{count, plural, zero {0 رسائل} one {رسالة واحدة} two {رسالتان} few {{count} رسائل} many {{count} رسالة} other {{count} رسالة}}"
+    "messageCount": "{count, plural, zero {0 رسائل} one {رسالة واحدة} two {رسالتان} few {{count} رسائل} many {{count} رسالة} other {{count} رسالة}}",
+    "noConversationsTitle": "لا توجد محادثات",
+    "noMatchingConversations": "لم يتم العثور على محادثات مطابقة."
   },
   "Settings": {
     "title": "الإعدادات",
