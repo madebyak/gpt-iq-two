@@ -64,7 +64,7 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
     >
       <div 
         className={cn(
-          "flex flex-col bg-card transition-all duration-300 ease-in-out"
+          "flex flex-col h-full bg-card transition-all duration-300 ease-in-out"
         )}
       >
         {/* New Chat Button - Wrapped for margin */}
@@ -80,17 +80,19 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
         {renderRecentLabel}
         
         {/* Conversation List */}
-        <ConversationList
-          conversations={conversations}
-          loading={loading}
-          error={error}
-          collapsed={collapsed}
-          locale={locale}
-          loadingConversationId={loadingConversationId}
-          formatDate={formatDate}
-          onSelectConversation={navigateToConversation}
-          user={user}
-        />
+        <div className="flex-grow overflow-y-auto">
+          <ConversationList
+            conversations={conversations}
+            loading={loading}
+            error={error}
+            collapsed={collapsed}
+            locale={locale}
+            loadingConversationId={loadingConversationId}
+            formatDate={formatDate}
+            onSelectConversation={navigateToConversation}
+            user={user}
+          />
+        </div>
         
         {/* Footer Menu */}
         <SidebarFooter

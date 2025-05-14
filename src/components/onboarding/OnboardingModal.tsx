@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 // import Lottie from 'lottie-react'; // Will be dynamically imported
-import secondAnimationData from '../../../public/onbording/second3.json';
+// import secondAnimationData from '../../../public/onbording/second3.json'; // No longer needed for step 2 image
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -100,10 +100,36 @@ export function OnboardingModal({
                 priority
               />
             ) : currentStep === 1 ? (
-              <LottiePlayer 
-                animationData={secondAnimationData} 
-                loop={true} 
-                style={{ height: '100%', width: '100%', transform: 'scale(1.1)' }}
+              <Image
+                src="/onbording/second.jpg"
+                alt="Jahiz AI Onboarding Step 2"
+                layout="fill"
+                objectFit="cover"
+                priority
+              />
+            ) : currentStep === 2 ? (
+              <Image
+                src="/onbording/third.jpg"
+                alt="Jahiz AI Onboarding Step 3"
+                layout="fill"
+                objectFit="cover"
+                priority
+              />
+            ) : currentStep === 3 ? (
+              <Image
+                src="/onbording/fourth.jpg"
+                alt="Jahiz AI Onboarding Step 4"
+                layout="fill"
+                objectFit="cover"
+                priority
+              />
+            ) : currentStep === 4 ? (
+              <Image
+                src="/onbording/fifth.jpg"
+                alt="Jahiz AI Onboarding Step 5"
+                layout="fill"
+                objectFit="cover"
+                priority
               />
             ) : (
               <span className="text-sm text-muted-foreground">Placeholder (Step {currentStep + 1})</span>
@@ -120,7 +146,7 @@ export function OnboardingModal({
             <AnimatePresence initial={false}>
               <motion.div
                 key={currentStep}
-                className="absolute inset-0 pt-6 px-6 flex flex-col items-center justify-center space-y-4"
+                className="absolute inset-0 pt-4 px-6 flex flex-col items-center justify-center space-y-2"
                 initial={{ x: 300, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -300, opacity: 0 }}

@@ -500,12 +500,24 @@
   "returnUrl": "returnUrl",
   "Onboarding": {
     "step1": {
-      "headline": "Meet Jahiz AI: Your Ready & Resourceful Bot.",
-      "subheading": "Evolved from our experimental phase, Jahiz AI is here – smarter, more capable, and always ready to explore ideas with you."
+      "headline": "Jahiz AI: Iraq's Intelligence, Redefining Your Tomorrow.",
+      "subheading": "Welcome to the first AI built for Iraq. Jahiz AI isn't just a tool, it's the new foundation for knowledge, creativity, and progress, Jahiz is always  ready  for you."
     },
     "step2": {
-      "headline": "Seamless Conversations, Instantly Ready.",
-      "subheading": "With a refined interface (Light/Dark!), conversation history, and continuous context, Jahiz AI keeps your workflow smooth and ready to resume."
+      "headline": "Jahiz AI: From Data to Deep Understanding.",
+      "subheading": "Ask anything, explore everything. Jahiz AI transforms complex information into activated insight, making you the expert on any subject, from global science to Iraqi heritage."
+    },
+    "step3": {
+      "headline": "Jahiz AI: Impactful Communication, Engineered for Excellence.",
+      "subheading": "Command your narrative. From decisive emails to compelling official letters and documents, Jahiz AI crafts your professional voice for maximum impact and efficiency."
+    },
+    "step4": {
+      "headline": "Jahiz AI: Code the Future, From Foundation to Full Stack.",
+      "subheading": "Build without limits. Jahiz AI provides the intelligent infrastructure for your coding ambitions, generating, debugging, and explaining code to accelerate innovation."
+    },
+    "step5": {
+      "headline": "Jahiz AI: Endless Possibilities, Where Ideas Ignite.",
+      "subheading": "Don't just create, innovate. Jahiz AI is your partner in transforming sparks of inspiration into powerful narratives, groundbreaking content, and visionary projects."
     },
     "backButton": "Back",
     "nextButton": "Next",

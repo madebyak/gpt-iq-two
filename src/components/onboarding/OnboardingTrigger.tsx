@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { OnboardingModal } from './OnboardingModal';
 import { useTranslations, useLocale } from 'next-intl';
 
+const LOCAL_STORAGE_KEY = 'jahizOnboardingCompleted';
+
 export function OnboardingTrigger() {
   const t = useTranslations('Onboarding');
   const locale = useLocale();
@@ -20,16 +22,16 @@ export function OnboardingTrigger() {
       subheading: t('step2.subheading'),
     },
     {
-      headline: "Select Your Interests",
-      subheading: "Help us tailor suggestions for you. (Step 3/5)",
+      headline: t('step3.headline'),
+      subheading: t('step3.subheading'),
     },
     {
-      headline: "Privacy Preferences",
-      subheading: "Configure how your data is handled. (Step 4/5)",
+      headline: t('step4.headline'),
+      subheading: t('step4.subheading'),
     },
     {
-      headline: "All Set!",
-      subheading: "You're ready to start chatting smarter. (Step 5/5)",
+      headline: t('step5.headline'),
+      subheading: t('step5.subheading'),
     },
   ];
 
@@ -38,13 +40,24 @@ export function OnboardingTrigger() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Logic to show modal initially
+  // Logic to show modal initially only if not completed
   useEffect(() => {
-    const needsOnboarding = true; 
-    if (needsOnboarding) {
+    try {
+      const hasCompletedOnboarding = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (hasCompletedOnboarding !== 'true') {
+        // If not completed, show the modal after a short delay
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+      // If already completed, isOpen remains false, modal doesn't show
+    } catch (error) {
+      console.error("Failed to access localStorage for onboarding:", error);
+      // Fallback: show modal if localStorage fails, or decide on other behavior
       const timer = setTimeout(() => {
         setIsOpen(true);
-      }, 500); 
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -54,8 +67,12 @@ export function OnboardingTrigger() {
       setCurrentStep((prev) => prev + 1);
     } else {
       console.log("Onboarding finished!");
-      setIsOpen(false); 
-      // TODO: Add logic to mark onboarding as complete
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
+      } catch (error) {
+        console.error("Failed to set localStorage for onboarding completion:", error);
+      }
+      setIsOpen(false);
     }
   };
 
@@ -64,13 +81,34 @@ export function OnboardingTrigger() {
       setCurrentStep((prev) => prev - 1);
     }
   };
+  
+  const handleModalOpenChange = (open: boolean) => {
+    if (!open) { // If modal is being closed
+      try {
+        const isAlreadyMarkedCompleted = localStorage.getItem(LOCAL_STORAGE_KEY) === 'true';
+        if (!isAlreadyMarkedCompleted && currentStep < TOTAL_STEPS - 1) {
+          // If not already marked by finishing AND it's being closed before the last step
+          console.log("Onboarding dismissed before completion, marking as seen.");
+          localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
+        }
+      } catch (error) {
+        console.error("Failed to access localStorage on modal close:", error);
+      }
+    }
+    setIsOpen(open); // Update the state to actually close/open the modal
+  };
 
   const currentStepContent = onboardingSteps[currentStep];
 
+  // Only render the modal if isOpen is true
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <OnboardingModal 
-      isOpen={isOpen} 
-      onOpenChange={setIsOpen} 
+    <OnboardingModal
+      isOpen={isOpen}
+      onOpenChange={handleModalOpenChange}
       currentStep={currentStep}
       totalSteps={TOTAL_STEPS}
       onNext={handleNextStep}
