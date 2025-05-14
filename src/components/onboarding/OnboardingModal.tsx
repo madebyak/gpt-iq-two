@@ -91,49 +91,110 @@ export function OnboardingModal({
 
         <motion.div className="flex flex-col flex-grow">
           <div className="relative w-full h-1/2 flex-shrink-0 flex items-center justify-center overflow-hidden">
-            {currentStep === 0 ? (
-              <Image
-                src="/onbording/first.jpg"
-                alt="Jahiz AI Onboarding Step 1"
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-            ) : currentStep === 1 ? (
-              <Image
-                src="/onbording/second.jpg"
-                alt="Jahiz AI Onboarding Step 2"
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-            ) : currentStep === 2 ? (
-              <Image
-                src="/onbording/third.jpg"
-                alt="Jahiz AI Onboarding Step 3"
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-            ) : currentStep === 3 ? (
-              <Image
-                src="/onbording/fourth.jpg"
-                alt="Jahiz AI Onboarding Step 4"
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-            ) : currentStep === 4 ? (
-              <Image
-                src="/onbording/fifth.jpg"
-                alt="Jahiz AI Onboarding Step 5"
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-            ) : (
-              <span className="text-sm text-muted-foreground">Placeholder (Step {currentStep + 1})</span>
-            )}
+            <AnimatePresence initial={false} mode="wait">
+              {currentStep === 0 && (
+                <motion.div
+                  key={0} // Unique key for the step
+                  className="absolute inset-0" // Ensure it fills the parent for proper layout="fill"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <Image
+                    src="/onbording/first.jpg"
+                    alt="Jahiz AI Onboarding Step 1"
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </motion.div>
+              )}
+              {currentStep === 1 && (
+                <motion.div
+                  key={1}
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <Image
+                    src="/onbording/second.jpg"
+                    alt="Jahiz AI Onboarding Step 2"
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </motion.div>
+              )}
+              {currentStep === 2 && (
+                <motion.div
+                  key={2}
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <Image
+                    src="/onbording/third.jpg"
+                    alt="Jahiz AI Onboarding Step 3"
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </motion.div>
+              )}
+              {currentStep === 3 && (
+                <motion.div
+                  key={3}
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <Image
+                    src="/onbording/fourth.jpg"
+                    alt="Jahiz AI Onboarding Step 4"
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </motion.div>
+              )}
+              {currentStep === 4 && (
+                <motion.div
+                  key={4}
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <Image
+                    src="/onbording/fifth.jpg"
+                    alt="Jahiz AI Onboarding Step 5"
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </motion.div>
+              )}
+              {currentStep >= 5 && ( // Fallback for any steps beyond what we have images for
+                <motion.div
+                  key={currentStep} // Use currentStep for any other step
+                  className="absolute inset-0 flex items-center justify-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <span className="text-sm text-muted-foreground">Placeholder (Step {currentStep + 1})</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
           <motion.div 

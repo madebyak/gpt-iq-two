@@ -42,6 +42,9 @@
     /* Additional accent color */
     --purple: 258 76% 52%; /* #5724e2 - accent-purple */
     
+    /* Custom user chat bubble background */
+    --user-bubble-background-light: 211 50% 95%; /* #b8d3f4 */
+    
     --radius: 0.5rem;
     --font-ibm-plex-sans: 'IBM Plex Sans', system-ui, sans-serif;
   }
@@ -78,6 +81,9 @@
 
     /* Additional accent color */
     --purple: 258 76% 52%; /* #5724e2 - accent-purple */
+
+    /* Custom user chat bubble background */
+    --user-bubble-background-dark: 211 28% 25%; /* #2d3e51 */
   }
 
   /* Font family settings */

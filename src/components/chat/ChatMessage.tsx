@@ -333,7 +333,7 @@ export function ChatMessage({ message, locale }: ChatMessageProps) {
           className={cn(
             "flex-grow rounded-lg px-4 py-3 shadow-sm text-sm max-w-full",
             isUser 
-              ? "bg-primary text-primary-foreground text-right"
+              ? "bg-[hsl(var(--user-bubble-background-light))] dark:bg-[hsl(var(--user-bubble-background-dark))] text-foreground text-right"
               : "bg-card text-foreground",
             !isUser && (hasArabicContent ? "text-right" : "text-left") 
           )}
