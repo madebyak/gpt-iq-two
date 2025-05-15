@@ -7,11 +7,31 @@ import { useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { useChatContext } from "@/components/providers/ChatProvider";
 
+// Add proper type definition for the ChatInputProps interface
 interface ChatInputProps {
   locale: string;
   isMobile: boolean;
   onInputFocus?: () => void;
 }
+
+// Create a safe wrapper for requestIdleCallback
+const safeRequestIdleCallback = (callback: () => void) => {
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    return window.requestIdleCallback(callback);
+  } else {
+    // Fallback to setTimeout for browsers without requestIdleCallback
+    return setTimeout(callback, 1);
+  }
+};
+
+// Create a safe wrapper for cancelIdleCallback
+const safeCancelIdleCallback = (id: number) => {
+  if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+    window.cancelIdleCallback(id);
+  } else {
+    clearTimeout(id);
+  }
+};
 
 // Create a simple memoized input component
 const MemoTextarea = memo(Textarea);
@@ -54,19 +74,11 @@ export function ChatInput({ locale, isMobile, onInputFocus }: ChatInputProps) {
       const newHeight = Math.min(currentScrollHeight, maxHeight);
       textareaRef.current.style.height = `${newHeight}px`;
       
-      // Use requestIdleCallback for non-critical state updates
-      if (typeof requestIdleCallback !== 'undefined') {
-        requestIdleCallback(() => {
-          setIsOverflowing(currentScrollHeight > maxHeight);
-          heightUpdatePending.current = false;
-        });
-      } else {
-        // Fallback for browsers without requestIdleCallback
-        setTimeout(() => {
-          setIsOverflowing(currentScrollHeight > maxHeight);
-          heightUpdatePending.current = false;
-        }, 0);
-      }
+      // Use our safe wrapper for non-critical state updates
+      safeRequestIdleCallback(() => {
+        setIsOverflowing(currentScrollHeight > maxHeight);
+        heightUpdatePending.current = false;
+      });
     });
   }, [isMobile]);
 
@@ -102,7 +114,7 @@ export function ChatInput({ locale, isMobile, onInputFocus }: ChatInputProps) {
 
   // Mobile keyboard handling
   useEffect(() => {
-    if (!isMobile || !window.visualViewport) return;
+    if (!isMobile || typeof window === 'undefined' || !window.visualViewport) return;
     
     const handleViewportResize = () => {
       if (!window.visualViewport) return;
@@ -126,10 +138,8 @@ export function ChatInput({ locale, isMobile, onInputFocus }: ChatInputProps) {
     handleViewportResize();
     
     return () => {
-      if (visualViewport) {
-        visualViewport.removeEventListener('resize', handleViewportResize);
-        visualViewport.removeEventListener('scroll', handleViewportResize);
-      }
+      visualViewport.removeEventListener('resize', handleViewportResize);
+      visualViewport.removeEventListener('scroll', handleViewportResize);
     };
   }, [isMobile, isKeyboardVisible]);
 
@@ -219,7 +229,7 @@ export function ChatInput({ locale, isMobile, onInputFocus }: ChatInputProps) {
           className={textareaClassName}
           dir={isRtl ? "rtl" : "ltr"}
           autoCorrect="off"
-          spellCheck="false"
+          spellCheck={false}
           autoCapitalize="off"
         />
         <button
