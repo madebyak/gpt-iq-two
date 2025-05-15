@@ -33,9 +33,56 @@ interface ChatLayoutProps {
 export function ChatLayout({ locale, messages, children, conversationId }: ChatLayoutProps) {
   const [isMobile, setIsMobile] = useState(false);
   const { isRtl } = useRtl(locale);
+  const chatLayoutContainerRef = useRef<HTMLDivElement>(null);
+  const chatInputContainerRef = useRef<HTMLDivElement>(null); // Ref for the sticky ChatInput container
   
   // Log the messages prop received by ChatLayout (using our structured logger)
   logger.debug('ChatLayout received messages', { messageKeys: messages ? Object.keys(messages) : [] });
+
+  // Effect to adjust main container height on mobile based on visualViewport
+  useEffect(() => {
+    const mainContainer = chatLayoutContainerRef.current;
+    if (!mainContainer) return; // Only proceed if mainContainer exists
+
+    if (isMobile) {
+      const adjustLayoutAndScroll = () => {
+        if (window.visualViewport) {
+          const headerHeightPx = 4 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+          const newHeight = window.visualViewport.height - headerHeightPx;
+          mainContainer.style.height = `${newHeight}px`;
+          logger.debug(`[ChatLayout] Mobile: Adjusted container height to: ${newHeight}px`);
+
+          // Temporarily remove the explicit scrollIntoView to see if CSS transition + sticky is smoother
+          /*
+          if (chatInputContainerRef.current) {
+            const activeElement = document.activeElement;
+            if (activeElement && chatInputContainerRef.current.contains(activeElement) && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
+              chatInputContainerRef.current.scrollIntoView({ block: 'end', behavior: 'auto' });
+              logger.debug('[ChatLayout] Mobile: Scrolled chatInputContainer into view (end)');
+            }
+          }
+          */
+        } else {
+          mainContainer.style.height = 'calc(100vh - 4rem)'; 
+          logger.debug('[ChatLayout] Mobile: visualViewport not supported, fallback to 100vh - 4rem');
+        }
+      };
+
+      adjustLayoutAndScroll();
+      window.visualViewport?.addEventListener('resize', adjustLayoutAndScroll);
+
+      return () => {
+        window.visualViewport?.removeEventListener('resize', adjustLayoutAndScroll);
+        // Reset height when cleaning up mobile effect or if isMobile becomes false
+        // This helps if the component re-renders with isMobile false before this effect re-runs
+        if (mainContainer) mainContainer.style.height = ''; 
+      };
+    } else {
+      // On Desktop: Remove any inline height style to let CSS classes take over
+      mainContainer.style.height = ''; 
+      logger.debug('[ChatLayout] Desktop: Cleared inline container height');
+    }
+  }, [isMobile]); // Rerun if isMobile changes
 
   // Check if we're on a mobile device
   useEffect(() => {
@@ -145,7 +192,7 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
                     {children}
                   </ChatContent>
                 </div>
-                <div className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
+                <div ref={chatInputContainerRef} className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
                   <ChatInput locale={locale} isMobile={isMobile} />
                 </div>
               </div>
@@ -199,7 +246,7 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
             {children}
           </ChatContent>
         </div>
-        <div className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
+        <div ref={chatInputContainerRef} className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
           <ChatInput locale={locale} isMobile={isMobile} />
         </div>
       </ChatProvider>
@@ -208,8 +255,17 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
 
   return (
     <TooltipProvider>
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
-        {isMobile ? <MobileLayout /> : <DesktopLayout />}
+      <div 
+        ref={chatLayoutContainerRef}
+        className={cn(
+          "h-screen flex flex-col bg-background", 
+          "transition-height duration-200 ease-in-out"
+        )}
+        style={{ overflowAnchor: 'none' }}
+      >
+        <div className="overflow-hidden flex-grow flex flex-col">
+           {isMobile ? <MobileLayout /> : <DesktopLayout />}
+        </div>
       </div>
     </TooltipProvider>
   );

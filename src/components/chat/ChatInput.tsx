@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Send } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from 'next-intl';
@@ -21,25 +21,114 @@ export function ChatInput({ locale, isMobile }: ChatInputProps) {
   const t = useTranslations('Chat');
   const isRtl = locale === 'ar';
 
-  // Adjust textarea height based on content
-  useEffect(() => {
+  const handleTextareaFocus = () => {
+    if (isMobile && textareaRef.current) {
+      // Delay to allow Safari's scroll, keyboard animation, and ChatLayout height transition (200ms) to settle
+      setTimeout(() => {
+        if (textareaRef.current) {
+          // Scroll the bottom of the textarea to be aligned with the bottom of its scroll container
+          textareaRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          console.log('[ChatInput] Attempted textarea.scrollIntoView({ block: \'end\' }) on focus (mobile) after delay');
+        }
+      }, 250); // Delay should be a bit longer than the layout's height transition (200ms)
+    }
+  };
+
+  const handleTextareaBlur = () => {
+    if (isMobile) {
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        console.log('[ChatInput] Attempted window.scrollTo(0,0) on blur (mobile)');
+      }, 100); 
+    }
+  };
+
+  const adjustTextareaHeight = useCallback(() => {
+    console.log('[ChatInput] adjustTextareaHeight called');
     const textarea = textareaRef.current;
     if (textarea) {
-      // Reset height to measure actual content height
-      textarea.style.height = 'auto';
-      
-      // Check if content exceeds max height
-      const contentHeight = textarea.scrollHeight;
-      const maxHeight = 200;
-      
-      // Set if overflowing to control overflow CSS
-      setIsOverflowing(contentHeight > maxHeight);
-      
-      // Set height (either auto-expanded or capped at max)
-      const newHeight = Math.min(contentHeight, maxHeight);
-      textarea.style.height = `${newHeight}px`;
+      console.log('[ChatInput] Textarea ref found');
+
+      requestAnimationFrame(() => {
+        console.log('[ChatInput] requestAnimationFrame callback');
+        setTimeout(() => {
+          console.log('[ChatInput] setTimeout callback (after rAF)');
+          if (textareaRef.current) {
+            // Set to auto, then measure scrollHeight, then set to new pixel height.
+            // This is a standard pattern for auto-sizing textareas.
+            textareaRef.current.style.height = 'auto'; 
+            const currentScrollHeight = textareaRef.current.scrollHeight;
+            console.log(`[ChatInput] scrollHeight after auto: ${currentScrollHeight}`);
+
+            let currentMaxHeight = 200;
+            // let viewportHeightDebug = "N/A"; // No longer displaying debug info
+            if (isMobile) {
+              const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+              // viewportHeightDebug = viewportHeight.toFixed(2);
+              currentMaxHeight = Math.max(50, Math.min(viewportHeight * 0.35, 180));
+            }
+            
+            setIsOverflowing(currentScrollHeight > currentMaxHeight);
+            const newHeight = Math.min(currentScrollHeight, currentMaxHeight);
+            console.log(`[ChatInput] Calculated newHeight: ${newHeight}`);
+            
+            // Only update height if it has actually changed by more than a tiny fraction
+            if (Math.abs(textareaRef.current.offsetHeight - newHeight) > 0.5) {
+              textareaRef.current.style.height = `${newHeight}px`;
+              console.log(`[ChatInput] Textarea height SET to: ${textareaRef.current.style.height}`);
+            } else {
+              console.log(`[ChatInput] Textarea height ALREADY approx ${newHeight}px, not setting.`);
+            }
+          }
+        }, 0); 
+      });
     }
-  }, [message]);
+  }, [isMobile, setIsOverflowing]); // Removed message from dependency, as useEffect for message handles calling this.
+
+  // Adjust textarea height based on content
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [message, adjustTextareaHeight]);
+
+  // Adjust textarea height on viewport resize for mobile
+  useEffect(() => {
+    if (!isMobile) {
+      return;
+    }
+    console.log('[ChatInput] Setting up mobile resize listener');
+
+    const handleResize = () => {
+      console.log('[ChatInput] Mobile resize event triggered!');
+      if (window.visualViewport) {
+        console.log(`[ChatInput] visualViewport height: ${window.visualViewport.height}, width: ${window.visualViewport.width}, offsetTop: ${window.visualViewport.offsetTop}`);
+      } else {
+        console.log(`[ChatInput] window.innerHeight: ${window.innerHeight}`);
+      }
+      adjustTextareaHeight();
+    };
+
+    // Call once initially to set height based on current viewport
+    console.log('[ChatInput] Initial mobile resize call');
+    handleResize(); 
+
+    if (window.visualViewport) {
+      console.log('[ChatInput] Attaching to visualViewport.resize');
+      window.visualViewport.addEventListener('resize', handleResize);
+      return () => {
+        console.log('[ChatInput] Detaching from visualViewport.resize');
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', handleResize);
+        }
+      };
+    } else {
+      console.log('[ChatInput] Attaching to window.resize (fallback)');
+      window.addEventListener('resize', handleResize);
+      return () => {
+        console.log('[ChatInput] Detaching from window.resize (fallback)');
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [isMobile, adjustTextareaHeight]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,10 +174,14 @@ export function ChatInput({ locale, isMobile }: ChatInputProps) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={handleTextareaFocus}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
+          onBlur={handleTextareaBlur}
           placeholder={t('chatPlaceholder')}
           disabled={isLoading}
+          rows={1}
+          style={{ fieldSizing: 'content', WebkitFieldSizing: 'content' } as React.CSSProperties}
           className={cn(
             "w-full resize-none",
             "min-h-[48px] md:min-h-[56px]",

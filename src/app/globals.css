@@ -6,6 +6,29 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
+  
+  .rtl-rotate-180 {
+    transform: rotate(180deg);
+  }
+  
+  /* Custom spacing variables for RTL adjustments */
+  :root {
+    --spacing: 0.25rem;
+  }
+
+  /* Custom transition timing function */
+  .ease-out-circ {
+    transition-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000);
+  }
+
+  /* Smoother ease-out for keyboard animation */
+  .ease-out-keyboard {
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1); /* easeOutQuint */
+  }
 }
 
 @layer base {
@@ -155,22 +178,7 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-/* RTL specific Tailwind utilities */
-@layer utilities {
-  .rtl-flip {
-    transform: scaleX(-1);
-  }
-  
-  .rtl-rotate-180 {
-    transform: rotate(180deg);
-  }
-  
-  /* Custom spacing variables for RTL adjustments */
-  :root {
-    --spacing: 0.25rem;
+    overflow-anchor: none; /* Prevent scroll anchoring issues */
   }
 }
 

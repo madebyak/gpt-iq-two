@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
@@ -43,6 +43,15 @@ export function generateMetadata({ params }: { params: { locale: string } }): Me
       icon: "/favicon.ico",
       apple: "/apple-touch-icon.png",
     },
+  };
+}
+
+// Generate viewport configuration
+export function generateViewport({ params }: { params: { locale: string } }): Viewport {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
   };
 }
 
