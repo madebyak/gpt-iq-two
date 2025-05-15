@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 // import Lottie from 'lottie-react'; // Will be dynamically imported
 // import secondAnimationData from '../../../public/onbording/second3.json'; // No longer needed for step 2 image
@@ -58,6 +58,43 @@ export function OnboardingModal({
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
 
+  // Use useRef to store the previous step for immediate comparison in render
+  const prevStepRef = React.useRef(currentStep);
+
+  // Determine animation direction synchronously in render
+  // 1 for "Next" (new from L, old to R), -1 for "Back" (new from R, old to L)
+  let determinedAnimationDirection = 1; // Default for initial load or "Next"
+  if (currentStep < prevStepRef.current) { // Moving Back
+    determinedAnimationDirection = -1;
+  } else if (currentStep > prevStepRef.current) { // Moving Next
+    determinedAnimationDirection = 1;
+  }
+  // If currentStep === prevStepRef.current (e.g., initial render, or no change), direction remains as last set or default.
+  // For the very first appearance, it defaults to 1 (like a "Next" animation).
+
+  // Update prevStepRef *after* render, for the next render cycle
+  useEffect(() => {
+    prevStepRef.current = currentStep;
+  }, [currentStep]);
+
+  const slideOffset = 300;
+  const textAnimationVariants = {
+    enter: (direction: number) => ({
+      x: direction === 1 ? -slideOffset : slideOffset,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      transition: { ease: "circInOut", duration: 0.3 },
+    },
+    exit: (direction: number) => ({
+      x: direction === 1 ? slideOffset : -slideOffset,
+      opacity: 0,
+      transition: { ease: "circInOut", duration: 0.3 },
+    }),
+  };
+
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const swipeThreshold = 50;
     const swipeVelocityThreshold = 0.3;
@@ -99,7 +136,7 @@ export function OnboardingModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "circInOut" }}
                 >
                   <Image
                     src="/onbording/first.jpg"
@@ -117,7 +154,7 @@ export function OnboardingModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "circInOut" }}
                 >
                   <Image
                     src="/onbording/second.jpg"
@@ -135,7 +172,7 @@ export function OnboardingModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "circInOut" }}
                 >
                   <Image
                     src="/onbording/third.jpg"
@@ -153,7 +190,7 @@ export function OnboardingModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "circInOut" }}
                 >
                   <Image
                     src="/onbording/fourth.jpg"
@@ -171,7 +208,7 @@ export function OnboardingModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "circInOut" }}
                 >
                   <Image
                     src="/onbording/fifth.jpg"
@@ -189,7 +226,7 @@ export function OnboardingModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.3, ease: "circInOut" }}
                 >
                   <span className="text-sm text-muted-foreground">Placeholder (Step {currentStep + 1})</span>
                 </motion.div>
@@ -204,14 +241,15 @@ export function OnboardingModal({
             onDragEnd={handleDragEnd}
             dragElastic={0.1}
           >
-            <AnimatePresence initial={false}>
+            <AnimatePresence initial={false} custom={determinedAnimationDirection} mode="wait">
               <motion.div
                 key={currentStep}
+                custom={determinedAnimationDirection}
+                variants={textAnimationVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
                 className="absolute inset-0 pt-4 px-6 flex flex-col items-center justify-center space-y-2"
-                initial={{ x: 300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-                transition={{ ease: "easeInOut", duration: 0.3 }}
               >
                 <h2 className="text-2xl font-semibold text-center">
                   {headline}
