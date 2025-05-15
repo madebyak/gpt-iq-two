@@ -3,6 +3,7 @@
 import Navbar from "@/components/layout/navbar";
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from 'next-intl';
+import { cn } from "@/lib/utils";
 
 interface HomeClientProps {
   children: ReactNode;
@@ -15,22 +16,22 @@ export default function HomeClient({
   locale,
   messages 
 }: HomeClientProps) {
-  // We need to have a single context for the entire component tree
-  // to ensure everything using i18n features (including Link component) works properly
+  const content = (
+    <div className={cn("flex flex-col h-full w-full")}>
+      <Navbar />
+      <div className={cn("flex-grow h-0")}>
+        {children}
+      </div>
+    </div>
+  );
+
   if (locale && messages) {
     return (
       <NextIntlClientProvider locale={locale} messages={messages}>
-        <Navbar />
-        {children}
+        {content}
       </NextIntlClientProvider>
     );
   }
   
-  // Fallback rendering without i18n context - simple content only
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return content;
 }

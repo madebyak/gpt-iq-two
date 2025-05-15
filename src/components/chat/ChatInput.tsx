@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { Send } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from 'next-intl';
@@ -10,189 +10,217 @@ import { useChatContext } from "@/components/providers/ChatProvider";
 interface ChatInputProps {
   locale: string;
   isMobile: boolean;
+  onInputFocus?: () => void;
 }
 
-export function ChatInput({ locale, isMobile }: ChatInputProps) {
+// Create a simple memoized input component
+const MemoTextarea = memo(Textarea);
+
+export function ChatInput({ locale, isMobile, onInputFocus }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [isComposing, setIsComposing] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
+  const [inputPosition, setInputPosition] = useState(0);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const inputContainerRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessage, isLoading } = useChatContext();
   const t = useTranslations('Chat');
   const isRtl = locale === 'ar';
+  
+  // Use a local ref to track input value to avoid unnecessary re-renders
+  const inputValueRef = useRef(message);
+  const heightUpdatePending = useRef(false);
 
-  const handleTextareaFocus = () => {
-    if (isMobile && textareaRef.current) {
-      // Delay to allow Safari's scroll, keyboard animation, and ChatLayout height transition (200ms) to settle
-      setTimeout(() => {
-        if (textareaRef.current) {
-          // Scroll the bottom of the textarea to be aligned with the bottom of its scroll container
-          textareaRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          console.log('[ChatInput] Attempted textarea.scrollIntoView({ block: \'end\' }) on focus (mobile) after delay');
-        }
-      }, 250); // Delay should be a bit longer than the layout's height transition (200ms)
-    }
-  };
-
-  const handleTextareaBlur = () => {
-    if (isMobile) {
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        console.log('[ChatInput] Attempted window.scrollTo(0,0) on blur (mobile)');
-      }, 100); 
-    }
-  };
-
+  // Adjust textarea height with requestAnimationFrame for better performance
   const adjustTextareaHeight = useCallback(() => {
-    console.log('[ChatInput] adjustTextareaHeight called');
-    const textarea = textareaRef.current;
-    if (textarea) {
-      console.log('[ChatInput] Textarea ref found');
-
-      requestAnimationFrame(() => {
-        console.log('[ChatInput] requestAnimationFrame callback');
+    if (heightUpdatePending.current) return;
+    
+    heightUpdatePending.current = true;
+    
+    // Use requestAnimationFrame for smoother visual updates
+    requestAnimationFrame(() => {
+      if (!textareaRef.current) {
+        heightUpdatePending.current = false;
+        return;
+      }
+      
+      // Reset height to auto first
+      textareaRef.current.style.height = 'auto';
+      
+      const currentScrollHeight = textareaRef.current.scrollHeight;
+      let maxHeight = isMobile ? 180 : 200;
+      
+      const newHeight = Math.min(currentScrollHeight, maxHeight);
+      textareaRef.current.style.height = `${newHeight}px`;
+      
+      // Use requestIdleCallback for non-critical state updates
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => {
+          setIsOverflowing(currentScrollHeight > maxHeight);
+          heightUpdatePending.current = false;
+        });
+      } else {
+        // Fallback for browsers without requestIdleCallback
         setTimeout(() => {
-          console.log('[ChatInput] setTimeout callback (after rAF)');
-          if (textareaRef.current) {
-            // Set to auto, then measure scrollHeight, then set to new pixel height.
-            // This is a standard pattern for auto-sizing textareas.
-            textareaRef.current.style.height = 'auto'; 
-            const currentScrollHeight = textareaRef.current.scrollHeight;
-            console.log(`[ChatInput] scrollHeight after auto: ${currentScrollHeight}`);
+          setIsOverflowing(currentScrollHeight > maxHeight);
+          heightUpdatePending.current = false;
+        }, 0);
+      }
+    });
+  }, [isMobile]);
 
-            let currentMaxHeight = 200;
-            // let viewportHeightDebug = "N/A"; // No longer displaying debug info
-            if (isMobile) {
-              const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-              // viewportHeightDebug = viewportHeight.toFixed(2);
-              currentMaxHeight = Math.max(50, Math.min(viewportHeight * 0.35, 180));
-            }
-            
-            setIsOverflowing(currentScrollHeight > currentMaxHeight);
-            const newHeight = Math.min(currentScrollHeight, currentMaxHeight);
-            console.log(`[ChatInput] Calculated newHeight: ${newHeight}`);
-            
-            // Only update height if it has actually changed by more than a tiny fraction
-            if (Math.abs(textareaRef.current.offsetHeight - newHeight) > 0.5) {
-              textareaRef.current.style.height = `${newHeight}px`;
-              console.log(`[ChatInput] Textarea height SET to: ${textareaRef.current.style.height}`);
-            } else {
-              console.log(`[ChatInput] Textarea height ALREADY approx ${newHeight}px, not setting.`);
-            }
-          }
-        }, 0); 
-      });
+  // Handle input changes
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    
+    // Update the local ref immediately for instant access
+    inputValueRef.current = newValue;
+    
+    // Apply the new value to the DOM directly for immediate feedback
+    if (textareaRef.current) {
+      textareaRef.current.value = newValue;
     }
-  }, [isMobile, setIsOverflowing]); // Removed message from dependency, as useEffect for message handles calling this.
+    
+    // Now handle UI updates with requestAnimationFrame
+    requestAnimationFrame(() => {
+      // Update the React state, which will cause a re-render
+      setMessage(newValue);
+      
+      // Schedule height adjustment for the next idle period
+      adjustTextareaHeight();
+    });
+  }, [adjustTextareaHeight]);
 
-  // Adjust textarea height based on content
+  // Adjust height when message changes
   useEffect(() => {
-    adjustTextareaHeight();
+    if (message !== inputValueRef.current) {
+      inputValueRef.current = message;
+      adjustTextareaHeight();
+    }
   }, [message, adjustTextareaHeight]);
 
-  // Adjust textarea height on viewport resize for mobile
+  // Mobile keyboard handling
   useEffect(() => {
-    if (!isMobile) {
-      return;
-    }
-    console.log('[ChatInput] Setting up mobile resize listener');
-
-    const handleResize = () => {
-      console.log('[ChatInput] Mobile resize event triggered!');
-      if (window.visualViewport) {
-        console.log(`[ChatInput] visualViewport height: ${window.visualViewport.height}, width: ${window.visualViewport.width}, offsetTop: ${window.visualViewport.offsetTop}`);
-      } else {
-        console.log(`[ChatInput] window.innerHeight: ${window.innerHeight}`);
-      }
-      adjustTextareaHeight();
-    };
-
-    // Call once initially to set height based on current viewport
-    console.log('[ChatInput] Initial mobile resize call');
-    handleResize(); 
-
-    if (window.visualViewport) {
-      console.log('[ChatInput] Attaching to visualViewport.resize');
-      window.visualViewport.addEventListener('resize', handleResize);
-      return () => {
-        console.log('[ChatInput] Detaching from visualViewport.resize');
-        if (window.visualViewport) {
-          window.visualViewport.removeEventListener('resize', handleResize);
-        }
-      };
-    } else {
-      console.log('[ChatInput] Attaching to window.resize (fallback)');
-      window.addEventListener('resize', handleResize);
-      return () => {
-        console.log('[ChatInput] Detaching from window.resize (fallback)');
-        window.removeEventListener('resize', handleResize);
-      };
-    }
-  }, [isMobile, adjustTextareaHeight]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (message.trim() && !isLoading) {
-      sendMessage(message.trim());
-      setMessage("");
+    if (!isMobile || !window.visualViewport) return;
+    
+    const handleViewportResize = () => {
+      if (!window.visualViewport) return;
       
-      // Reset textarea height
+      const windowHeight = window.innerHeight;
+      const viewportHeight = window.visualViewport.height;
+      const keyboardHeight = Math.max(0, windowHeight - viewportHeight);
+      const isKeyboardShown = keyboardHeight > 20;
+      
+      if (isKeyboardShown !== isKeyboardVisible) {
+        setIsKeyboardVisible(isKeyboardShown);
+        setInputPosition(isKeyboardShown ? viewportHeight : windowHeight);
+      }
+    };
+    
+    const visualViewport = window.visualViewport;
+    visualViewport.addEventListener('resize', handleViewportResize, { passive: true });
+    visualViewport.addEventListener('scroll', handleViewportResize, { passive: true });
+    
+    // Initial check
+    handleViewportResize();
+    
+    return () => {
+      if (visualViewport) {
+        visualViewport.removeEventListener('resize', handleViewportResize);
+        visualViewport.removeEventListener('scroll', handleViewportResize);
+      }
+    };
+  }, [isMobile, isKeyboardVisible]);
+
+  // Handle form submission
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputValueRef.current.trim() && !isLoading) {
+      sendMessage(inputValueRef.current.trim());
+      setMessage("");
+      inputValueRef.current = "";
+      
+      // Reset textarea height after sending
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
     }
-  };
+  }, [isLoading, sendMessage]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Handle key presses
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !isComposing && !isLoading) {
       if (isMobile) {
-        // On mobile, if Shift is pressed, allow newline (default behavior).
-        // If only Enter is pressed, also allow newline (don't prevent default, don't submit).
-        // The user must use the send button to submit on mobile.
-        if (e.shiftKey) {
-          return; // Allow default Shift+Enter behavior (newline)
-        }
-        // For Enter alone on mobile, we also want a newline, so we don't preventDefault.
-        // No special action needed here; it will insert a newline by default.
+        if (e.shiftKey) return;
         return;
       } else {
-        // Desktop: Enter without Shift submits the form.
         if (!e.shiftKey) {
           e.preventDefault();
           handleSubmit(e);
         }
-        // Desktop: Shift+Enter will naturally create a newline if not prevented.
       }
     }
-  };
+  }, [handleSubmit, isComposing, isLoading, isMobile]);
+
+  // Handle focusing on the input
+  const handleFocus = useCallback((e: React.FocusEvent) => {
+    if (onInputFocus) {
+      onInputFocus();
+    }
+  }, [onInputFocus]);
+
+  // Handle composition state (for IME input methods)
+  const handleCompositionStart = useCallback(() => setIsComposing(true), []);
+  const handleCompositionEnd = useCallback(() => setIsComposing(false), []);
+
+  // Create className for textarea
+  const textareaClassName = cn(
+    "w-full resize-none",
+    "min-h-[48px] md:min-h-[56px]",
+    isOverflowing ? "overflow-y-auto" : "overflow-hidden",
+    "overflow-x-hidden border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+    "py-2 md:py-3",
+    isRtl ? "text-right pr-4 pl-14" : "text-left pl-4 pr-14",
+    "rounded-2xl text-base placeholder:text-muted-foreground/60",
+    isLoading && "opacity-70"
+  );
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
-      <div className="relative rounded-2xl border border-input bg-background shadow-sm transition-all duration-200 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50">
-        <Textarea
+    <form 
+      onSubmit={handleSubmit} 
+      className={cn(
+        "w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8",
+        isMobile && "transform-gpu" // Use GPU acceleration
+      )}
+      style={isMobile ? {
+        position: isKeyboardVisible ? 'fixed' : 'relative',
+        bottom: isKeyboardVisible ? 0 : 'auto',
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        paddingBottom: isKeyboardVisible ? '8px' : '0',
+        transform: 'translateZ(0)' // Force hardware acceleration
+      } : {}}
+      ref={inputContainerRef}
+    >
+      <div className="relative rounded-2xl border border-input bg-background shadow-sm focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50">
+        <MemoTextarea
           ref={textareaRef}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={handleTextareaFocus}
-          onCompositionStart={() => setIsComposing(true)}
-          onCompositionEnd={() => setIsComposing(false)}
-          onBlur={handleTextareaBlur}
+          onFocus={handleFocus}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
           placeholder={t('chatPlaceholder')}
           disabled={isLoading}
           rows={1}
-          style={{ fieldSizing: 'content', WebkitFieldSizing: 'content' } as React.CSSProperties}
-          className={cn(
-            "w-full resize-none",
-            "min-h-[48px] md:min-h-[56px]",
-            isOverflowing ? "overflow-y-auto" : "overflow-hidden",
-            "overflow-x-hidden border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
-            "py-2 md:py-3",
-            isRtl ? "text-right pr-4 pl-14" : "text-left pl-4 pr-14",
-            "rounded-2xl text-base placeholder:text-muted-foreground/60",
-            isLoading && "opacity-70"
-          )}
+          className={textareaClassName}
           dir={isRtl ? "rtl" : "ltr"}
+          autoCorrect="off"
+          spellCheck="false"
+          autoCapitalize="off"
         />
         <button
           type="submit"
@@ -221,7 +249,7 @@ export function ChatInput({ locale, isMobile }: ChatInputProps) {
           {t('enterToSend')}
         </p>
       )}
-      {isMobile && (
+      {isMobile && !isKeyboardVisible && (
         <p className="text-xs text-muted-foreground mt-2 text-center">
           {t('sendMessageHintMobile', { defaultValue: 'Tap the send button to send.' })}
         </p>

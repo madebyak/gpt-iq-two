@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { 
   ResizablePanel, 
   ResizablePanelGroup,
@@ -33,56 +33,88 @@ interface ChatLayoutProps {
 export function ChatLayout({ locale, messages, children, conversationId }: ChatLayoutProps) {
   const [isMobile, setIsMobile] = useState(false);
   const { isRtl } = useRtl(locale);
-  const chatLayoutContainerRef = useRef<HTMLDivElement>(null);
-  const chatInputContainerRef = useRef<HTMLDivElement>(null); // Ref for the sticky ChatInput container
+  const chatLayoutContainerRef = useRef<HTMLDivElement>(null); // Ref for the main container
   
   // Log the messages prop received by ChatLayout (using our structured logger)
   logger.debug('ChatLayout received messages', { messageKeys: messages ? Object.keys(messages) : [] });
 
-  // Effect to adjust main container height on mobile based on visualViewport
-  useEffect(() => {
+  // Define adjustContainerHeight using useCallback in the main component scope
+  const adjustContainerHeight = useCallback(() => {
     const mainContainer = chatLayoutContainerRef.current;
-    if (!mainContainer) return; // Only proceed if mainContainer exists
+    if (!mainContainer || !isMobile) return; 
 
-    if (isMobile) {
-      const adjustLayoutAndScroll = () => {
-        if (window.visualViewport) {
-          const headerHeightPx = 4 * parseFloat(getComputedStyle(document.documentElement).fontSize);
-          const newHeight = window.visualViewport.height - headerHeightPx;
-          mainContainer.style.height = `${newHeight}px`;
-          logger.debug(`[ChatLayout] Mobile: Adjusted container height to: ${newHeight}px`);
+    // Don't apply transition initially when container's style.height hasn't been set yet
+    const hasHeightBeenSetBefore = mainContainer.style.height !== '';
+    
+    // If height has been set before, add a smooth but faster transition
+    if (hasHeightBeenSetBefore) {
+      mainContainer.style.transition = 'height 0.18s cubic-bezier(0.4, 0, 0.2, 1)';
+    }
 
-          // Temporarily remove the explicit scrollIntoView to see if CSS transition + sticky is smoother
-          /*
-          if (chatInputContainerRef.current) {
-            const activeElement = document.activeElement;
-            if (activeElement && chatInputContainerRef.current.contains(activeElement) && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
-              chatInputContainerRef.current.scrollIntoView({ block: 'end', behavior: 'auto' });
-              logger.debug('[ChatLayout] Mobile: Scrolled chatInputContainer into view (end)');
-            }
-          }
-          */
-        } else {
-          mainContainer.style.height = 'calc(100vh - 4rem)'; 
-          logger.debug('[ChatLayout] Mobile: visualViewport not supported, fallback to 100vh - 4rem');
+    // Use a single RAF for better performance
+    requestAnimationFrame(() => {
+      if (!chatLayoutContainerRef.current) return;
+      
+      let newHeight: number;
+      const headerHeightPx = 4 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+      
+      if (window.visualViewport) {
+        // Calculate based on visual viewport (area visible above keyboard)
+        newHeight = window.visualViewport.height - headerHeightPx;
+        
+        // Apply additional offset to account for any potential browser UI
+        const offsetFromBottom = window.innerHeight - (window.visualViewport.offsetTop + window.visualViewport.height);
+        if (offsetFromBottom > 0) {
+          newHeight -= Math.min(offsetFromBottom, 20); // Add small buffer of max 20px
         }
-      };
+        
+        // Apply height with smooth transition if this isn't the first time
+        chatLayoutContainerRef.current.style.height = `${newHeight}px`;
+        
+        // Force scroll to top to ensure proper positioning - this helps reduce perceived delay
+        if (window.scrollY > 0) {
+          window.scrollTo({ top: 0, behavior: 'auto' }); // Use 'auto' instead of 'smooth' for immediate response
+        }
+        
+        logger.debug(`[ChatLayout] Mobile: Adjusted container height to: ${newHeight}px (visualViewport)`);
+      } else {
+        // Fallback method
+        newHeight = window.innerHeight - headerHeightPx;
+        chatLayoutContainerRef.current.style.height = `${newHeight}px`;
+        logger.debug('[ChatLayout] Mobile: Adjusted container height to: ${newHeight}px (innerHeight fallback)');
+      }
+      
+      // Remove the transition after it's done to prevent it affecting other operations
+      if (hasHeightBeenSetBefore) {
+        setTimeout(() => {
+          if (chatLayoutContainerRef.current) {
+            chatLayoutContainerRef.current.style.transition = '';
+          }
+        }, 200); // Slightly longer than transition duration
+      }
+    });
+  }, [isMobile]);
 
-      adjustLayoutAndScroll();
-      window.visualViewport?.addEventListener('resize', adjustLayoutAndScroll);
+  // Effect to handle container height adjustment on mobile
+  useEffect(() => {
+    if (isMobile) {
+      adjustContainerHeight(); // Initial call when isMobile becomes true
+      window.visualViewport?.addEventListener('resize', adjustContainerHeight);
 
       return () => {
-        window.visualViewport?.removeEventListener('resize', adjustLayoutAndScroll);
-        // Reset height when cleaning up mobile effect or if isMobile becomes false
-        // This helps if the component re-renders with isMobile false before this effect re-runs
-        if (mainContainer) mainContainer.style.height = ''; 
+        window.visualViewport?.removeEventListener('resize', adjustContainerHeight);
+        if (chatLayoutContainerRef.current) {
+          chatLayoutContainerRef.current.style.height = ''; 
+        }
       };
     } else {
-      // On Desktop: Remove any inline height style to let CSS classes take over
-      mainContainer.style.height = ''; 
+      // On Desktop: Remove any inline height style
+      if (chatLayoutContainerRef.current) {
+        chatLayoutContainerRef.current.style.height = ''; 
+      }
       logger.debug('[ChatLayout] Desktop: Cleared inline container height');
     }
-  }, [isMobile]); // Rerun if isMobile changes
+  }, [isMobile, adjustContainerHeight]); // Rerun if isMobile or adjustContainerHeight changes
 
   // Check if we're on a mobile device
   useEffect(() => {
@@ -101,6 +133,26 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
       window.removeEventListener('resize', checkIfMobile);
     };
   }, []);
+
+  // Wrapper for adjustContainerHeight to call it multiple times on focus
+  const handleInputFocus = useCallback(() => {
+    if (isMobile) {
+      logger.debug("[ChatLayout] handleInputFocus called on mobile");
+      
+      // Force immediate scroll to top - this helps reduce perceived delay
+      if (window.scrollY > 0) {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      
+      // Immediate adjustment on focus
+      adjustContainerHeight();
+      
+      // Additional strategic adjustments timed to match keyboard animation
+      // Focus on fewer, more strategic timings rather than many calls
+      setTimeout(() => adjustContainerHeight(), 50);  // Early keyboard animation
+      setTimeout(() => adjustContainerHeight(), 300); // Middle of keyboard animation (most keyboards take ~300-400ms to appear)
+    }
+  }, [isMobile, adjustContainerHeight]);
 
   // Desktop layout with resizable panels
   function DesktopLayout() {
@@ -192,8 +244,12 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
                     {children}
                   </ChatContent>
                 </div>
-                <div ref={chatInputContainerRef} className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
-                  <ChatInput locale={locale} isMobile={isMobile} />
+                <div className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
+                  <ChatInput 
+                    locale={locale} 
+                    isMobile={isMobile} 
+                    onInputFocus={handleInputFocus}
+                  />
                 </div>
               </div>
             </ChatProvider>
@@ -246,8 +302,12 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
             {children}
           </ChatContent>
         </div>
-        <div ref={chatInputContainerRef} className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
-          <ChatInput locale={locale} isMobile={isMobile} />
+        <div className="sticky bottom-0 px-4 py-2 md:p-4 bg-background/80 backdrop-blur-sm">
+          <ChatInput 
+            locale={locale} 
+            isMobile={isMobile} 
+            onInputFocus={handleInputFocus}
+          />
         </div>
       </ChatProvider>
     </div>
@@ -256,16 +316,15 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
   return (
     <TooltipProvider>
       <div 
-        ref={chatLayoutContainerRef}
+        ref={chatLayoutContainerRef} 
         className={cn(
-          "h-screen flex flex-col bg-background", 
-          "transition-height duration-200 ease-in-out"
+          "flex flex-col",
+          !isMobile && "h-[calc(100vh-4rem)]",
+          "transition-opacity duration-300 ease-in-out"
         )}
-        style={{ overflowAnchor: 'none' }}
+        style={{ opacity: 1 }}
       >
-        <div className="overflow-hidden flex-grow flex flex-col">
-           {isMobile ? <MobileLayout /> : <DesktopLayout />}
-        </div>
+        {isMobile ? <MobileLayout /> : <DesktopLayout />}
       </div>
     </TooltipProvider>
   );

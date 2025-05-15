@@ -52,6 +52,7 @@ export function generateViewport({ params }: { params: { locale: string } }): Vi
     width: 'device-width',
     initialScale: 1,
     viewportFit: 'cover',
+    interactiveWidget: 'resizes-content',
   };
 }
 
@@ -88,11 +89,12 @@ export default async function LocaleLayout({
       dir={isRtl ? "rtl" : "ltr"} 
       suppressHydrationWarning
       className={cn(
-        isRtl && "rtl"
+        isRtl && "rtl",
+        "h-full"
       )}
     >
       <body className={cn(
-        `${ibmPlexSans.variable} ${ibmPlexSansArabic.variable} antialiased min-h-screen flex flex-col`,
+        `${ibmPlexSans.variable} ${ibmPlexSansArabic.variable} antialiased h-full flex flex-col`,
         isRtl ? "font-ibm-plex-sans-arabic" : "font-sans"
       )}>
         <ThemeProvider
@@ -103,7 +105,7 @@ export default async function LocaleLayout({
         >
           <ClientProviders messages={localeMessages} locale={locale}>
             <Toaster position="top-center" reverseOrder={false} />
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col h-full">
               <div className="flex-grow">
                 {children}
               </div>
