@@ -98,7 +98,7 @@ export function ChatLayout({ locale, messages, children, conversationId }: ChatL
             context="ChatLayout.Sidebar"
           >
             <NextIntlClientProvider locale={locale} messages={messages}>
-              <div className="flex flex-col h-full bg-card">
+              <div className="flex flex-col h-full bg-card w-full overflow-hidden">
                 <div className="py-2 flex bg-card">
                   <SidebarButton 
                     variant="ghost" 

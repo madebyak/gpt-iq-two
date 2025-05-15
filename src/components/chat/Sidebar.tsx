@@ -45,8 +45,15 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
   const renderRecentLabel = useMemo(() => {
     if (collapsed) return null;
     
+    // When not collapsed, hide if container is too narrow
     return (
-      <div className="py-1 mt-2 px-4">
+      <div className={cn(
+        "py-1 mt-2 px-4",
+        // Hide if the @sidebar container is less than 10rem (160px) wide
+        // This class will be applied if the container query matches.
+        // We assume a container name 'sidebar' is set on the parent.
+        "@[10rem]/sidebar:hidden" 
+      )}>
         <div className={cn(
           "text-xs font-medium text-muted-foreground uppercase tracking-wider", 
           isRtl && "text-right w-full"
@@ -64,7 +71,8 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
     >
       <div 
         className={cn(
-          "flex flex-col h-full bg-card transition-all duration-300 ease-in-out"
+          "flex flex-col h-full bg-card transition-all duration-300 ease-in-out",
+          "@container/sidebar" // Define this div as a container named 'sidebar'
         )}
       >
         {/* New Chat Button - Wrapped for margin */}
@@ -80,7 +88,7 @@ export function Sidebar({ collapsed = false, locale }: SidebarProps) {
         {renderRecentLabel}
         
         {/* Conversation List */}
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto overflow-x-hidden">
           <ConversationList
             conversations={conversations}
             loading={loading}

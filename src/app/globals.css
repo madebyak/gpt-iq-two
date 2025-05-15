@@ -306,3 +306,9 @@ html,
 body {
   overflow: hidden;
 }
+
+/* Add this new rule */
+[data-radix-scroll-area-viewport] > div[style*="min-width"][style*="display: table"] {
+  min-width: 0 !important;
+  width: 100% !important; /* Also try to force width to its container */
+}
