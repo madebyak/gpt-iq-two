@@ -1,5 +1,5 @@
 import { ChatLayout } from "@/components/layout/ChatLayout";
-import Navbar from "@/components/layout/navbar";
+import NavbarClient from "@/components/layout/navbar-client";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { getMessages } from 'next-intl/server';
@@ -94,7 +94,7 @@ export default async function ConversationPage({
     
     return (
       <>
-        <Navbar />
+        <NavbarClient />
         <ChatLayout 
           locale={params.locale}
           conversationId={params.id}
@@ -106,7 +106,7 @@ export default async function ConversationPage({
     console.error("Error in ConversationPage:", error);
     return (
       <>
-        <Navbar />
+        <NavbarClient />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="bg-card p-6 rounded-lg shadow-lg max-w-md text-center">
             <h3 className="text-lg font-medium mb-2 text-destructive">Error Loading Conversation</h3>

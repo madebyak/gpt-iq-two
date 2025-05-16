@@ -526,5 +526,9 @@
   "SponsorshipPage": {
     "title": "Sponsorship",
     "contentPlaceholder": "Sponsorship details coming soon."
+  },
+  "FeatureRequest": {
+    "pleaseLogIn": "Please sign in to submit feedback or requests.",
+    "loading": "Loading authentication status"
   }
 }

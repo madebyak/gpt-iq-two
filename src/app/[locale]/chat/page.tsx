@@ -1,5 +1,5 @@
 import { ChatLayout } from "@/components/layout/ChatLayout";
-import Navbar from "@/components/layout/navbar";
+import NavbarClient from "@/components/layout/navbar-client";
 import { getMessages } from 'next-intl/server';
 
 export default async function ChatPage({ params }: { params: { locale: string } }) {
@@ -10,7 +10,7 @@ export default async function ChatPage({ params }: { params: { locale: string } 
   
   return (
     <>
-      <Navbar />
+      <NavbarClient />
       {/* Pass all messages down to the layout to ensure all namespaces are available */}
       {/* ChatLayout will render the correct ChatContent and ChatInput internally */}
       <ChatLayout locale={params.locale} messages={messages} />

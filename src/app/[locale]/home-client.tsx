@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/components/layout/navbar";
+import NavbarClient from "@/components/layout/navbar-client";
 import { ReactNode } from "react";
 import { NextIntlClientProvider } from 'next-intl';
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ export default function HomeClient({
 }: HomeClientProps) {
   const content = (
     <div className={cn("flex flex-col h-full w-full")}>
-      <Navbar />
+      <NavbarClient />
       <div className={cn("flex-grow h-0")}>
         {children}
       </div>

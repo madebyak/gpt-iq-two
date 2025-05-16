@@ -5,19 +5,12 @@ import { useLocale } from "next-intl";
 import dynamic from 'next/dynamic';
 import { useAuth } from "@/lib/auth/auth-context";
 import { useMediaQuery } from "@/lib/hooks/useMediaQuery";
-// import Navbar from "@/components/layout/navbar";
+import NavbarClient from "@/components/layout/navbar-client";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils";
 // import { SidebarNav } from "./SidebarNav";
 // import { MobileNav } from "./MobileNav";
 // import { Breadcrumbs } from "./Breadcrumbs";
-
-// Dynamically import Navbar with SSR turned off
-const Navbar = dynamic(() => import('@/components/layout/navbar'), { 
-  ssr: false,
-  // You might want a placeholder for Navbar if it causes layout shifts
-  // loading: () => <div className=\"h-16 border-b flex items-center justify-between px-4 animate-pulse bg-muted/60\"><div classname=\"h-7 w-24 bg-muted animate-pulse rounded-md\"></div><div classname=\"h-9 w-40 bg-muted animate-pulse rounded-md\"></div></div>
-});
 
 // Dynamically import other layout components
 const SidebarNav = dynamic(() => import('./SidebarNav').then(mod => mod.SidebarNav), { ssr: false });
@@ -44,7 +37,7 @@ export function AccountLayout({ children, title, description, activeItem = 'acco
 
   if (isLoading) return (
     <>
-      <Navbar />
+      <NavbarClient />
       <Container className="py-10">
         <div className="flex">
           {/* Sidebar skeleton */}
@@ -74,7 +67,7 @@ export function AccountLayout({ children, title, description, activeItem = 'acco
   if (isMobile) {
     return (
       <div dir={isRtl ? 'rtl' : 'ltr'} className="flex flex-col h-screen">
-        <Navbar />
+        <NavbarClient />
         <main className="flex-grow overflow-y-auto py-6 px-4 pb-16">
           {children}
         </main>
@@ -85,7 +78,7 @@ export function AccountLayout({ children, title, description, activeItem = 'acco
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
-      <Navbar />
+      <NavbarClient />
       <Container className={cn('py-8 flex', isRtl ? 'flex-row-reverse' : 'flex-row')}>
         <SidebarNav activeItem={activeItem} />
         <div className="flex-1">

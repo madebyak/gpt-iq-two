@@ -328,5 +328,9 @@
   "SponsorshipPage": {
     "title": "الرعاية",
     "contentPlaceholder": "تفاصيل الرعاية قادمة قريباً."
+  },
+  "FeatureRequest": {
+    "pleaseLogIn": "يرجى تسجيل الدخول لتقديم ملاحظاتك أو طلباتك.",
+    "loading": "جاري تحميل حالة المصادقة"
   }
 }
