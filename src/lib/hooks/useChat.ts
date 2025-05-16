@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/lib/auth/auth-context";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter, usePathname } from "@/i18n/navigation";
 
 export type MessageRole = "user" | "assistant";
 
@@ -25,6 +26,8 @@ export interface ConversationMeta {
 export function useChat(initialConversationId?: string) {
   const { user, isLoading: isAuthLoading } = useAuth();
   const supabase = createClient();
+  const router = useRouter();
+  const pathname = usePathname();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -402,6 +405,15 @@ export function useChat(initialConversationId?: string) {
   // Send a message to the chat API
   const sendMessage = useCallback(
     async (content: string) => {
+      // Check if user is authenticated
+      if (!user) {
+        setError("Please log in to send messages."); // Optionally set an error message
+        // Redirect to login page with returnUrl
+        router.push(`/auth/login?returnUrl=${pathname}`);
+        setIsLoading(false); // Reset loading state
+        return; // Stop further execution
+      }
+
       try {
         setError(null);
         setIsLoading(true); // Set loading state immediately
@@ -711,7 +723,7 @@ export function useChat(initialConversationId?: string) {
         setIsLoading(false);
       }
     },
-    [addMessage, messages, conversationId, user, supabase]
+    [addMessage, messages, conversationId, user, supabase, router, pathname]
   );
   
   // Clear all messages and start a new conversation
