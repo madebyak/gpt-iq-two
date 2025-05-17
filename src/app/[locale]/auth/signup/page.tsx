@@ -247,7 +247,7 @@ export default function SignupPage({ params }: SignupPageProps) {
               id="terms" 
               className="mt-1" 
               checked={termsAccepted}
-              onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+              onCheckedChange={(checked: boolean) => setTermsAccepted(checked as boolean)}
               disabled={isLoading || googleLoading}
             />
             <Label htmlFor="terms" className="text-base font-medium leading-normal">
