@@ -530,15 +530,15 @@
   },
   "FeatureRequestPage": {
     "metadataTitle": "Feature Request",
-    "heading": "Write the Next Chapter of Jahiz",
-    "subheading": "Your feature ideas will script Iraq's digital future—share what you need and watch it come to life.",
+    "heading": "Shape the Next Wave of Jahiz Features",
+    "subheading": "Your suggestions will define Iraq's digital future—share your needs and watch them come to life.",
     "categoryFeatureRequest": "Feature Request",
     "categoryReportBugs": "Report Bugs",
-    "categoryFeedback": "Feedback",
+    "categoryFeedback": "Feedback and Suggestions",
     "categoryOthers": "Others",
     "categoryAriaLabel": "Select a category",
-    "detailsRemainingChars": "{remainingChars, plural, =0 {No characters remaining} one {# character remaining} other {# characters remaining}}",
-    "detailsPlaceholder": "Write your detailed request here...",
+    "detailsRemainingChars": "{remainingChars, plural, zero {No characters remaining} one {1 character remaining} other {# characters remaining}}",
+    "detailsPlaceholder": "Type your detailed request here...",
     "detailsAriaLabel": "Request details",
     "submitButton": "Submit",
     "submittingButton": "Submitting...",
@@ -548,8 +548,15 @@
     "apiMessages": {
       "errorNotLoggedIn": "You must be logged in to submit feedback.",
       "errorMissingFields": "Please select at least one category and provide details for your request.",
-      "errorGeneral": "Failed to submit your request. Please try again later.",
+      "errorGeneral": "Your request submission failed. Please try again later.",
       "successGeneral": "Your request has been submitted successfully! Thank you."
-    }
+    },
+    "featureSubmitErrorGeneral": "Sorry, something went wrong while submitting your request. Please try again.",
+    "successGeneral": "Your request has been submitted successfully! Thank you."
+  },
+  "Changelog": {
+    "title": "Changelog",
+    "description": "See what's new in our latest updates.",
+    "noEntries": "No changelog entries yet. Check back soon!"
   }
 }

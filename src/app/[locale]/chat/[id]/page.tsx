@@ -1,13 +1,13 @@
 import { ChatLayout } from "@/components/layout/ChatLayout";
 import NavbarClient from "@/components/layout/navbar-client";
-import { createClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { getMessages } from 'next-intl/server';
 
 // Check if the conversation exists before rendering
 export async function generateMetadata({ params }: { params: { locale: string; id: string } }) {
   try {
-    const supabase = createClient();
+    const supabase = createSupabaseServerClient();
     
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -57,7 +57,7 @@ export default async function ConversationPage({
   params: { locale: string; id: string } 
 }) {
   try {
-    const supabase = createClient();
+    const supabase = createSupabaseServerClient();
     
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();

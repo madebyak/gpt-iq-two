@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { StreamingTextResponse, Message as VercelAIMessage } from "ai";
-import { createClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { z } from 'zod';
 
 // Zod schema for input validation
@@ -28,7 +28,7 @@ const genAI = new GoogleGenerativeAI(apiKey as string);
 // Generate stream handler for Gemini API
 export async function POST(req: NextRequest) {
   // 1. Authentication Check
-  const supabase = createClient();
+  const supabase = createSupabaseServerClient();
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
   if (sessionError || !session) {

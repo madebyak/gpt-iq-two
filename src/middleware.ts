@@ -1,7 +1,7 @@
 import createIntlMiddleware from 'next-intl/middleware';
 import { locales, defaultLocale } from './i18n/config';
 import { NextResponse, type NextRequest } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 // Define public routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -66,7 +66,7 @@ async function middleware(request: NextRequest) {
   // For protected routes, check authentication
   try {
     // Create a Supabase client for the request
-    const supabase = createClient();
+    const supabase = createSupabaseServerClient();
     
     // Get the session
     const { data: { session } } = await supabase.auth.getSession();

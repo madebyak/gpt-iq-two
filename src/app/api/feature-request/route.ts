@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server'; // Use server client for route handlers
+import { createSupabaseServerClient } from '@/lib/supabase/server'; // Corrected import
 import { z } from 'zod';
 
 // Define the expected schema for the request body
@@ -10,7 +10,7 @@ const featureRequestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const supabase = createClient();
+  const supabase = createSupabaseServerClient();
 
   // 1. Check user authentication
   const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -14,6 +14,14 @@ const nextConfig = {
         // port: '', // Optional: add if needed
         // pathname: '/a/**', // Optional: be more specific if needed
       },
+      {
+        protocol: 'https', // Added for placehold.co
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'bmpczgoxslplnpsdajby.supabase.co',
+      },
       // Add other patterns here if needed
     ],
   },
