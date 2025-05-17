@@ -184,7 +184,7 @@ export default function FeatureRequestContent() {
               "px-6 py-3 h-auto border-2 rounded-lg transition-all duration-200 ease-in-out",
               "data-[state=on]:border-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary",
               "hover:bg-accent/50 hover:border-accent-foreground/30",
-              "min-w-[150px]"
+              "w-full sm:w-auto sm:min-w-[150px]"
             )}
             aria-label={category.label}
           >
@@ -203,7 +203,7 @@ export default function FeatureRequestContent() {
           className={cn(
             "text-sm mb-1 w-full",
             remainingChars === 0 ? "text-destructive" : "text-muted-foreground",
-            "text-left"
+            isArabicLocale ? "text-right" : "text-left"
             )}
         >
           {t('detailsRemainingChars', { remainingChars })}
@@ -215,7 +215,7 @@ export default function FeatureRequestContent() {
           placeholder={t('detailsPlaceholder')}
           maxLength={MAX_CHARS}
           rows={6}
-          className="w-full p-3 border-2 rounded-lg transition-colors duration-200 ease-in-out resize-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-input"
+          className="w-full p-3 border-2 rounded-lg transition-colors duration-200 ease-in-out resize-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-input text-base"
           aria-label={t('detailsAriaLabel')}
         />
       </div>

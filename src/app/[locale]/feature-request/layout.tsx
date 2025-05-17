@@ -8,11 +8,13 @@ export default async function FeatureRequestLayout({
   params: { locale: string };
 }) {
   return (
-    <>
-      <NavbarClient />
-      <main className="flex-1 overflow-hidden">
+    <div className="flex flex-col h-full">
+      <div className="flex-shrink-0">
+        <NavbarClient />
+      </div>
+      <main className="flex-1 overflow-y-auto min-h-0">
         {children}
       </main>
-    </>
+    </div>
   );
 } 

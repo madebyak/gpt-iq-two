@@ -110,7 +110,7 @@ export default async function LocaleLayout({
           <ClientProviders messages={localeMessages} locale={locale}>
             <Toaster position="top-center" reverseOrder={false} />
             <div className="flex flex-col h-full">
-              <div className="flex-grow">
+              <div className="flex-grow min-h-0">
                 {children}
               </div>
               <OnboardingTrigger />
