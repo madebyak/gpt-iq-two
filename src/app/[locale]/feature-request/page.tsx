@@ -1,11 +1,11 @@
-import { getTranslations } from 'next-intl/server';
 import { Metadata } from 'next';
 import FeatureRequestContent from './feature-request-content';
+import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
-  const t = await getTranslations({ locale, namespace: 'Navbar' });
+  const t = await getTranslations({ locale, namespace: 'FeatureRequestPage' });
   return {
-    title: t('featureRequest'),
+    title: t('metadataTitle'),
   };
 }
 
@@ -15,22 +15,11 @@ interface FeatureRequestPageProps {
   };
 }
 
-export default function FeatureRequestPage({ params: { locale } }: FeatureRequestPageProps) {
-  const isArabic = locale === 'ar';
-
-  const headingText = isArabic 
-    ? "ساهم في المرحلة القادمة من ميزات \"جاهز\"" 
-    : "Write the Next Chapter of Jahiz";
+export default async function FeatureRequestPage({ params: { locale } }: FeatureRequestPageProps) {
+  const t = await getTranslations({ locale, namespace: 'FeatureRequestPage' });
   
-  const subheadingText = isArabic
-    ? "مقتراحتكم سترسم ملامح مستقبل العراق الرقمي — شاركوا احتياجاتكم وشاهدوها تتحقق."
-    : "Your feature ideas will script Iraq's digital future—share what you need and watch it come to life.";
-
   return (
     <FeatureRequestContent 
-      locale={locale} 
-      headingText={headingText} 
-      subheadingText={subheadingText} 
     />
   );
 } 

@@ -329,8 +329,28 @@
     "title": "الرعاية",
     "contentPlaceholder": "تفاصيل الرعاية قادمة قريباً."
   },
-  "FeatureRequest": {
-    "pleaseLogIn": "يرجى تسجيل الدخول لتقديم ملاحظاتك أو طلباتك.",
-    "loading": "جاري تحميل حالة المصادقة"
+  "FeatureRequestPage": {
+    "metadataTitle": "طلب ميزة",
+    "heading": "ساهم في المرحلة القادمة من ميزات \"جاهز\"",
+    "subheading": "مقتراحتكم سترسم ملامح مستقبل العراق الرقمي — شاركوا احتياجاتكم وشاهدوها  تتحقق.",
+    "categoryFeatureRequest": "طلب ميزة",
+    "categoryReportBugs": "الإبلاغ عن الأخطاء",
+    "categoryFeedback": "ملاحظات واقتراحات",
+    "categoryOthers": "أخرى",
+    "categoryAriaLabel": "اختر فئة",
+    "detailsRemainingChars": "{remainingChars, plural, zero {لم يتبق أي حرف} one {يتبقى حرف واحد} two {يتبقى حرفان} few {يتبقى # أحرف} many {يتبقى # حرفًا} other {يتبقى # حرفًا}}",
+    "detailsPlaceholder": "اكتب طلبك المفصل هنا...",
+    "detailsAriaLabel": "تفاصيل الطلب",
+    "submitButton": "إرسال",
+    "submittingButton": "جارٍ الإرسال...",
+    "authLoading": "جاري التحميل...",
+    "authSignInPrompt": "يرجى تسجيل الدخول لتقديم الملاحظات أو الطلبات.",
+    "feedbackSubmitSuccess": "تم إرسال ملاحظاتك بنجاح! شكراً لك.",
+    "apiMessages": {
+      "errorNotLoggedIn": "يجب تسجيل الدخول لتقديم الملاحظات.",
+      "errorMissingFields": "يرجى اختيار فئة واحدة على الأقل وتقديم تفاصيل لطلبك.",
+      "errorGeneral": "فشل إرسال طلبك. يرجى المحاولة مرة أخرى لاحقاً.",
+      "successGeneral": "تم إرسال طلبك بنجاح! شكراً لك."
+    }
   }
 }

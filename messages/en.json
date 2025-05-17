@@ -10,7 +10,8 @@
     "aboutUs": "About Us",
     "aboutUsDescription": "Learn more about our team and mission",
     "signIn": "Sign In",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "openMainMenu": "Open Main Menu"
   },
   "ThemeToggle": {
     "light": "Light",
@@ -527,8 +528,28 @@
     "title": "Sponsorship",
     "contentPlaceholder": "Sponsorship details coming soon."
   },
-  "FeatureRequest": {
-    "pleaseLogIn": "Please sign in to submit feedback or requests.",
-    "loading": "Loading authentication status"
+  "FeatureRequestPage": {
+    "metadataTitle": "Feature Request",
+    "heading": "Write the Next Chapter of Jahiz",
+    "subheading": "Your feature ideas will script Iraq's digital future—share what you need and watch it come to life.",
+    "categoryFeatureRequest": "Feature Request",
+    "categoryReportBugs": "Report Bugs",
+    "categoryFeedback": "Feedback",
+    "categoryOthers": "Others",
+    "categoryAriaLabel": "Select a category",
+    "detailsRemainingChars": "{remainingChars, plural, =0 {No characters remaining} one {# character remaining} other {# characters remaining}}",
+    "detailsPlaceholder": "Write your detailed request here...",
+    "detailsAriaLabel": "Request details",
+    "submitButton": "Submit",
+    "submittingButton": "Submitting...",
+    "authLoading": "Loading...",
+    "authSignInPrompt": "Please sign in to submit feedback or requests.",
+    "feedbackSubmitSuccess": "Your feedback has been submitted successfully! Thank you.",
+    "apiMessages": {
+      "errorNotLoggedIn": "You must be logged in to submit feedback.",
+      "errorMissingFields": "Please select at least one category and provide details for your request.",
+      "errorGeneral": "Failed to submit your request. Please try again later.",
+      "successGeneral": "Your request has been submitted successfully! Thank you."
+    }
   }
 }

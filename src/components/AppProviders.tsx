@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { AuthProvider } from "@/lib/auth/auth-context";
 
@@ -15,8 +15,17 @@ export default function AppProviders({
   children,
   locale,
 }: AppProvidersProps) {
+
+  useEffect(() => {
+    console.log("[AppProviders] Received messages:", JSON.stringify(messages, null, 2));
+  }, [messages]);
+
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider 
+      locale={locale} 
+      messages={messages}
+      timeZone="Asia/Baghdad"
+    >
       <AuthProvider>
         {children}
       </AuthProvider>

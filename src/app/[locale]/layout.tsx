@@ -81,7 +81,11 @@ export default async function LocaleLayout({
 
   // Restore message loading
   const messages = (await import(`../../../messages/${locale}.json`)).default;
+  
+  // END ADDED FOR DIAGNOSTICS
+
   const localeMessages = messages;
+  console.log(`[LocaleLayout - ${locale}] Messages loaded:`, JSON.stringify(localeMessages, null, 2));
 
   return (
     <html 

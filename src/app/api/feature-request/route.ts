@@ -67,7 +67,8 @@ export async function POST(request: Request) {
     }
 
     console.log('API: Feedback submitted successfully', data);
-    return NextResponse.json({ message: 'Feedback submitted successfully!', data }, { status: 201 });
+    // Return a messageKey for translation on the client
+    return NextResponse.json({ messageKey: 'feedbackSubmitSuccess', data }, { status: 201 });
 
   } catch (error) {
     console.error('API: Unexpected error during submission', error);

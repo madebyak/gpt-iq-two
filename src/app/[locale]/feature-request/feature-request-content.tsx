@@ -9,29 +9,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/auth-context";
-import { useTranslations } from "next-intl";
-
-interface FeatureRequestContentProps {
-  locale: string;
-  headingText: string;
-  subheadingText: string;
-}
+import { useTranslations, useLocale } from 'next-intl';
 
 const MAX_CHARS = 1000;
 
-export default function FeatureRequestContent({ 
-  locale, 
-  headingText, 
-  subheadingText
-}: FeatureRequestContentProps) {
-  const isArabic = locale === 'ar';
+export default function FeatureRequestContent() {
+  const t = useTranslations('FeatureRequestPage');
+  const locale = useLocale();
   const { user, session, isLoading: isLoadingAuth } = useAuth();
-  const t = useTranslations("FeatureRequest");
-
+  
   const [triggerHeading, setTriggerHeading] = useState(false);
   const [triggerSubheading, setTriggerSubheading] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [requestDetails, setRequestDetails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [apiSuccessMessage, setApiSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -55,68 +48,121 @@ export default function FeatureRequestContent({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!session) {
       console.log("User not authenticated. Cannot submit.");
+      setApiError(t('apiMessages.errorNotLoggedIn'));
       return;
     }
-    console.log("Submit clicked!");
-    console.log("Selected Categories:", selectedCategories);
-    console.log("Request Details:", requestDetails);
-    // Here you would typically send this data to your backend/API
-    // For now, let's clear the fields as a simple feedback
-    setSelectedCategories([]);
-    setRequestDetails("");
-    // You might want to show a success toast/message here
+    if (selectedCategories.length === 0 || requestDetails.trim() === "") {
+      setApiError(t('apiMessages.errorMissingFields'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setApiError(null);
+    setApiSuccessMessage(null);
+
+    try {
+      const response = await fetch('/api/feature-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          categories: selectedCategories,
+          details: requestDetails,
+          pageUrl: window.location.href,
+        }),
+      });
+
+      const result = await response.json();
+
+      console.log("API Response messageKey:", result.messageKey);
+
+      if (!response.ok) {
+        const errorMessage = result.messageKey ? t(result.messageKey as any) : (result.error || t('apiMessages.errorGeneral'));
+        throw new Error(errorMessage);
+      }
+
+      const successMsg = result.messageKey ? t(result.messageKey as any) : (result.message || t('apiMessages.successGeneral'));
+      setApiSuccessMessage(successMsg);
+      setSelectedCategories([]);
+      setRequestDetails("");
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      setApiError(error.message || t('apiMessages.errorGeneral'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const categories = [
-    { id: "featureRequest", label: isArabic ? "طلب ميزة" : "Feature Request" },
-    { id: "reportBugs", label: isArabic ? "الإبلاغ عن خطأ" : "Report Bugs" },
-    { id: "feedback", label: isArabic ? "ملاحظات" : "Feedback" },
-    { id: "others", label: isArabic ? "أخرى" : "Others" },
+    { id: "featureRequest", label: t('categoryFeatureRequest') },
+    { id: "reportBugs", label: t('categoryReportBugs') },
+    { id: "feedback", label: t('categoryFeedback') },
+    { id: "others", label: t('categoryOthers') },
   ];
 
   const remainingChars = MAX_CHARS - requestDetails.length;
-  const canSubmit = selectedCategories.length > 0 && requestDetails.trim().length > 0 && !!session && !isLoadingAuth;
+  const canSubmit = selectedCategories.length > 0 && requestDetails.trim().length > 0 && !!session && !isLoadingAuth && !isSubmitting;
+
+  const isArabicLocale = locale === 'ar';
 
   return (
     <div className="flex flex-col items-center p-6 pt-12 md:pt-16 w-full">
       <SplitText
-        text={headingText}
-        isArabic={isArabic}
+        text={t('heading')}
         trigger={triggerHeading}
+        isArabic={isArabicLocale}
         className={cn(
           "font-bold mb-6 md:mb-8 leading-tight text-center",
-          isArabic ? "text-6xl md:text-7xl" : "text-7xl md:text-8xl"
+          isArabicLocale ? "text-6xl md:text-7xl" : "text-7xl md:text-8xl"
         )}
-        delay={isArabic ? 100 : 50}
+        delay={isArabicLocale ? 100 : 50}
         animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
         animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
         easing={easings.easeOutCubic}
         onAnimationComplete={handleHeadingAnimationComplete}
       />
       <SplitText
-        text={subheadingText}
-        isArabic={isArabic}
+        text={t('subheading')}
         trigger={triggerSubheading}
-        className="text-3xl md:text-4xl text-muted-foreground max-w-3xl md:max-w-4xl !text-center mb-10 md:mb-12"
-        delay={isArabic ? 100 : 25}
+        isArabic={isArabicLocale}
+        className={cn(
+          "text-muted-foreground max-w-3xl md:max-w-4xl !text-center mb-10 md:mb-12",
+          isArabicLocale ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
+        )}
+        delay={isArabicLocale ? 80 : 25}
         animationFrom={{ opacity: 0, transform: 'translate3d(0,30px,0)' }}
         animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
         easing={easings.easeOutCubic}
         onAnimationComplete={handleSubheadingAnimationComplete}
       />
 
+      {/* API Error Message */}
+      {apiError && (
+        <div className="mb-4 w-full max-w-xl md:max-w-2xl p-3 rounded-md bg-destructive/10 text-destructive text-center">
+          {apiError}
+        </div>
+      )}
+      
+      {/* API Success Message */}
+      {apiSuccessMessage && (
+        <div className="mb-4 w-full max-w-xl md:max-w-2xl p-3 rounded-md bg-primary/10 text-primary text-center">
+          {apiSuccessMessage}
+        </div>
+      )}
+
       {isLoadingAuth && (
         <div className="mb-10 text-muted-foreground">
-          {t("loading")}...
+          {t('authLoading')}
         </div>
       )}
 
       {!isLoadingAuth && !session && (
         <div className="mb-10 text-center p-4 border border-dashed rounded-md">
-          <p className="text-lg text-destructive">{t("pleaseLogIn")}</p>
+          <p className="text-lg text-destructive">{t('authSignInPrompt')}</p>
         </div>
       )}
 
@@ -128,7 +174,7 @@ export default function FeatureRequestContent({
           setSelectedCategories(value);
         }}
         className="flex flex-wrap justify-center gap-3 md:gap-4 mb-10 md:mb-12"
-        aria-label={isArabic ? "اختر فئة" : "Select a category"}
+        aria-label={t('categoryAriaLabel')}
       >
         {categories.map((category) => (
           <ToggleGroupItem
@@ -138,7 +184,7 @@ export default function FeatureRequestContent({
               "px-6 py-3 h-auto border-2 rounded-lg transition-all duration-200 ease-in-out",
               "data-[state=on]:border-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary",
               "hover:bg-accent/50 hover:border-accent-foreground/30",
-              isArabic ? "min-w-[120px]" : "min-w-[150px]"
+              "min-w-[150px]"
             )}
             aria-label={category.label}
           >
@@ -157,34 +203,34 @@ export default function FeatureRequestContent({
           className={cn(
             "text-sm mb-1 w-full",
             remainingChars === 0 ? "text-destructive" : "text-muted-foreground",
-            isArabic ? "text-right" : "text-left"
+            "text-left"
             )}
         >
-          {isArabic ? `الأحرف المتبقية: ${remainingChars}` : `${remainingChars} characters remaining`}
+          {t('detailsRemainingChars', { remainingChars })}
         </Label>
         <Textarea
           id="request-details-textarea"
           value={requestDetails}
           onChange={handleDetailsChange}
-          placeholder={isArabic ? "اكتب تفاصيل طلبك هنا..." : "Write your detailed request here..."}
+          placeholder={t('detailsPlaceholder')}
           maxLength={MAX_CHARS}
           rows={6}
           className="w-full p-3 border-2 rounded-lg transition-colors duration-200 ease-in-out resize-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-input"
-          aria-label={isArabic ? "تفاصيل الطلب" : "Request details"}
+          aria-label={t('detailsAriaLabel')}
         />
       </div>
 
       <div className="w-full max-w-xl md:max-w-2xl">
         <Button 
           onClick={handleSubmit}
-          disabled={!canSubmit || isLoadingAuth}
+          disabled={!canSubmit || isLoadingAuth || isSubmitting}
           className={cn(
             "w-full py-3 text-lg",
             "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary)/0.9)]"
           )}
           size="lg"
         >
-          {isArabic ? "إرسال" : "Submit"}
+          {isSubmitting ? t('submittingButton') : t('submitButton')}
         </Button>
       </div>
     </div>
